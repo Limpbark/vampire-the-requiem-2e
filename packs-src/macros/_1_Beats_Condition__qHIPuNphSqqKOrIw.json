@@ -1,0 +1,24 @@
+{
+  "_id": "qHIPuNphSqqKOrIw",
+  "name": "+1 Beats (Condition)",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "systems/mta/icons/macros/beat_condition.svg",
+  "scope": "global",
+  "command": "for(let t of canvas.tokens.controlled){\n if(t){\nif(t.actor){\nconsole.trace(t)\nt.actor.addProgress(\"Condition\", 1, 0);\nChatMessage.create({\nspeaker: ChatMessage.getSpeaker({actor: t.actor}),\ncontent: \"Got a Beat for a Condition!\"\n});\n}\n}\n}",
+  "folder": null,
+  "sort": 0,
+  "permission": {
+    "default": 1,
+    "rgSvVH0I52G7WbzM": 3
+  },
+  "flags": {
+    "furnace": {
+      "runAsGM": false
+    },
+    "core": {
+      "sourceId": "Macro.mJjzMNOvJzsSv15W"
+    }
+  },
+  "_key": "!macros!qHIPuNphSqqKOrIw"
+}

@@ -1,0 +1,69 @@
+{
+  "id": "vampire-the-requiem-2e",
+  "title": "Vampire the Requiem 2E",
+  "description": "A Foundry VTT game system for Vampire: The Requiem 2nd Edition, focused on Vampire, Ghoul, and Mortal characters. An offshoot of the Chronicles of Darkness 2E system by SoulCake, updated for Foundry VTT v14.",
+  "version": "1.0.0",
+  "socket": true,
+  "authors": [
+    {
+      "name": "Matthew Schouten"
+    },
+    {
+      "name": "SoulCake",
+      "discord": "soulcake",
+      "ko-fi": "soulcake",
+      "flags": {
+        "role": "Original Chronicles of Darkness 2E system author"
+      }
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.361"
+  },
+  "url": "https://github.com/OWNER/vampire-the-requiem-2e",
+  "manifest": "https://github.com/OWNER/vampire-the-requiem-2e/releases/latest/download/system.json",
+  "download": "https://github.com/OWNER/vampire-the-requiem-2e/releases/latest/download/system.zip",
+  "changelog": "https://github.com/OWNER/vampire-the-requiem-2e/releases",
+  "readme": "https://github.com/OWNER/vampire-the-requiem-2e/blob/main/README.md",
+  "bugs": "https://github.com/OWNER/vampire-the-requiem-2e/issues",
+  "esmodules": ["module/mta.js"],
+  "styles": ["styles/default.css", "styles/override.css"],
+  "packs": [
+    {
+      "name": "macros",
+      "label": "Macros",
+      "system": "vampire-the-requiem-2e",
+      "path": "./packs/macros",
+      "type": "Macro"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "French",
+      "path": "lang/fr.json"
+    },
+    {
+      "lang": "es",
+      "name": "Spanish",
+      "path": "lang/es.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Russian",
+      "path": "lang/ru.json"
+    }
+  ],
+  "initiative": "1d10 + @derivedTraits.initiativeMod.final",
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "health"
+}

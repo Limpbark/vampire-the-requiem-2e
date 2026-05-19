@@ -1,0 +1,24 @@
+{
+  "_id": "V4fEECSfXT0sA39n",
+  "name": "Add Beats (Custom)",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "systems/mta/icons/macros/beat_custom.svg",
+  "scope": "global",
+  "command": "for(let token of canvas.tokens.controlled){\nif(token){\nif(token.actor){\ntoken.actor.addProgressDialogue();\nChatMessage.create({\nuser: game.user._id,\nspeaker: ChatMessage.getSpeaker({actor: token.actor}),\ncontent: \"Got some Beats!\"\n});\n}\n}}",
+  "folder": null,
+  "sort": 0,
+  "permission": {
+    "default": 1,
+    "rgSvVH0I52G7WbzM": 3
+  },
+  "flags": {
+    "furnace": {
+      "runAsGM": false
+    },
+    "core": {
+      "sourceId": "Macro.S2kX3B4LHEv7tncn"
+    }
+  },
+  "_key": "!macros!V4fEECSfXT0sA39n"
+}

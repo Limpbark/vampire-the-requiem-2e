@@ -1,0 +1,44 @@
+<form class="{{cssClass}} flexcol" autocomplete="off">
+  <header class="sheet-header flexrow">
+    <img class="profile" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+
+    <div class="header-details flexrow">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{item.name}}" placeholder="Item Name" />
+      </h1>
+      <div class="item-subtitle">
+        <h4 class="item-type">{{localize "MTA.Milestone"}}</h4>
+        <span class="item-status"></span>
+      </div>
+      <ul class="summary">
+        <li>
+          <label>{{localize "MTA.Type"}}</label> 
+          <select name="system.type">
+            {{selectOptions config.prometheanMilestoneTypes selected=system.type localize=true}}
+          </select>
+        </li>
+        <li>
+          <label>{{localize "MTA.Magnitude"}}</label> 
+          <select name="system.magnitude">
+            {{selectOptions config.prometheanMilestoneMagnitudes selected=system.magnitude localize=true}}
+          </select>
+        </li>
+      </ul>
+    </div>
+  </header>
+  <div class="gold-border"> </div>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs">
+    <a class="item" data-tab="description">{{localize "MTA.Description"}}</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Description Tab --}}
+    <div class="tab" data-tab="description">
+      {{editor enrichedDescription target="system.description" button=true owner=owner editable=editable}}
+    </div>
+  </section>
+</form>

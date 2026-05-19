@@ -1,0 +1,38 @@
+<div class="worldbuilding chat-card attack-card">
+  <div class="card-header">
+    <div class="flexrow">
+      <img class="item-img" src="{{utterance.img}}" title="{{utterance.name}}" width="36" height="36" />
+      <h3 class="item-name">{{utterance.name}}</h3>
+    </div>
+    <div class="flexrow arcanum">
+      <h5>{{chosenTier}}</h5>
+    </div>
+  </div>
+  <div class="card-content">
+    <div class="utterance-info-row">
+      <strong>{{localize "MTA.Mummy.Utterance.chat.cost"}}</strong> {{cost}}
+    </div>
+    <div class="utterance-info-row">
+      <strong>{{localize "MTA.Mummy.Utterance.chat.castingTime"}}</strong> {{castingTime}}
+    </div>
+    {{#each tierDesc}}
+    <div class="utterance-desc-wrap">
+      <label class="utterance-desc-header">
+        <input type="checkbox" class="utterance-desc-collapse-control">
+        <strong>{{ this.tier }}:</strong>
+        {{ this.pillar }}
+        {{ this.pillar_level }}
+        {{#if this.pillar_keywords}}
+        {{ this.pillar_keywords }}
+        {{/if}}
+      </label>
+      <div class="utterance-desc-content">
+        {{{this.desc}}}
+        {{#if show_pillar_effect}}
+        {{{this.pillar_effect}}}
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>

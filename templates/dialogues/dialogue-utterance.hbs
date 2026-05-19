@@ -1,0 +1,19 @@
+<form class="utterance-dialog {{cssClass}}" autocomplete="off">
+  <div class="stat-group">
+    <div class="form-line">
+      <label>{{localize 'MTA.Mummy.Utterance.dialog.labelTier'}}</label>
+      <select name="tier">
+        {{selectOptions tierOpts}}
+      </select>
+    </div>
+    <div class="form-line">
+      <label>{{localize 'MTA.Mummy.Utterance.dialog.labelIsDeathCurse'}}</label>
+      <label class="checkBox"><input type="checkbox" name="isDeathCurse"><span></span></label>
+    </div>
+  </div>
+  <footer>
+    <button type="submit" class="button stoneButton castUtterance">
+      {{localize 'MTA.Mummy.Utterance.dialog.btnSubmit'}}
+    </button>
+  </footer>
+</form>

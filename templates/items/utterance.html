@@ -1,0 +1,142 @@
+<form class="{{cssClass}} flexcol" autocomplete="off">
+    <header class="sheet-header flexrow">
+       <img class="profile" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+
+        <div class="header-details flexrow">
+          <h1 class="charname">
+            <input name="name" type="text" value="{{item.name}}" placeholder="Item Name" />
+          </h1>
+          <div class="item-subtitle">
+            <h4 class="item-type">{{localize "MTA.Mummy.Utterance.title"}}</h4>
+            <span class="item-status"></span>
+          </div>
+        </div>
+    </header>
+  <div class="gold-border"> </div>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs">
+      <a class="item" data-tab="tier1">{{localize "MTA.Mummy.Utterance.tabTier1"}}</a>
+      <a class="item" data-tab="tier2">{{localize "MTA.Mummy.Utterance.tabTier2"}}</a>
+      <a class="item" data-tab="tier3">{{localize "MTA.Mummy.Utterance.tabTier3"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        {{!-- Description Tab --}}
+        <div class="tab" data-tab="tier1">
+          <div class="item-stat-block">
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillar"}}</label>
+              <select name="system.tier1_pillar">
+                {{selectOptions config.utterancePillars selected=system.tier1_pillar localize=true}}
+              </select>
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarLvl"}}</label>
+              <input name="system.tier1_pillar_level" type="number" step="1" min="1" max="5" value="{{system.tier1_pillar_level}}" />
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarKeyword"}}</label>
+              <div class="checkStack">
+                <div class="checkRow"><label class="checkBox"><input name="system.tier1_pillar_keywords" type="checkbox" value="epic" {{#if mummyKeywords.t1.epic}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.epic"}}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier1_pillar_keywords" type="checkbox" value="curse" {{#if mummyKeywords.t1.curse}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.curse" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier1_pillar_keywords" type="checkbox" value="potency" {{#if mummyKeywords.t1.potency}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.potency" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier1_pillar_keywords" type="checkbox" value="subtle" {{#if mummyKeywords.t1.subtle}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.subtle" }}</label></div>
+              </div>
+            </div>
+            {{#if mummyKeywords.t1.potency}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPotencyValue"}}</label>
+              <input name="system.tier1_potency" type="number" step="1" min="1" max="99" value="{{system.tier1_potency}}" />
+            </div>
+            {{/if}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelDesc"}}</label>
+              {{editor tier1_desc_enriched target="system.tier1_desc" button=true owner=owner editable=editable}}
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarEffect"}}</label>
+              {{editor tier1_pillar_effect_enriched target="system.tier1_pillar_effect" button=true owner=owner editable=editable class="editor-sm"}}
+            </div>
+            {{{dicePoolList this fieldName='tier1_dicePool'}}}
+          </div>
+        </div>
+        <div class="tab" data-tab="tier2">
+          <div class="item-stat-block">
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillar"}}</label>
+              <select name="system.tier2_pillar">
+                {{selectOptions config.utterancePillars selected=system.tier2_pillar localize=true}}
+              </select>
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarLvl"}}</label>
+              <input name="system.tier2_pillar_level" type="number" step="1" min="1" max="5" value="{{system.tier2_pillar_level}}" />
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarKeyword"}}</label>
+              <div class="checkStack">
+                <div class="checkRow"><label class="checkBox"><input name="system.tier2_pillar_keywords" type="checkbox" value="epic" {{#if mummyKeywords.t2.epic}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.epic"}}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier2_pillar_keywords" type="checkbox" value="curse" {{#if mummyKeywords.t2.curse}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.curse" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier2_pillar_keywords" type="checkbox" value="potency" {{#if mummyKeywords.t2.potency}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.potency" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier2_pillar_keywords" type="checkbox" value="subtle" {{#if mummyKeywords.t2.subtle}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.subtle" }}</label></div>
+              </div>
+            </div>
+            {{#if mummyKeywords.t2.potency}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPotencyValue"}}</label>
+              <input name="system.tier2_potency" type="number" step="1" min="1" max="99" value="{{system.tier2_potency}}" />
+            </div>
+            {{/if}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelDesc"}}</label>
+              {{editor tier2_desc_enriched target="system.tier2_desc" button=true owner=owner editable=editable}}
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarEffect"}}</label>
+              {{editor tier2_pillar_effect_enriched target="system.tier2_pillar_effect" button=true owner=owner editable=editable class="editor-sm"}}
+            </div>
+            {{{dicePoolList this fieldName='tier2_dicePool'}}}
+          </div>
+        </div>
+        <div class="tab" data-tab="tier3">
+          <div class="item-stat-block">
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillar"}}</label>
+              <select name="system.tier3_pillar">
+                {{selectOptions config.utterancePillars selected=system.tier3_pillar localize=true}}
+              </select>
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarLvl"}}</label>
+              <input name="system.tier3_pillar_level" type="number" step="1" min="1" max="5" value="{{system.tier3_pillar_level}}" />
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarKeyword"}}</label>
+              <div class="checkStack">
+                <div class="checkRow"><label class="checkBox"><input name="system.tier3_pillar_keywords" type="checkbox" value="epic" {{#if mummyKeywords.t3.epic}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.epic"}}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier3_pillar_keywords" type="checkbox" value="curse" {{#if mummyKeywords.t3.curse}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.curse" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier3_pillar_keywords" type="checkbox" value="potency" {{#if mummyKeywords.t3.potency}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.potency" }}</label></div>
+                <div class="checkRow"><label class="checkBox"><input name="system.tier3_pillar_keywords" type="checkbox" value="subtle" {{#if mummyKeywords.t3.subtle}}checked="checked"{{/if}}><span></span> {{localize "MTA.Mummy.Utterance.subtle" }}</label></div>
+              </div>
+            </div>
+            {{#if mummyKeywords.t3.potency}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPotencyValue"}}</label>
+              <input name="system.tier3_potency" type="number" step="1" min="1" max="99" value="{{system.tier3_potency}}" />
+            </div>
+            {{/if}}
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelDesc"}}</label>
+              {{editor tier3_desc_enriched target="system.tier3_desc" button=true owner=owner editable=editable}}
+            </div>
+            <div class="form-line">
+              <label>{{localize "MTA.Mummy.Utterance.labelPillarEffect"}}</label>
+              {{editor tier3_pillar_effect_enriched target="system.tier3_pillar_effect" button=true owner=owner editable=editable class="editor-sm"}}
+            </div>
+            {{{dicePoolList this fieldName='tier3_dicePool'}}}
+          </div>
+        </div>
+    </section>
+</form>

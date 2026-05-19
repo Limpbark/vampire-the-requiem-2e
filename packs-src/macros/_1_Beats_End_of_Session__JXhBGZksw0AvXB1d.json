@@ -1,0 +1,24 @@
+{
+  "_id": "JXhBGZksw0AvXB1d",
+  "name": "+1 Beats (End of Session)",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "systems/mta/icons/macros/beat_session.svg",
+  "scope": "global",
+  "command": "for(let token of canvas.tokens.controlled){\nif(token){\nif(token.actor){\ntoken.actor.addProgress(\"End of Session\", 1, 0);\nChatMessage.create({\nuser: game.user._id,\nspeaker: ChatMessage.getSpeaker({actor: token.actor}),\ncontent: \"Got a Beat for end of session!\"\n});\n}\n}\n}",
+  "folder": null,
+  "sort": 0,
+  "permission": {
+    "default": 1,
+    "rgSvVH0I52G7WbzM": 3
+  },
+  "flags": {
+    "furnace": {
+      "runAsGM": true
+    },
+    "core": {
+      "sourceId": "Macro.TzOogDZrS3OcOZLz"
+    }
+  },
+  "_key": "!macros!JXhBGZksw0AvXB1d"
+}
