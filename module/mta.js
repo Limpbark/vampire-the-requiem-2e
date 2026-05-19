@@ -539,6 +539,45 @@ Hooks.on("renderCombatTracker", (app, html) => {
 });
 
 
+/* -------------------------------------------- */
+/*  Foundry v14 theme compatibility             */
+/* -------------------------------------------- */
+
+/**
+ * Foundry v14 themes application windows independently of the core UI and may
+ * render this system's (dark-designed) sheets and dialogs under the light
+ * theme ("theme-light"), which makes their text unreadable on the dark
+ * backgrounds. Force every system window (.mta-sheet) to use the dark theme so
+ * the v14 theme CSS variables resolve to the intended (light-text) values.
+ * @param {Node} node  A DOM node to inspect (and whose descendants are inspected).
+ */
+function _vtrForceDarkTheme(node) {
+  if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+  const fix = (el) => {
+    if (el.classList.contains("mta-sheet") && el.classList.contains("theme-light")) {
+      el.classList.replace("theme-light", "theme-dark");
+    }
+  };
+  fix(node);
+  node.querySelectorAll?.(".mta-sheet.theme-light").forEach(fix);
+}
+
+Hooks.once("ready", function () {
+  _vtrForceDarkTheme(document.body);
+  new MutationObserver((records) => {
+    for (const r of records) {
+      if (r.type === "childList") r.addedNodes.forEach(_vtrForceDarkTheme);
+      else if (r.type === "attributes") _vtrForceDarkTheme(r.target);
+    }
+  }).observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"]
+  });
+});
+
+
 
 
 
