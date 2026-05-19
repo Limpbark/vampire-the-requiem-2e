@@ -294,6 +294,8 @@ export class DiceRollerDialogue extends Application {
     roll.messySuccess = false;
     roll.messyFailure = false;
     if (hungerTermIndex >= 0 && roll.dice[hungerTermIndex]) {
+      // Tag the Hunger term so Dice So Nice renders it in the crimson colourset.
+      roll.dice[hungerTermIndex].options.appearance = { colorset: "vtr-hunger" };
       for (const r of roll.dice[hungerTermIndex].results) {
         if (r.active === false) continue;
         if (r.result === 10) roll.messySuccess = true;

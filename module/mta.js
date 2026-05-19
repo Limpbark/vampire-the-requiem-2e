@@ -603,6 +603,31 @@ Hooks.once("ready", function () {
 });
 
 
+/* -------------------------------------------- */
+/*  Dice So Nice integration                    */
+/* -------------------------------------------- */
+
+// Register a crimson "Hunger" colourset so Hunger dice (homebrew) are visually
+// distinct in the Dice So Nice 3D animation, matching the chat card. The roll
+// builder tags the Hunger term with `options.appearance = { colorset: "vtr-hunger" }`.
+Hooks.once("diceSoNiceReady", (dice3d) => {
+  dice3d.addColorset({
+    name: "vtr-hunger",
+    description: "Hunger (Vampire the Requiem 2E)",
+    category: "Vampire the Requiem 2E",
+    foreground: "#ffffff",
+    background: "#c8102e",
+    edge: "#7a0a18",
+    outline: "#3a0008",
+    texture: "none",
+    material: "plastic",
+    font: "auto",
+    fontScale: {},
+    visibility: "visible"
+  }, "default");
+});
+
+
 
 
 
