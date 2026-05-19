@@ -23,7 +23,7 @@ system by SoulCake**, trimmed down to Vampire play and updated for **Foundry VTT
 In Foundry VTT: **Game Systems → Install System**, then paste the manifest URL:
 
 ```
-https://github.com/OWNER/vampire-the-requiem-2e/releases/latest/download/system.json
+https://github.com/Limpbark/vampire-the-requiem-2e/releases/latest/download/system.json
 ```
 
 Foundry will install the latest release and prompt for updates automatically when a new

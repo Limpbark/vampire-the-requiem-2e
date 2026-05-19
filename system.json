@@ -21,12 +21,12 @@
     "minimum": "14",
     "verified": "14.361"
   },
-  "url": "https://github.com/OWNER/vampire-the-requiem-2e",
-  "manifest": "https://github.com/OWNER/vampire-the-requiem-2e/releases/latest/download/system.json",
-  "download": "https://github.com/OWNER/vampire-the-requiem-2e/releases/latest/download/system.zip",
-  "changelog": "https://github.com/OWNER/vampire-the-requiem-2e/releases",
-  "readme": "https://github.com/OWNER/vampire-the-requiem-2e/blob/main/README.md",
-  "bugs": "https://github.com/OWNER/vampire-the-requiem-2e/issues",
+  "url": "https://github.com/Limpbark/vampire-the-requiem-2e",
+  "manifest": "https://github.com/Limpbark/vampire-the-requiem-2e/releases/latest/download/system.json",
+  "download": "https://github.com/Limpbark/vampire-the-requiem-2e/releases/latest/download/system.zip",
+  "changelog": "https://github.com/Limpbark/vampire-the-requiem-2e/releases",
+  "readme": "https://github.com/Limpbark/vampire-the-requiem-2e/blob/main/README.md",
+  "bugs": "https://github.com/Limpbark/vampire-the-requiem-2e/issues",
   "esmodules": ["module/mta.js"],
   "styles": ["styles/default.css", "styles/override.css"],
   "packs": [
