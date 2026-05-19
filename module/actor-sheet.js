@@ -761,6 +761,13 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     //Custom select text boxes
     customui.registerCustomSelectBoxes(html, this);
 
+    // Splat selector: a single dropdown that sets both characterType and characterVariant
+    // (Ghoul is a variant of the "vampire" type so it keeps Vitae, Disciplines, etc.)
+    html.find('.splat-select').change(event => {
+      const [characterType, characterVariant] = event.currentTarget.value.split("|");
+      this.actor.update({ "system.characterType": characterType, "system.characterVariant": characterVariant });
+    });
+
     //Health tracker
     /* this._onBoxChange(html); */
     this._initialiseDotTrackers(html);

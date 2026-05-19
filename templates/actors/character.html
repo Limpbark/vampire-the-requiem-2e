@@ -178,14 +178,11 @@
             <span></span>
           </label>
         </span>
-        <select name="system.characterType">
-          {{selectOptions characterTypes selected=system.characterType localize=true}}
+        <select class="splat-select">
+          <option value="mortal|mortal" {{#if (eq system.characterVariant "mortal")}}selected{{/if}}>{{localize "MTA.Mortal"}}</option>
+          <option value="vampire|vampire" {{#if (eq system.characterVariant "vampire")}}selected{{/if}}>{{localize "MTA.Vampire"}}</option>
+          <option value="vampire|ghoul" {{#if (eq system.characterVariant "ghoul")}}selected{{/if}}>{{localize "MTA.Ghoul"}}</option>
         </select>
-        {{#if showVariants}}
-          <select name="system.characterVariant">
-            {{selectOptions characterVariants selected=system.characterVariant localize=true}}
-          </select>
-        {{/if}}
         {{#if (eq system.characterVariant "scelesti")}}
           <select name="system.scelestiRank">
             {{#select system.scelestiRank}}
