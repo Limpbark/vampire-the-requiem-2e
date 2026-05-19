@@ -37,6 +37,13 @@
           </div>
         </dd>
         {{/if}}
+        {{#if hasHunger}}
+        <dt>Hunger dice:</dt>
+        <dd>
+          <span class="hunger-readout">0</span>
+          <span class="hunger-readout-note">/ {{vitae}} Vitae</span>
+        </dd>
+        {{/if}}
         {{#if enableDifficulty}}
         <dt>{{ localize "MTA.Difficulty" }}:</dt>
         <dd>
@@ -80,6 +87,14 @@
                 <span>{{ localize "MTA.Extended" }}</span>
               </label>
             </p>
+            {{#if hasHunger}}
+            <p>
+              <label class="checkBox marginR">
+                <input data-dtype="Boolean" name="willpower" type="checkbox">
+                <span>Willpower (+3)</span>
+              </label>
+            </p>
+            {{/if}}
           </div>
         </dd>
         {{#if spendAmmo}}

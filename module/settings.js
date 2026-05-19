@@ -95,6 +95,15 @@ export const registerSystemSettings = function () {
     requiresReload: true
   });
 
+  game.settings.register("vampire-the-requiem-2e", "hungerDice", {
+    name: "Homebrew rule: Hunger Dice",
+    hint: "For Vampires and Ghouls, when a dice pool exceeds current Vitae the excess dice become Hunger dice (a 10 causes a messy success, a 1 on a failed roll causes a messy failure). The dice roller calculates and displays this automatically.",
+    scope: "world",
+    config: true,
+    default: true,
+    type: Boolean
+  });
+
   /** Not visible */
 
   /**

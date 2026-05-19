@@ -582,6 +582,24 @@ Hooks.once("ready", function () {
     const dice = event.target.closest(".vtr-roll .dice-tooltip");
     if (dice) dice.closest(".vtr-roll")?.classList.toggle("show-formula");
   });
+
+  // Hunger dice messy failure: roll a Resolve + Composure frenzy resistance.
+  document.body.addEventListener("click", (event) => {
+    const btn = event.target.closest("button[data-vtr-frenzy]");
+    if (!btn) return;
+    const actor = game.actors.get(btn.dataset.actorId);
+    if (!actor) { ui.notifications.warn("Frenzy resistance roll: actor not found."); return; }
+    const resolve = actor.system?.attributes_mental?.resolve;
+    const composure = actor.system?.attributes_social?.composure;
+    const pool = (resolve?.final ?? resolve?.value ?? 0) + (composure?.final ?? composure?.value ?? 0);
+    DiceRollerDialogue.rollToChat({
+      dicePool: pool,
+      flavor: "Frenzy Resistance",
+      title: "Frenzy Resistance",
+      actorOverride: actor,
+      hungerDice: 0
+    });
+  });
 });
 
 

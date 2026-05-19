@@ -7,3 +7,45 @@
 .vtr-roll .dice-formula { display: none; }
 .vtr-roll.show-formula .dice-formula { display: block; }
 .vtr-roll .dice-total { word-break: normal; font-size: 16px; }
+
+/* Hunger dice (homebrew): the Hunger term's dice are tinted crimson and ringed.
+   A blend mode is used (not a filter) so the crimson ring keeps its colour. */
+.vtr-roll .hunger-die {
+  background-color: #d0143a;
+  background-blend-mode: color;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px #e0203a, 0 0 6px 1px rgba(224, 32, 58, 0.85);
+}
+.vtr-roll .hunger-part { margin-top: 2px; }
+
+/* Messy success / messy failure notices below a Hunger roll. */
+.vtr-roll .hunger-messy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 4px 6px 2px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  text-align: center;
+}
+.vtr-roll .hunger-messy-title { font-weight: bold; font-size: 14px; }
+.vtr-roll .hunger-messy-text { font-size: 12px; opacity: 0.9; }
+.vtr-roll .messy-success { background: rgba(176, 16, 48, 0.18); border: 1px solid #b01030; color: #f1c4cc; }
+.vtr-roll .messy-failure { background: rgba(176, 16, 48, 0.32); border: 1px solid #d4143a; color: #ffd9df; }
+.vtr-roll .vtr-frenzy-button {
+  align-self: center;
+  margin-top: 3px;
+  padding: 3px 10px;
+  background: #b01030;
+  color: #fff;
+  border: 1px solid #d4143a;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+  width: auto;
+}
+.vtr-roll .vtr-frenzy-button:hover { background: #d4143a; box-shadow: 0 0 6px #d4143a; }
+
+/* Hunger dice readout in the dice roller dialog. */
+.hunger-readout { font-weight: bold; font-size: 18px; color: #e7808c; }
+.hunger-readout-note { opacity: 0.7; font-size: 12px; }

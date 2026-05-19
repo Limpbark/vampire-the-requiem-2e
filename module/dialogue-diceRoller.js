@@ -107,6 +107,12 @@ export class DiceRollerDialogue extends Application {
 
     if (game.settings.get("vampire-the-requiem-2e", "showRollDifficulty")) data.enableDifficulty = true;
 
+    // Hunger dice (homebrew) — Vampires and Ghouls only.
+    const hungerActor = this.actorOverride;
+    data.hasHunger = !!(hungerActor && hungerActor.system?.characterType === "vampire"
+      && game.settings.get("vampire-the-requiem-2e", "hungerDice"));
+    data.vitae = hungerActor?.system?.vitae?.value ?? 0;
+
     return data;
   }
 
@@ -131,7 +137,7 @@ export class DiceRollerDialogue extends Application {
     let noSuccessesToDamage = $('input[name=noSuccessesToDamage]').prop("checked");
     let applyDefense = $('input[name=applyDefense]').prop("checked");
     let damageType = $('select[name=damageType]').val();
-    console.log("input", damageType)
+    let willpower = $('input[name=willpower]').prop("checked");
 
     // Fetch all specialties
     let specialties = [];
@@ -141,7 +147,7 @@ export class DiceRollerDialogue extends Application {
       }
     });
 
-    return { dicePool_userMod, explode_threshold, rote_action, dicePool_difficulty, ammoPerShot, advancedAction, extended, ignoreArmor, ignoreBallistic, noSuccessesToDamage, applyDefense, specialties, damageType };
+    return { dicePool_userMod, explode_threshold, rote_action, dicePool_difficulty, ammoPerShot, advancedAction, extended, ignoreArmor, ignoreBallistic, noSuccessesToDamage, applyDefense, specialties, damageType, willpower };
   }
 
   activateListeners(html) {
@@ -181,24 +187,46 @@ export class DiceRollerDialogue extends Application {
       i.trigger('change');
     });
     html.find('.roll-execute').click(ev => this._executeRoll(html, ev));
+
+    // Live Hunger dice preview for Vampires/Ghouls: updates as the pool changes.
+    if (this.actorOverride?.system?.characterType === "vampire"
+      && game.settings.get("vampire-the-requiem-2e", "hungerDice")) {
+      const vitae = this.actorOverride.system?.vitae?.value ?? 0;
+      const base = this.dicePool;
+      const updateHunger = () => {
+        const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
+        const bonus = (raw === "" || raw === "-") ? 0 : parseInt(raw, 10);
+        let specialties = 0;
+        html.find('input[name^="specialty_"]').each(function () { if ($(this).prop("checked")) specialties++; });
+        const realPool = base + bonus + specialties;
+        html.find('.hunger-readout').text(Math.max(0, realPool - vitae));
+      };
+      html.find('[name="dicePoolBonus"]').on("change", updateHunger);
+      html.find('input[name^="specialty_"]').on("change", updateHunger);
+      updateHunger();
+    }
   }
 
   async _executeRoll(html, ev) {
     const modifiers = this._fetchInputs(html);
-    console.log("NMOD", modifiers)
     modifiers.dicePool_userMod += modifiers.specialties.length;
-    const dicePool = this.dicePool + modifiers.dicePool_userMod;
+    const realPool = this.dicePool + modifiers.dicePool_userMod;
+    const defenseAdj = (this.damageRoll && modifiers.applyDefense) ? this.defense : 0;
+    const willpowerBonus = modifiers.willpower ? 3 : 0;
+    const hungerDice = DiceRollerDialogue._hungerDiceCount(this.actorOverride, realPool - defenseAdj);
+    const dicePool = realPool + willpowerBonus;
     const roteAction = modifiers.rote_action;
     let flavor = (this.flavor || "Skill Check")
       + (modifiers.dicePool_userMod > 0 ? " + " + modifiers.dicePool_userMod : modifiers.dicePool_userMod < 0 ? " - " + -modifiers.dicePool_userMod : "");
     for (const specialty of modifiers.specialties) {
       flavor += ` [${specialty}]`;
     }
+    if (willpowerBonus) flavor += " [Willpower]";
     const explodeThreshold = modifiers.explode_threshold;
     const targetNumber = Math.clamp(modifiers.dicePool_difficulty, 1, 10);
     const rollReturn = {};
-    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType });
-    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget });
+    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice });
+    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice });
 
     if (modifiers.extended) {
       let successes = rollReturn.roll.total;
@@ -213,14 +241,44 @@ export class DiceRollerDialogue extends Application {
     }
   }
 
-  static async _roll({ dicePool = 1, targetNumber = 8, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, chanceDie = false, exceptionalTarget = 5, advancedAction = false }) {
+  /**
+   * Number of Hunger dice (homebrew) for a given pre-Willpower dice pool:
+   * the amount by which the pool exceeds the actor's current Vitae.
+   * Returns 0 for non-Vampires/Ghouls or when the homebrew rule is disabled.
+   */
+  static _hungerDiceCount(actor, realPool) {
+    if (!actor || !game.settings.get("vampire-the-requiem-2e", "hungerDice")) return 0;
+    if (actor.system?.characterType !== "vampire") return 0;
+    const vitae = actor.system?.vitae?.value ?? 0;
+    return Math.max(0, Math.floor(realPool) - vitae);
+  }
+
+  static async _roll({ dicePool = 1, targetNumber = 8, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, chanceDie = false, exceptionalTarget = 5, advancedAction = false, hungerDice = 0 }) {
     //Create dice pool qualities
     const roteActionString = roteAction ? "r<8" : "";
     const explodeString = eightAgain ? "x>=8" : nineAgain ? "x>=9" : tenAgain ? "x>=10" : "";
     const targetNumString = chanceDie ? "cs>=10" : "cs>=" + targetNumber;
+    const dieString = "d10" + roteActionString + explodeString + targetNumString;
 
-    let roll = new Roll(dicePool + "d10" + roteActionString + explodeString + targetNumString);
+    // Hunger dice (homebrew): roll the Hunger dice as a separate term so the
+    // Beast's interference (10s and 1s on those dice) can be detected.
+    hungerDice = Math.clamp(hungerDice, 0, dicePool);
+    const normalDice = dicePool - hungerDice;
+    let formula, hungerTermIndex = -1;
+    if (hungerDice <= 0) {
+      formula = dicePool + dieString;
+    } else if (normalDice <= 0) {
+      formula = hungerDice + dieString;
+      hungerTermIndex = 0;
+    } else {
+      formula = normalDice + dieString + " + " + hungerDice + dieString;
+      hungerTermIndex = 1;
+    }
+
+    let roll = new Roll(formula);
     roll = await roll.roll();
+    roll.hungerDiceCount = hungerDice;
+    roll.hungerTermIndex = hungerTermIndex;
 
     if (chanceDie && roteAction && roll.terms[0].results[0].result === 1) {
       //Chance dice don't reroll 1s with Rote quality
@@ -231,8 +289,22 @@ export class DiceRollerDialogue extends Application {
     if (roll.total >= exceptionalTarget) roll.exceptionalSuccess = true;
     else roll.exceptionalSuccess = false;
 
+    // Messy success (a 10 on a Hunger die) / messy failure (a 1 on a Hunger
+    // die when the overall roll fails).
+    roll.messySuccess = false;
+    roll.messyFailure = false;
+    if (hungerTermIndex >= 0 && roll.dice[hungerTermIndex]) {
+      for (const r of roll.dice[hungerTermIndex].results) {
+        if (r.active === false) continue;
+        if (r.result === 10) roll.messySuccess = true;
+        else if (r.result === 1) roll.messyFailure = true;
+      }
+      if (roll.total > 0) roll.messyFailure = false;
+      else roll.messySuccess = false;
+    }
+
     if (advancedAction) {
-      const roll2 = await DiceRollerDialogue._roll({ dicePool: dicePool, targetNumber: targetNumber, tenAgain: tenAgain, nineAgain: nineAgain, eightAgain: eightAgain, roteAction: roteAction, chanceDie: chanceDie, exceptionalTarget: exceptionalTarget, advancedAction: false });
+      const roll2 = await DiceRollerDialogue._roll({ dicePool: dicePool, targetNumber: targetNumber, tenAgain: tenAgain, nineAgain: nineAgain, eightAgain: eightAgain, roteAction: roteAction, chanceDie: chanceDie, exceptionalTarget: exceptionalTarget, advancedAction: false, hungerDice: hungerDice });
       if (roll2.total > roll.total) {
         roll2.advancedRoll = roll;
         roll = roll2;
@@ -241,21 +313,21 @@ export class DiceRollerDialogue extends Application {
         roll.advancedRoll = roll2;
       }
     }
-    console.log(roll);
     return roll;
   }
 
 
-  static async rollToHtml({ dicePool = 1, targetNumber = 8, extended = false, extended_accumulatedSuccesses = 0, extended_rolls = 0, extended_rollsMax = 0, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, flavor = "Skill Check", showFlavor = true, exceptionalTarget = 5, blindGMRoll = false, rollReturn, advancedAction = false, comment = "" }) {
+  static async rollToHtml({ dicePool = 1, targetNumber = 8, extended = false, extended_accumulatedSuccesses = 0, extended_rolls = 0, extended_rollsMax = 0, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, flavor = "Skill Check", showFlavor = true, exceptionalTarget = 5, blindGMRoll = false, rollReturn, advancedAction = false, comment = "", hungerDice = 0, actorId = null }) {
     //Is the roll a chance die?
     let chanceDie = false;
     if (dicePool < 1) {
       tenAgain = false;
       chanceDie = true;
       dicePool = 1;
+      hungerDice = 0;
     }
 
-    let roll = await DiceRollerDialogue._roll({ dicePool: dicePool, targetNumber: targetNumber, tenAgain: tenAgain, nineAgain: nineAgain, eightAgain: eightAgain, roteAction: roteAction, chanceDie: chanceDie, exceptionalTarget: exceptionalTarget, advancedAction });
+    let roll = await DiceRollerDialogue._roll({ dicePool: dicePool, targetNumber: targetNumber, tenAgain: tenAgain, nineAgain: nineAgain, eightAgain: eightAgain, roteAction: roteAction, chanceDie: chanceDie, exceptionalTarget: exceptionalTarget, advancedAction, hungerDice: hungerDice });
     if (rollReturn) rollReturn.roll = roll;
     //Create Roll Message
     let speaker = ChatMessage.getSpeaker();
@@ -281,9 +353,7 @@ export class DiceRollerDialogue extends Application {
 
     let html = await roll.render(chatData);
 
-    // Reorganise the roll card: the dice graphic is shown first, the formula is
-    // hidden behind a click (handled by CSS in override.css + mta.js), and the
-    // bare success count becomes a full-sentence result.
+    // Build a full-sentence result from the success count.
     const hits = Math.max(0, roll.total);
     const hitWord = hits === 1 ? "hit" : "hits";
     let resultText, resultClass = "";
@@ -298,9 +368,43 @@ export class DiceRollerDialogue extends Application {
     } else {
       resultText = "0 hits - Failure.";
     }
-    html = html.replace('class="dice-roll"', 'class="dice-roll vtr-roll"');
-    html = html.replace(/<h4 class="dice-total[^"]*">[\s\S]*?<\/h4>/,
-      () => `<h4 class="dice-total${resultClass ? " " + resultClass : ""}">${resultText}</h4>`);
+
+    // Reorganise the card (dice graphic first, formula behind a click), restate
+    // the result as a sentence, and surface Hunger dice and messy outcomes.
+    const wrap = document.createElement("div");
+    wrap.innerHTML = html;
+    const diceRoll = wrap.querySelector(".dice-roll");
+    if (diceRoll) {
+      diceRoll.classList.add("vtr-roll");
+      if (roll.hungerTermIndex >= 0) {
+        const parts = wrap.querySelectorAll(".dice-tooltip .tooltip-part");
+        const hungerPart = parts[roll.hungerTermIndex];
+        if (hungerPart) {
+          hungerPart.classList.add("hunger-part");
+          hungerPart.querySelectorAll(".dice-rolls .die").forEach(d => d.classList.add("hunger-die"));
+        }
+      }
+      const total = wrap.querySelector(".dice-total");
+      if (total) {
+        total.textContent = resultText;
+        if (resultClass) total.classList.add(resultClass);
+      }
+      if (roll.messySuccess || roll.messyFailure) {
+        const notice = document.createElement("div");
+        if (roll.messySuccess) {
+          notice.className = "hunger-messy messy-success";
+          notice.innerHTML = `<span class="hunger-messy-title">Messy success</span>`
+            + `<span class="hunger-messy-text">The Beast shows through &mdash; the Storyteller assigns a Condition.</span>`;
+        } else {
+          notice.className = "hunger-messy messy-failure";
+          notice.innerHTML = `<span class="hunger-messy-title">Messy failure</span>`
+            + `<span class="hunger-messy-text">The Beast is loose on a failed roll.</span>`
+            + (actorId ? `<button type="button" class="vtr-frenzy-button" data-vtr-frenzy data-actor-id="${actorId}">Roll Frenzy Resistance</button>` : "");
+        }
+        diceRoll.appendChild(notice);
+      }
+      html = wrap.innerHTML;
+    }
 
     if (roll.advancedRoll) {
       let advHtml = await roll.advancedRoll.render(chatData);
@@ -339,8 +443,12 @@ export class DiceRollerDialogue extends Application {
     advancedAction = false,
     comment = "",
     macro,
-    actor
+    actor,
+    hungerDice
   }) {
+
+    // Quick rolls don't pass a Hunger count; derive it from the actor's Vitae.
+    if (hungerDice === undefined) hungerDice = DiceRollerDialogue._hungerDiceCount(actorOverride, dicePool);
 
     const templateData = {
       roll: await DiceRollerDialogue.rollToHtml({
@@ -359,7 +467,9 @@ export class DiceRollerDialogue extends Application {
         extended_rolls: extended_rolls,
         extended_rollsMax: extended_rollsMax,
         advancedAction,
-        comment
+        comment,
+        hungerDice: hungerDice,
+        actorId: actorOverride?.id
       })
     };
 
@@ -468,10 +578,13 @@ export class DiceRollerDialogue extends Application {
     defense = 0,
     macro,
     actor,
-    damageType = "lethal"
+    damageType = "lethal",
+    hungerDice
   }) {
-    console.log("DAMAGE", damageType)
     if (applyDefense) dicePool -= defense;
+
+    // Derive the Hunger count from the actor's Vitae if it wasn't supplied.
+    if (hungerDice === undefined) hungerDice = DiceRollerDialogue._hungerDiceCount(actorOverride, dicePool);
 
     const templateData = {
       data: {
@@ -490,7 +603,9 @@ export class DiceRollerDialogue extends Application {
             blindGMRoll: blindGMRoll,
             rollReturn: rollReturn,
             advancedAction,
-            comment
+            comment,
+            hungerDice: hungerDice,
+            actorId: actorOverride?.id
           })
         }],
       },
