@@ -280,12 +280,31 @@ export class DiceRollerDialogue extends Application {
 
 
     let html = await roll.render(chatData);
-    if (roll.dramaticFailure) html = html.replace('class="dice-total"', 'class="dice-total dramaticFailure"');
-    else if (roll.exceptionalSuccess) html = html.replace('class="dice-total"', 'class="dice-total exceptionalSuccess"');
+
+    // Reorganise the roll card: the dice graphic is shown first, the formula is
+    // hidden behind a click (handled by CSS in override.css + mta.js), and the
+    // bare success count becomes a full-sentence result.
+    const hits = Math.max(0, roll.total);
+    const hitWord = hits === 1 ? "hit" : "hits";
+    let resultText, resultClass = "";
+    if (roll.dramaticFailure) {
+      resultClass = "dramaticFailure";
+      resultText = chanceDie ? "1 on chance die - Dramatic failure!" : `${hits} ${hitWord} - Dramatic failure!`;
+    } else if (roll.exceptionalSuccess) {
+      resultClass = "exceptionalSuccess";
+      resultText = `${hits} ${hitWord} - Exceptional success!`;
+    } else if (hits >= 1) {
+      resultText = `${hits} ${hitWord} - Success.`;
+    } else {
+      resultText = "0 hits - Failure.";
+    }
+    html = html.replace('class="dice-roll"', 'class="dice-roll vtr-roll"');
+    html = html.replace(/<h4 class="dice-total[^"]*">[\s\S]*?<\/h4>/,
+      () => `<h4 class="dice-total${resultClass ? " " + resultClass : ""}">${resultText}</h4>`);
+
     if (roll.advancedRoll) {
       let advHtml = await roll.advancedRoll.render(chatData);
-      advHtml = advHtml.replace('class="dice-roll"', 'class="dice-roll advancedRoll"');
-      console.log("ASD", advHtml);
+      advHtml = advHtml.replace('class="dice-roll"', 'class="dice-roll vtr-roll advancedRoll"');
       html += advHtml;
     }
 

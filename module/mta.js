@@ -575,6 +575,13 @@ Hooks.once("ready", function () {
     attributes: true,
     attributeFilter: ["class"]
   });
+
+  // Roll cards show the dice graphic by default; clicking the dice row
+  // reveals (or hides again) the underlying dice formula.
+  document.body.addEventListener("click", (event) => {
+    const dice = event.target.closest(".vtr-roll .dice-tooltip");
+    if (dice) dice.closest(".vtr-roll")?.classList.toggle("show-formula");
+  });
 });
 
 

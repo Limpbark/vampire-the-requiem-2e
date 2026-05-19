@@ -1,1 +1,9 @@
 /** Add content here and the system will ensure that this file will always be loaded last. **/
+
+/* Roll cards: show the dice graphic first; the formula is revealed only when
+   the dice row is clicked (toggled by the handler in module/mta.js). */
+.vtr-roll .dice-tooltip { display: block !important; cursor: pointer; }
+.vtr-roll .dice-tooltip .part-header { display: none; }
+.vtr-roll .dice-formula { display: none; }
+.vtr-roll.show-formula .dice-formula { display: block; }
+.vtr-roll .dice-total { word-break: normal; font-size: 16px; }
