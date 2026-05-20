@@ -49,3 +49,31 @@
 /* Hunger dice readout in the dice roller dialog. */
 .hunger-readout { font-weight: bold; font-size: 18px; color: #e7808c; }
 .hunger-readout-note { opacity: 0.7; font-size: 12px; }
+
+/* Attribute / Skill dots: a tabletop-style row of pips after the value.
+   Caps at 5 for Mortals and Ghouls; for Vampires the cap rises to match
+   Blood Potency. Wraps to a second row above 5 dots. Clicking the row
+   selects the trait via the hidden checkbox the dots-label is bound to. */
+.trait-dots {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: center;
+  margin-left: 4px;
+  max-width: 64px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.trait-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #888;
+  background: transparent;
+  flex: 0 0 auto;
+}
+.trait-dot.filled {
+  background: #c8102e;
+  border-color: #e0203a;
+  box-shadow: 0 0 2px rgba(224, 32, 58, 0.45);
+}

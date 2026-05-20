@@ -414,6 +414,26 @@ export const registerHandlebarsHelpers = function () {
     let traitValue = isInteger ? trait : trait.value;
     if (traitValue == undefined) traitValue = 0;
     const localisedName = game.i18n.localize("MTA." + traitName);
+
+    // VtR 2E character-sheet flair: render a row of dots after the value for
+    // attributes and skills, capped by Blood Potency for Vampires (Ghouls and
+    // Mortals always cap at 5). Clicking the dots selects the trait, same as
+    // clicking its name.
+    const showDots = /^(attributes|skills)_(physical|social|mental)\./.test(traitName);
+    let traitMax = 999;
+    let dotsHtml = "";
+    if (showDots) {
+      if (actor.system?.characterVariant === "vampire") {
+        const bp = actor.system?.vampire_traits?.bloodPotency?.final
+          ?? actor.system?.vampire_traits?.bloodPotency?.value ?? 0;
+        traitMax = Math.max(5, bp);
+      } else {
+        traitMax = 5;
+      }
+      for (let i = 1; i <= traitMax; i++) {
+        dotsHtml += `<span class="trait-dot${i <= traitValue ? " filled" : ""}"></span>`;
+      }
+    }
     return `
     <li class="attribute flexrow rollableInput">
       <span>
@@ -456,7 +476,8 @@ export const registerHandlebarsHelpers = function () {
           </span>
           ` : ''} 
         <span class="attribute-mod ${trait.isModified ? (`${trait.final >= trait.value ? "positive" : "negative"}`) : ''}">${trait.isModified ? (Number.isInteger(trait.final) ? "(" + trait.final + ")" : "") : ''}</span>
-        <input class="attribute-value" type="number" name="system.${isInteger ? traitName : traitName + ".value"}" value=${traitValue} data-dtype="Number" min=0 max=999>
+        <input class="attribute-value" type="number" name="system.${isInteger ? traitName : traitName + ".value"}" value=${traitValue} data-dtype="Number" min=0 max=${traitMax}>
+        ${dotsHtml ? `<label class="trait-dots" for="${actor._id + traitName}">${dotsHtml}</label>` : ''}
     </span>
   </li>`
   });
