@@ -167,6 +167,46 @@
   pointer-events: none;
 }
 
+/* Codex panel: reference text for the currently-selected trait. Sits in the
+   right column above Merits. Empty when nothing is selected; scrolls when the
+   selected entry is taller than the panel. */
+.codex-panel {
+  margin: 4px 0;
+  padding: 0;
+  background: transparent;
+  max-height: 240px;
+  overflow-y: auto;
+  min-height: 0;
+}
+.codex-panel:empty { display: none; }
+.codex-panel:not(:empty) {
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid #3c3d41;
+  border-bottom: 1px solid #3c3d41;
+  padding: 8px 10px;
+}
+.codex-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #efe6d8;
+  border-bottom: 1px solid rgba(192, 16, 48, 0.5);
+  padding-bottom: 3px;
+}
+.codex-body { font-size: 13px; line-height: 1.45; }
+.codex-body p { margin: 4px 0; }
+.codex-body p.codex-rolls,
+.codex-body p.codex-specialties {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 6px;
+}
+.codex-body ul { margin: 4px 0; padding-left: 1.2em; font-size: 12px; }
+.codex-body li { margin: 2px 0; }
+.codex-body em { opacity: 0.75; }
+
 /* Attribute / Skill dots: a tabletop-style row of pips after the value.
    Caps at 5 for Mortals and Ghouls; for Vampires the cap rises to match
    Blood Potency. The helper emits one `.trait-dots-row` for every five

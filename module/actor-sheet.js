@@ -13,6 +13,7 @@ import {
 import "../lib/dragster/dragster.js";
 import * as customui from "./ui.js";
 import { TacticDialogue } from "./dialogue-tactic.js";
+import { CODEX_ENTRIES } from "./codex.js";
 
 const getInventory = () => ({
   firearm: {
@@ -1668,6 +1669,23 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.update({ "system.vitae.value": value });
     });
 
+    // Codex panel: when a trait is selected (its attribute-check is toggled
+    // on), show that trait's reference text. When deselections leave nothing
+    // checked, clear the panel.
+    html.find('.attribute-check').on('change', (ev) => {
+      const cb = ev.currentTarget;
+      if (cb.checked) {
+        this._updateCodex(cb.dataset.trait);
+      } else {
+        const stillChecked = html.find('.attribute-check:checked');
+        if (stillChecked.length) {
+          this._updateCodex(stillChecked.last().get(0).dataset.trait);
+        } else {
+          this._updateCodex(null);
+        }
+      }
+    });
+
     html.find('.dreamingButton').mousedown(ev => {
       switch (ev.which) {
         case 1:
@@ -1719,6 +1737,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
       //Uncheck attributes/skills and reset
       attributeChecks.prop("checked", !attributeChecks.prop("checked"));
+      this._updateCodex(null);
     });
 
     //Clicking spellcasting button
@@ -2461,6 +2480,19 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Update the Item
     await super._updateObject(event, formData);
+  }
+
+  /**
+   * Populate (or clear) the codex panel based on which trait is selected.
+   * @param {string|null} traitKey  e.g. "attributes_physical.strength"; null clears.
+   */
+  _updateCodex(traitKey) {
+    const root = this.element instanceof jQuery ? this.element[0] : this.element;
+    const panel = root?.querySelector('.codex-panel');
+    if (!panel) return;
+    const entry = traitKey ? CODEX_ENTRIES[traitKey] : null;
+    if (!entry) { panel.innerHTML = ''; return; }
+    panel.innerHTML = `<h4 class="codex-title">${entry.title}</h4><div class="codex-body">${entry.body}</div>`;
   }
 
 } // End of class
