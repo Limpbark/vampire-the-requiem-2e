@@ -1652,6 +1652,10 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       }
     });
 
+    html.find('.daysleepButton').click(ev => {
+      this.actor.daysleep();
+    });
+
     html.find('.dreamingButton').mousedown(ev => {
       switch (ev.which) {
         case 1:

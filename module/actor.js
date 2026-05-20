@@ -1479,6 +1479,34 @@ export class ActorMtA extends Actor {
     this.update({ "system.patternParadox": 0 });
   }
 
+  /**
+   * Daysleep: when a vampire rises for the night they expend a point of Vitae.
+   * Posts a chat message, and if the character has injuries, a follow-up
+   * reminder about automatic healing during daysleep (the vampire spends
+   * Vitae unconsciously, 1 per 2 bashing or 1 lethal, 5 per aggravated;
+   * spend 1 Willpower per wound to preserve a wound through the sleep).
+   */
+  async daysleep() {
+    const sys = this.system;
+    const currentVitae = sys.vitae?.value ?? 0;
+    const newVitae = Math.max(0, currentVitae - 1);
+    await this.update({ "system.vitae.value": newVitae });
+
+    const speaker = ChatMessage.getSpeaker({ actor: this });
+    await ChatMessage.create({
+      speaker,
+      content: `<p><strong>${this.name}</strong> wakes and expends a point of Vitae.</p>`
+    });
+
+    const damaged = sys.health && (sys.health.value ?? sys.health.max) < (sys.health.max ?? 0);
+    if (damaged) {
+      await ChatMessage.create({
+        speaker,
+        content: `<p><em><strong>${this.name}</strong> has injuries &mdash; during daysleep the Beast heals them automatically (1 Vitae per 2 bashing or 1 lethal; 5 Vitae per aggravated). Spend 1 Willpower per wound to preserve it through the rest.</em></p>`
+      });
+    }
+  }
+
   scourPattern() {
     const reduceAttribute = (attribute) => {
       const itemData = {

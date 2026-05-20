@@ -638,10 +638,17 @@
             <img src="systems/vampire-the-requiem-2e/icons/gui/macro-compromise.svg" alt="Compromise.">
           </div>
         {{/if}}
+        {{#if (eq system.characterVariant "vampire")}}
+        <div class="button charMacroButton daysleepButton tooltip">
+          <span class="tooltip-text">Daysleep: rise and expend 1 Vitae</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-daysleep.svg" alt="Daysleep.">
+        </div>
+        {{else}}
         <div class="button charMacroButton dreamingButton tooltip {{#if system.isDreaming}}dreaming{{/if}}">
           <span class="tooltip-text">{{ localize "MTA.TooltipDreaming" }}</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-dreaming.svg" alt="Dream.">
         </div>
+        {{/if}}
         {{#if show.macro_amnion}}
           {{#if system.isDreaming}}
             <div class="button charMacroButton amnionButton tooltip dreaming">
