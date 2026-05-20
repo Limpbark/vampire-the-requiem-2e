@@ -556,7 +556,6 @@ MTA.EXTRA_BEAT_CONFIG = {
   "mage": "MTA.ArcBeats",
   "hunter": "MTA.GroupBeats",
   "sinEater": "MTA.SynergyBeats",
-  "vampire": "MTA.BloodBeats",
   "mummy": "MTA.Mummy.ReminisceBeats",
   "promethean": "MTA.VitriolBeats",
 }
@@ -566,7 +565,6 @@ MTA.EXTRA_EXP_CONFIG = {
   "mage": "MTA.ArcExp",
   "hunter": "MTA.GroupExp",
   "sinEater": "MTA.SynergyExp",
-  "vampire": "MTA.BloodExp",
   "mummy": "MTA.Mummy.ReminisceExp",
   "promethean": "MTA.VitriolExp",
 }

@@ -56,6 +56,9 @@ export class ProgressDialogue extends Application {
 
     data.extraBeatsName = beatsKey ? game.i18n.localize(beatsKey) : undefined;
     data.showExtraBeats = !!beatsKey;
+    // Exp tally (every 5 beats becomes 1 Exp); shown alongside the Beats total
+    // now that the constant Beats/Exp display has moved off the sheet.
+    data.experience_total = Math.floor(data.beats_total / 5);
     data.progress = data.progress.slice(-5);
     while (data.progress.length < 5) data.progress.push({ name: "" })
     return data;

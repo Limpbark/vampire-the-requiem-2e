@@ -50,6 +50,29 @@
 .hunger-readout { font-weight: bold; font-size: 18px; color: #e7808c; }
 .hunger-readout-note { opacity: 0.7; font-size: 12px; }
 
+/* Collapsed Derived Traits panel at the bottom of the right column. */
+.derived-traits { margin-top: 4px; }
+.derived-traits > summary {
+  cursor: pointer;
+  padding: 6px 10px;
+  font-weight: bold;
+  background: rgba(60, 60, 60, 0.3);
+  border-top: 1px solid #3c3d41;
+  border-bottom: 1px solid #3c3d41;
+  list-style: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+.derived-traits > summary::before {
+  content: "\25B8"; /* ▸ */
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+}
+.derived-traits[open] > summary::before { content: "\25BE"; /* ▾ */ }
+.derived-traits > summary::-webkit-details-marker { display: none; }
+
 /* Attribute / Skill dots: a tabletop-style row of pips after the value.
    Caps at 5 for Mortals and Ghouls; for Vampires the cap rises to match
    Blood Potency. The helper emits one `.trait-dots-row` for every five

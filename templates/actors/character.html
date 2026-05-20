@@ -252,6 +252,9 @@
           {{/if}}
         {{/if}}
       </div>
+      {{!-- Vampires always have access to Dread Powers (homebrew); the toggle
+            stays for Mortals and Ghouls who can opt in. --}}
+      {{#unless (eq system.characterVariant "vampire")}}
       <div class="horrorHeader {{#if system.usesDreadPowers}}active{{/if}}">
         <label> {{localize "MTA.usesDreadPowers"}} </label>
         <label class="checkBox">
@@ -259,61 +262,10 @@
           <span></span>
         </label>
       </div>
-      <!-- Block #1 -->
-      <div class="expBox">
-        <div>
-          <div class="button charMacroButton progress tooltip">
-            <span class="tooltip-text">{{ localize "MTA.TooltipProgressMenu" }}</span>
-            <img src="systems/vampire-the-requiem-2e/icons/gui/progress-menu.svg" alt="Open progress menu.">
-          </div>
-          <div>
-            <div class="exp-header">{{localize "MTA.Beats" }}</div>
-            <input class="attribute-value borderInput disabled" type="number" name="beats_computed" value={{beats_computed}} disabled/>
-          </div>
-          <div>
-            <div class="exp-header">{{localize "MTA.Exp" }}</div>
-            <input class="attribute-value borderInput disabled" type="number" name="experience_computed" value={{experience_computed}} disabled/>
-          </div>
-        </div>
-        {{#if extraBeatsName}}
-          <div>
-            <div style="width:32px;min-width:32px"></div>
-            <div>
-              <div class="exp-header">{{extraBeatsName}}</div>
-              <input class="attribute-value borderInput disabled" type="number" name="arcaneBeats_computed" value={{arcaneBeats_computed}} disabled/>
-            </div>
-            <div>
-              <div class="exp-header">{{extraExpName}}</div>
-              <input class="attribute-value borderInput disabled" type="number" name="arcaneExperience_computed" value={{arcaneExperience_computed}} disabled/>
-            </div>
-          </div>
-        {{/if}}
-      </div>
-
-
-      <!-- Block #2 -->
-      <div class="kInput statBox">
-        <h4> {{ localize "MTA.DerivedTraits" }}</h4>
-        <div class="gold-border"> </div>
-        <div class="armourGrid">
-          {{#each derivedTraits as |cvalue ckey|}}
-          {{#with (lookup ../system.derivedTraits [ckey])}}
-            <span>
-              <input class="attribute-check" id="{{cvalue}}{{../../actor.id}}" data-attribute="{{ckey}}" data-trait="derivedTraits.{{ckey}}" data-attributeValue={{chooseNum final value}} data-attributeLabel="{{cvalue}}" type="checkbox" data-dtype="Boolean">
-              <label class="button attribute-button" for="{{cvalue}}{{../../actor.id}}">{{cvalue}}</label>
-            </span>
-            <input class="{{#if isModified}}{{posneg final value}}{{/if}}" value={{chooseNum final value}} disabled>
-            <div class="niceNumber digits2" >
-              <input name="system.derivedTraits.{{ckey}}.mod" type="text" placeholder="0" data-dtype="Number" onchange="this.value=Math.clamp(this.value,-999,999);" value="{{numberFormat mod decimals=0 sign=true}}">
-              <div class="numBtns">
-                <div class="plusBtn">+</div>
-                <div class="minusBtn">−</div>
-              </div>
-            </div>
-          {{/with}}
-          {{/each}}
-        </div>
-      </div>
+      {{/unless}}
+      {{!-- Beats/Exp tally is shown in the Progress popup (book button in the
+            macro row); Derived Traits are rendered collapsed at the bottom of
+            this column. This area is reserved for a future codex panel. --}}
       <div class="items-block">
         <div class="items-table">
           {{!-- Merits --}}
@@ -362,7 +314,7 @@
           </table>
         </div>
       </div>
-      {{#if system.usesDreadPowers}}
+      {{#if showDreadPowers}}
       <div class="items-block">
         <div class="items-table">
           {{!-- Dread Powers --}}
@@ -594,6 +546,32 @@
           </table>
         </div>
       </div>
+
+      {{!-- Derived Traits, tucked at the bottom and collapsed by default. --}}
+      <details class="derived-traits">
+        <summary>{{ localize "MTA.DerivedTraits" }}</summary>
+        <div class="kInput statBox">
+          <div class="gold-border"></div>
+          <div class="armourGrid">
+            {{#each derivedTraits as |cvalue ckey|}}
+            {{#with (lookup ../system.derivedTraits [ckey])}}
+              <span>
+                <input class="attribute-check" id="{{cvalue}}{{../../actor.id}}" data-attribute="{{ckey}}" data-trait="derivedTraits.{{ckey}}" data-attributeValue={{chooseNum final value}} data-attributeLabel="{{cvalue}}" type="checkbox" data-dtype="Boolean">
+                <label class="button attribute-button" for="{{cvalue}}{{../../actor.id}}">{{cvalue}}</label>
+              </span>
+              <input class="{{#if isModified}}{{posneg final value}}{{/if}}" value={{chooseNum final value}} disabled>
+              <div class="niceNumber digits2">
+                <input name="system.derivedTraits.{{ckey}}.mod" type="text" placeholder="0" data-dtype="Number" onchange="this.value=Math.clamp(this.value,-999,999);" value="{{numberFormat mod decimals=0 sign=true}}">
+                <div class="numBtns">
+                  <div class="plusBtn">+</div>
+                  <div class="minusBtn">−</div>
+                </div>
+              </div>
+            {{/with}}
+            {{/each}}
+          </div>
+        </div>
+      </details>
     </div>
 
     <div class="characterMacroPanel">
@@ -605,6 +583,10 @@
         <div class="button charMacroButton perceptionButton tooltip">
           <span class="tooltip-text">{{ localize "MTA.TooltipPerceptionCheck" }}</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/perception.svg" alt="Perception check.">
+        </div>
+        <div class="button charMacroButton progress tooltip">
+          <span class="tooltip-text">{{ localize "MTA.TooltipProgressMenu" }}</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/progress-menu.svg" alt="Open progress menu.">
         </div>
         {{#if show.macro_spell}}
           <div class="button charMacroButton improvisedSpellButton tooltip">

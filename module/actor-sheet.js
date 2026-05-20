@@ -286,6 +286,9 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     sheetData.show = systemData.typeConf.sheet;
     sheetData.virtueName = systemData.typeConf.virtueName;
     sheetData.viceName = systemData.typeConf.viceName;
+    // Vampires always show the Dread Powers section as a standard category;
+    // Mortals and Ghouls still opt in via the "Uses Dread Powers" toggle.
+    sheetData.showDreadPowers = systemData.usesDreadPowers || systemData.characterVariant === "vampire";
 
     sheetData.characterTypes = {};
     sheetData.characterVariants = systemData.typeConf.characterVariants;
