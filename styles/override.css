@@ -52,17 +52,23 @@
 
 /* Attribute / Skill dots: a tabletop-style row of pips after the value.
    Caps at 5 for Mortals and Ghouls; for Vampires the cap rises to match
-   Blood Potency. Wraps to a second row above 5 dots. Clicking the row
-   selects the trait via the hidden checkbox the dots-label is bound to. */
+   Blood Potency. The helper emits one `.trait-dots-row` for every five
+   dots, so the first five always stay on a single line and any extra
+   dots (BP 6+) stack on a new row below. Clicking anywhere on the dots
+   selects the trait, same as clicking its name. */
 .trait-dots {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 2px;
-  align-items: center;
   margin-left: 4px;
-  max-width: 64px;
   vertical-align: middle;
   cursor: pointer;
+}
+.trait-dots-row {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 .trait-dot {
   width: 9px;
@@ -77,3 +83,6 @@
   border-color: #e0203a;
   box-shadow: 0 0 2px rgba(224, 32, 58, 0.45);
 }
+/* Shrink the attribute/skill value input slightly to make room for the
+   row of five dots without forcing the row to wrap. */
+.characterSheet .attribute.rollableInput .attribute-value { max-width: 2rem; }

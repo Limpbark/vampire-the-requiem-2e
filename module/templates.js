@@ -418,20 +418,25 @@ export const registerHandlebarsHelpers = function () {
     // VtR 2E character-sheet flair: render a row of dots after the value for
     // attributes and skills, capped by Blood Potency for Vampires (Ghouls and
     // Mortals always cap at 5). Clicking the dots selects the trait, same as
-    // clicking its name.
+    // clicking its name. Dots are grouped into HTML rows of up to five so the
+    // first five always stay on a single line; higher caps stack below.
     const showDots = /^(attributes|skills)_(physical|social|mental)\./.test(traitName);
     let traitMax = 999;
     let dotsHtml = "";
     if (showDots) {
       if (actor.system?.characterVariant === "vampire") {
-        const bp = actor.system?.vampire_traits?.bloodPotency?.final
-          ?? actor.system?.vampire_traits?.bloodPotency?.value ?? 0;
+        const bp = actor.system?.vampire_traits?.bloodPotency?.value ?? 0;
         traitMax = Math.max(5, bp);
       } else {
         traitMax = 5;
       }
+      let row = "";
       for (let i = 1; i <= traitMax; i++) {
-        dotsHtml += `<span class="trait-dot${i <= traitValue ? " filled" : ""}"></span>`;
+        row += `<span class="trait-dot${i <= traitValue ? " filled" : ""}"></span>`;
+        if (i % 5 === 0 || i === traitMax) {
+          dotsHtml += `<span class="trait-dots-row">${row}</span>`;
+          row = "";
+        }
       }
     }
     return `
