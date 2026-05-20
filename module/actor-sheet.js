@@ -1659,6 +1659,15 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.daysleep();
     });
 
+    // The macro-bar Vitae pool input is intentionally not bound to the form
+    // (its name attribute is omitted to avoid colliding with the Disciplines-
+    // tab Vitae input), so update the actor directly on change.
+    html.find('.vitae-pool-value').change(ev => {
+      const raw = ev.currentTarget.value;
+      const value = Math.max(0, parseInt(raw, 10) || 0);
+      this.actor.update({ "system.vitae.value": value });
+    });
+
     html.find('.dreamingButton').mousedown(ev => {
       switch (ev.which) {
         case 1:

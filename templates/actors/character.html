@@ -646,12 +646,17 @@
         </div>
         {{/if}}
 
-        {{!-- Prominent Vitae blood pool counter (Vampires + Ghouls). --}}
+        {{!-- Prominent Vitae blood pool counter (Vampires + Ghouls).
+              The input intentionally has no `name` attribute so it does not
+              clash with the canonical system.vitae.value input on the
+              Disciplines tab (duplicate names confuse Foundry's form
+              submission). A dedicated change handler in actor-sheet.js
+              writes the value back via actor.update(). --}}
         {{#if (eq system.characterType "vampire")}}
         <div class="vitae-pool tooltip" title="Vitae">
           <span class="tooltip-text">{{ localize "MTA.Vitae" }}</span>
           <div class="niceNumber">
-            <input class="vitae-pool-value" name="system.vitae.value" type="number" value="{{system.vitae.value}}" data-dtype="Number" min="0">
+            <input class="vitae-pool-value" type="number" value="{{system.vitae.value}}" data-dtype="Number" min="0">
             <div class="numBtns">
               <div class="plusBtn">+</div>
               <div class="minusBtn">−</div>
