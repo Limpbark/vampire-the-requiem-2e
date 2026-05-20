@@ -169,13 +169,22 @@
 
 /* Codex panel: reference text for the currently-selected trait. Sits in the
    right column above Merits. Empty when nothing is selected; scrolls when the
-   selected entry is taller than the panel. */
+   selected entry is taller than the panel.
+   The sheet uses `grid-template-columns: auto max-content` for the right
+   column, which sizes the column to the widest child's intrinsic width. We
+   pin the panel to a fixed width so its long paragraphs don't blow the
+   column out (and force the whole sheet wider). */
 .codex-panel {
+  width: 320px;
+  max-width: 320px;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
   margin: 4px 0;
   padding: 0;
   background: transparent;
   max-height: 240px;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
 }
 .codex-panel:empty { display: none; }
