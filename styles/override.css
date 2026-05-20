@@ -73,6 +73,100 @@
 .derived-traits[open] > summary::before { content: "\25BE"; /* ▾ */ }
 .derived-traits > summary::-webkit-details-marker { display: none; }
 
+/* The progress (book) icon was originally sized for the small Beats box; in
+   the macro row it should match the other charMacroButton icons. */
+.worldbuilding .characterMacroPanel .charMacroButton.progress,
+.worldbuilding .characterMacroPanel .charMacroButton.progress > img {
+  height: 50px;
+  width: 50px;
+  min-width: 50px;
+}
+
+/* Prominent Vitae blood-pool counter on the macro row (Vampires & Ghouls).
+   Click the number to edit; hover reveals +/- buttons. Background uses
+   vtm-blood-stats.png (drop the PNG into icons/gui/ to enable the flair). */
+.characterSheet .characterMacroPanel > div { position: relative; }
+.characterSheet .vitae-pool {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 72px;
+  height: 72px;
+  background-image: url("../icons/gui/vtm-blood-stats.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  user-select: none;
+}
+.characterSheet .vitae-pool .niceNumber {
+  background: transparent;
+  border: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.characterSheet .vitae-pool input.vitae-pool-value {
+  background: transparent;
+  border: none;
+  color: #ffd0d8;
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
+  width: 44px;
+  padding: 0;
+  text-shadow: 0 1px 2px #000, 0 0 6px rgba(255, 208, 216, 0.5);
+  -moz-appearance: textfield;
+}
+.characterSheet .vitae-pool input.vitae-pool-value::-webkit-outer-spin-button,
+.characterSheet .vitae-pool input.vitae-pool-value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.characterSheet .vitae-pool .numBtns {
+  position: absolute;
+  left: -14px;
+  top: 0;
+  bottom: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.characterSheet .vitae-pool:hover .numBtns,
+.characterSheet .vitae-pool:focus-within .numBtns {
+  display: flex;
+}
+.characterSheet .vitae-pool .numBtns > div {
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
+  text-align: center;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffd0d8;
+  border: 1px solid #5a0010;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+}
+.characterSheet .vitae-pool .numBtns > div:hover { background: #5a0010; }
+.characterSheet .vitae-pool-label {
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px #000;
+  margin-top: -4px;
+  pointer-events: none;
+}
+
 /* Attribute / Skill dots: a tabletop-style row of pips after the value.
    Caps at 5 for Mortals and Ghouls; for Vampires the cap rises to match
    Blood Potency. The helper emits one `.trait-dots-row` for every five
