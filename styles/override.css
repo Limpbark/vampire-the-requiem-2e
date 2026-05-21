@@ -256,10 +256,21 @@
 }
 .characterSheet .vtr-title {
   font-family: "Cezanne VTR", cursive;
-  font-size: 18px;
+  font-size: 26px;
   color: #a86038;
-  margin-top: 2px;
-  line-height: 1.1;
+  margin-top: 4px;
+  line-height: 1.05;
+}
+/* Push the Health / Willpower / Humanity boxes to the bottom of the header
+   column so their lower edge lines up with the bottom of the portrait, and
+   the freed vertical space sits between the title and those boxes. */
+.characterSheet .sheet-header.stats > div:not(.portrait) {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+.characterSheet .sheet-header.stats .bottomCharaBlock {
+  margin-top: auto;
 }
 .characterSheet .vtr-name-edit {
   flex: 0 0 auto;
