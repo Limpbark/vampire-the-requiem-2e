@@ -408,14 +408,21 @@ game-pause .vtr-pause-icon img {
   background-color: #050505;
 }
 .kUltraBlock.vtr-dice-dialog .flexBlock > .vtr-dice-right-col {
-  flex: 1 1 auto;
+  /* Fixed-size column with a stable layout: dice visual on top at a fixed
+     height (so it never changes the column's height), an auto-margin gap,
+     and the Execute button anchored at the bottom of the *intrinsic*
+     column height — not at the bottom of whatever the flex parent has
+     stretched the column to. This keeps the button still while the dice
+     visual fills/empties. */
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  min-width: 220px;
+  justify-content: flex-start;
+  width: 260px;
+  min-width: 260px;
   padding: 0.5rem;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 .kUltraBlock.vtr-dice-dialog .dice-pool-visual {
   display: flex;
@@ -424,10 +431,17 @@ game-pause .vtr-pause-icon img {
   justify-content: center;
   gap: 4px;
   width: 100%;
-  max-width: 260px;
+  /* Fixed height so the button below it doesn't shift when the pool size
+     changes. Five rows of 30px dice + 4px gaps fits ~5x7 = 35 dice; very
+     large pools scroll inside the box instead of stretching the column. */
+  height: 180px;
   padding: 6px 4px;
-  flex: 1 1 auto;
-  align-self: stretch;
+  overflow-y: auto;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+.kUltraBlock.vtr-dice-dialog .vtr-dice-right-col .megaBtn {
+  flex: 0 0 auto;
 }
 .kUltraBlock.vtr-dice-dialog .dice-pool-visual .dpv-die {
   width: 30px;
