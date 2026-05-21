@@ -2335,18 +2335,18 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
   async _onItemSummary(event) {
     event.preventDefault();
     const li = $(event.currentTarget).parents(".item-row");
+    const item = this.actor.items.get(li.data("item-id"));
+    // Fetch the chat data once and reuse for both the inline summary row and
+    // the codex panel mirror below.
+    const chatData = item ? await item.getChatData({ secrets: this.actor.owner }) : null;
 
-    // Toggle summary
+    // Toggle inline summary row
     if (li.hasClass("expanded")) {
       const summary = li.next(".item-summary");
       summary.children().children("div").slideUp(200, () => summary.remove());
-    } else {
+    } else if (chatData) {
       const tb = $(event.currentTarget).parents(".item-table");
       const colSpanMax = [...tb.get(0).rows[0].cells].reduce((a, v) => (v.colSpan) ? a + v.colSpan * 1 : a + 1, 0);
-      const item = this.actor.items.get(li.data("item-id"));
-      const chatData = await item.getChatData({
-        secrets: this.actor.owner
-      });
       const tr = $(`<tr class="item-summary"> <td colspan="${colSpanMax}"> <div> ${chatData.description} </div> </td> </tr>`);
       const div = tr.children().children("div");
       div.hide();
@@ -2354,6 +2354,25 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       div.slideDown(200);
     }
     li.toggleClass("expanded");
+
+    // Mirror the description into the right-column codex panel so a power's
+    // text can be read alongside the rest of the sheet without keeping its
+    // inline summary expanded.
+    if (item && chatData) this._setCodexFromItem(item, chatData.description);
+  }
+
+  /**
+   * Render an item's description in the codex panel. Title is the item name;
+   * body is the same HTML the inline summary shows.
+   * @param {Item} item
+   * @param {string} description  HTML body to render.
+   */
+  _setCodexFromItem(item, description) {
+    const root = this.element instanceof jQuery ? this.element[0] : this.element;
+    const panel = root?.querySelector('.codex-panel');
+    if (!panel) return;
+    const titleHtml = foundry.utils.escapeHTML(item?.name ?? "");
+    panel.innerHTML = `<h4 class="codex-title">${titleHtml}</h4><div class="codex-body">${description ?? ""}</div>`;
   }
 
   async _initialiseDotTrackers(html) {

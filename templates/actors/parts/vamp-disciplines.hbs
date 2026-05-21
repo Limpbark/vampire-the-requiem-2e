@@ -1,78 +1,5 @@
-<div class="attributes-flexrow">
-  <ol class="attributes-list">
-    <li class="attributes-header flexrow">
-      <span class="attribute-key">{{localize "MTA.Discipline"}}</span>
-      <span class="attribute-valueHeader">{{localize "MTA.Value"}}</span>
-    </li>
-    {{#each config.disciplines_common as |cvalue ckey|}}
-      {{{rollableInput ../actor "disciplines_common" ckey}}}
-    {{/each}}
-  </ol>
-
-  <ol class="attributes-list">
-    <li class="attributes-header flexrow">
-      <span class="attribute-key">{{localize "MTA.Discipline"}}</span>
-      <span class="attribute-valueHeader">{{localize "MTA.Value"}}</span>
-    </li>
-    {{#each config.disciplines_unique as |cvalue ckey|}}
-      {{{rollableInput ../actor "disciplines_unique" ckey}}}
-    {{/each}}
-    {{#each system.disciplines_own as |attr key|}}
-      <li class="attribute flexrow discipline" data-attribute="{{key}}">
-        <span>
-          <input class="attribute-check" id="disciplines_own{{attr.label}}{{key}}{{../actor._id}}" data-trait="disciplines_own.{{key}}" type="checkbox" data-dtype="Boolean">
-          <label class="button attribute-button" for="disciplines_own{{attr.label}}{{key}}{{../actor._id}}">{{attr.label}}</label>
-          <input class="button discipline-name invisible" type="text" name="system.disciplines_own.{{key}}.label" value="{{attr.label}}" />
-
-          
-          <span class="button discipline-delete" data-attribute="{{key}}" title="Delete Discipline"><i class="fas fa-times-circle"></i></span>
-          <span class="button discipline-edit" data-item-id="{{key}}" title="Edit Discipline"><i class="fas fa-edit"></i></span>
-        </span>
-        <span class="attribute-mod {{#if isModified}}{{posneg final value}}{{/if}}">{{#if isModified}} ({{final}}){{/if}}</span>
-        <input class="attribute-value" type="number" name="system.disciplines_own.{{key}}.value" value={{attr.value}} data-dtype="Number" min="0" max="10" />
-      </li>
-    {{/each}}
-    <li class="button discipline-create">
-      {{localize "MTA.ButtonAdd"}}
-    </li>
-  </ol>
-  <div class="flex-col">
-
-    {{{bigStatBox actor false "vampire_traits.bloodPotency"}}}
-
-    <div class="kInput statBox big">
-      <h4>
-        <div class="button charMacroButton calculate resource tooltip">
-          <span class="tooltip-text">{{localize "MTA.TooltipCalcMaxVitae"}}</span>
-          <img src="systems/vampire-the-requiem-2e/icons/gui/calculate.svg" alt="Calculate max. vitae.">
-        </div>
-        {{localize "MTA.Vitae"}}
-      </h4>
-      <div class="gold-border"></div>
-      <div class="split">
-        <div class="niceNumber buttonsLeft">
-          <input name="system.vitae.value" type="number" value="{{system.vitae.value}}" data-dtype="Number">
-          <div class="numBtns">
-            <div class="plusBtn">+</div>
-            <div class="minusBtn">−</div>
-          </div>
-        </div>
-        <span class="delimiter"> / </span>
-        <div class="niceNumber">
-          <input name="system.vitae.max" type="number" value="{{system.vitae.max}}" data-dtype="Number">
-          <div class="numBtns">
-            <div class="plusBtn">+</div>
-            <div class="minusBtn">−</div>
-          </div>
-        </div>
-      </div>
-      <div class="description">{{vitae_per_turn}} {{localize "MTA.VitaePerTurn"}}</div>
-    </div>
-
-
-  </div>
-</div>
-
+{{!-- Order: powers/devotions/rites/coils/scales first (most-used in play),
+      then the Discipline values + Blood Potency + Vitae block below. --}}
 <div class="items-block">
   <div class="items-table">
     {{!-- Discipline Powers --}}
@@ -290,5 +217,80 @@
         {{/each}}
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="attributes-flexrow">
+  <ol class="attributes-list">
+    <li class="attributes-header flexrow">
+      <span class="attribute-key">{{localize "MTA.Discipline"}}</span>
+      <span class="attribute-valueHeader">{{localize "MTA.Value"}}</span>
+    </li>
+    {{#each config.disciplines_common as |cvalue ckey|}}
+      {{{rollableInput ../actor "disciplines_common" ckey}}}
+    {{/each}}
+  </ol>
+
+  <ol class="attributes-list">
+    <li class="attributes-header flexrow">
+      <span class="attribute-key">{{localize "MTA.Discipline"}}</span>
+      <span class="attribute-valueHeader">{{localize "MTA.Value"}}</span>
+    </li>
+    {{#each config.disciplines_unique as |cvalue ckey|}}
+      {{{rollableInput ../actor "disciplines_unique" ckey}}}
+    {{/each}}
+    {{#each system.disciplines_own as |attr key|}}
+      <li class="attribute flexrow discipline" data-attribute="{{key}}">
+        <span>
+          <input class="attribute-check" id="disciplines_own{{attr.label}}{{key}}{{../actor._id}}" data-trait="disciplines_own.{{key}}" type="checkbox" data-dtype="Boolean">
+          <label class="button attribute-button" for="disciplines_own{{attr.label}}{{key}}{{../actor._id}}">{{attr.label}}</label>
+          <input class="button discipline-name invisible" type="text" name="system.disciplines_own.{{key}}.label" value="{{attr.label}}" />
+
+
+          <span class="button discipline-delete" data-attribute="{{key}}" title="Delete Discipline"><i class="fas fa-times-circle"></i></span>
+          <span class="button discipline-edit" data-item-id="{{key}}" title="Edit Discipline"><i class="fas fa-edit"></i></span>
+        </span>
+        <span class="attribute-mod {{#if isModified}}{{posneg final value}}{{/if}}">{{#if isModified}} ({{final}}){{/if}}</span>
+        <input class="attribute-value" type="number" name="system.disciplines_own.{{key}}.value" value={{attr.value}} data-dtype="Number" min="0" max="10" />
+      </li>
+    {{/each}}
+    <li class="button discipline-create">
+      {{localize "MTA.ButtonAdd"}}
+    </li>
+  </ol>
+  <div class="flex-col">
+
+    {{{bigStatBox actor false "vampire_traits.bloodPotency"}}}
+
+    <div class="kInput statBox big">
+      <h4>
+        <div class="button charMacroButton calculate resource tooltip">
+          <span class="tooltip-text">{{localize "MTA.TooltipCalcMaxVitae"}}</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/calculate.svg" alt="Calculate max. vitae.">
+        </div>
+        {{localize "MTA.Vitae"}}
+      </h4>
+      <div class="gold-border"></div>
+      <div class="split">
+        <div class="niceNumber buttonsLeft">
+          <input name="system.vitae.value" type="number" value="{{system.vitae.value}}" data-dtype="Number">
+          <div class="numBtns">
+            <div class="plusBtn">+</div>
+            <div class="minusBtn">−</div>
+          </div>
+        </div>
+        <span class="delimiter"> / </span>
+        <div class="niceNumber">
+          <input name="system.vitae.max" type="number" value="{{system.vitae.max}}" data-dtype="Number">
+          <div class="numBtns">
+            <div class="plusBtn">+</div>
+            <div class="minusBtn">−</div>
+          </div>
+        </div>
+      </div>
+      <div class="description">{{vitae_per_turn}} {{localize "MTA.VitaePerTurn"}}</div>
+    </div>
+
+
   </div>
 </div>
