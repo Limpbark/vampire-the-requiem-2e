@@ -431,20 +431,26 @@
 /* ---------------------------------------------------------------------------
    Homebrew Phases of Night ribbon
    --------------------------------
-   - Sits inline on the macro bar between the macro icons and the Vitae pool.
-   - Top row: ankh-shaped arrows flank the phase label text.
+   - Lives in the right column directly under the splat selector and above
+     the Merits / Dread Powers / Numina / Conditions / Tilts / Spell Effects /
+     Derived Traits block.
+   - Top row: ankh-shaped arrows flank the phase label text. The arrows are
+     rotated so the long stem points sideways (left/right), evoking the
+     direction the skull will move when clicked.
    - Bottom row: phase_of_night.png as a horizontal strip of 10 segments; the
      skull marker is absolutely positioned via an inline `left: N%` style
      emitted by getData() (centre of the active 10% segment).
-   - Reserve room on the right (~90px) so the absolutely-positioned Vitae pool
-     doesn't overlap the ribbon's right edge.
+   - Width matches the codex-panel (320px) so the right grid column doesn't
+     have to grow to accommodate it.
 --------------------------------------------------------------------------- */
 .characterSheet .phase-ribbon {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  vertical-align: middle;
-  margin: 0 0.5rem 0 0.25rem;
+  width: 320px;
+  max-width: 320px;
+  box-sizing: border-box;
+  margin: 4px 0 6px;
   user-select: none;
 }
 .characterSheet .phase-ribbon .phase-label-row {
@@ -459,26 +465,37 @@
   height: 22px;
   cursor: pointer;
   opacity: 0.85;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, filter 0.1s;
   flex: 0 0 auto;
+  /* Both arrows start from the same base orientation (the ankh's natural
+     "loop on top" pose). Direction-specific rotations are applied below so
+     the stem of the ankh points either left or right. */
 }
 .characterSheet .phase-ribbon .phase-arrow:hover {
   opacity: 1;
-  transform: scale(1.1);
+  filter: drop-shadow(0 0 3px rgba(255, 220, 180, 0.6));
 }
-.characterSheet .phase-ribbon .phase-arrow:active {
-  transform: scale(0.95);
-}
-/* Mirror the right arrow so the ankh "points" the other way. attributes.png
-   is symmetrical-ish, but the flip makes the directional intent obvious. */
+/* Left arrow: rotate 90° clockwise so the loop is on the right and the long
+   stem points to the left (←). Right arrow: rotate 90° counter-clockwise so
+   the stem points to the right (→). Hover/active scaling is layered on top
+   so it doesn't clobber the base rotation. */
 .characterSheet .phase-ribbon .phase-arrow-left {
-  transform: scaleX(-1);
+  transform: rotate(90deg);
+}
+.characterSheet .phase-ribbon .phase-arrow-right {
+  transform: rotate(-90deg);
 }
 .characterSheet .phase-ribbon .phase-arrow-left:hover {
-  transform: scaleX(-1) scale(1.1);
+  transform: rotate(90deg) scale(1.1);
+}
+.characterSheet .phase-ribbon .phase-arrow-right:hover {
+  transform: rotate(-90deg) scale(1.1);
 }
 .characterSheet .phase-ribbon .phase-arrow-left:active {
-  transform: scaleX(-1) scale(0.95);
+  transform: rotate(90deg) scale(0.95);
+}
+.characterSheet .phase-ribbon .phase-arrow-right:active {
+  transform: rotate(-90deg) scale(0.95);
 }
 .characterSheet .phase-ribbon .phase-label {
   font-family: "Trajan VTR", "Times New Roman", serif;
@@ -491,7 +508,7 @@
 }
 .characterSheet .phase-ribbon .phase-track {
   position: relative;
-  width: 320px;
+  width: 100%;
   height: 42px;
   background-image: url("../ui/phase_of_night.png");
   background-repeat: no-repeat;

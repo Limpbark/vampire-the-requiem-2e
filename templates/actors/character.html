@@ -202,6 +202,24 @@
           </select>
         {{/if}}
       </div>
+      {{!-- Homebrew Phases of Night ribbon (right column, directly under the
+            class banner). Hidden unless the "phasesOfNight" world setting is
+            on. Label + ankh arrows above; skull marker is absolutely
+            positioned over the appropriate one of the ten ribbon segments
+            via an inline `left: N%` style emitted from getData(). --}}
+      {{#if showPhasesOfNight}}
+      <div class="phase-ribbon" data-phase="{{phaseOfNight.index}}">
+        <div class="phase-label-row">
+          <img class="phase-arrow phase-arrow-left" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Previous phase" title="Earlier phase">
+          <span class="phase-label">{{phaseOfNight.label}}</span>
+          <img class="phase-arrow phase-arrow-right" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Next phase" title="Later phase">
+        </div>
+        <div class="phase-track">
+          <img class="phase-skull" src="systems/vampire-the-requiem-2e/ui/requiem_skull_sepia.webp" alt="" style="left: {{phaseOfNight.skullPosPct}}%;">
+        </div>
+      </div>
+      {{/if}}
+
       {{!-- charclassHeader hidden via CSS: for Mortal/Vampire/Ghoul it carries
             no content (deviant/promethean-only flags). Kept in the DOM so any
             splat-specific warnings could be reintroduced later. --}}
@@ -657,24 +675,6 @@
         <div class="button charMacroButton falteringButton tooltip">
           <span class="tooltip-text">{{ localize "MTA.TooltipFalteringRoll" }}</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-faltering.svg" alt="{{ localize "MTA.TooltipFalteringRoll" }}">
-        </div>
-        {{/if}}
-
-        {{!-- Homebrew Phases of Night ribbon. Sits between the macro icons
-              and the Vitae pool when the "phasesOfNight" world setting is on.
-              The label + ankh arrows are above the ribbon; the skull marker
-              is absolutely positioned over the appropriate one of the ten
-              ribbon segments via an inline `left:` percentage. --}}
-        {{#if showPhasesOfNight}}
-        <div class="phase-ribbon" data-phase="{{phaseOfNight.index}}">
-          <div class="phase-label-row">
-            <img class="phase-arrow phase-arrow-left" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Previous phase" title="Earlier phase">
-            <span class="phase-label">{{phaseOfNight.label}}</span>
-            <img class="phase-arrow phase-arrow-right" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Next phase" title="Later phase">
-          </div>
-          <div class="phase-track">
-            <img class="phase-skull" src="systems/vampire-the-requiem-2e/ui/requiem_skull_sepia.webp" alt="" style="left: {{phaseOfNight.skullPosPct}}%;">
-          </div>
         </div>
         {{/if}}
 
