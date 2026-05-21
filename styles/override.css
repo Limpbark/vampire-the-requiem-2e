@@ -227,8 +227,8 @@
 }
 @font-face {
   font-family: "Cezanne VTR";
-  src: url("../fonts/Cezanne.woff2") format("woff2"),
-       url("../fonts/Cezanne.ttf") format("truetype");
+  src: url("../fonts/P22_Cezanne_Regular.woff2") format("woff2"),
+       url("../fonts/P22%20Cezanne%20Regular.ttf") format("truetype");
   font-display: swap;
 }
 
