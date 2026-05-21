@@ -675,9 +675,23 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs">
-      <a class="item" data-tab="attributes">{{ localize "MTA.TabAttributes" }}</a>
+      <a class="item vtr-tab" data-tab="attributes">
+        <img class="tab-icon" src="systems/vampire-the-requiem-2e/icons/gui/attributes.png" alt="">
+        <span class="tab-label">
+          <span class="tab-name">{{ localize "MTA.TabAttributes" }}</span>
+          <span class="tab-subtitle">Traits</span>
+        </span>
+      </a>
       {{#if show.tab_magic}} <a class="item" data-tab="magic">{{ localize "MTA.TabMagic" }}</a> {{/if}}
-      {{#if (eq system.characterType "vampire")}} <a class="item" data-tab="disciplines">{{ localize "MTA.TabDisciplines" }}</a> {{/if}}
+      {{#if (eq system.characterType "vampire")}}
+      <a class="item vtr-tab" data-tab="disciplines">
+        <img class="tab-icon" src="systems/vampire-the-requiem-2e/icons/gui/blood_and_powers.webp" alt="">
+        <span class="tab-label">
+          <span class="tab-name">{{ localize "MTA.TabDisciplines" }}</span>
+          <span class="tab-subtitle">Blood &amp; Powers</span>
+        </span>
+      </a>
+      {{/if}}
       {{#if show.tab_contracts}} <a class="item" data-tab="contracts">{{ localize "MTA.TabContracts" }}</a> {{/if}}
       {{#if (eq system.characterType "werewolf")}} <a class="item" data-tab="gifts">{{ localize "MTA.TabGifts" }}</a> {{/if}}
       {{#if (eq system.characterType "demon")}} <a class="item" data-tab="embeds">{{ localize "MTA.TabDemonEmbeds" }}</a> {{/if}}
@@ -686,10 +700,30 @@
       {{#if (eq system.characterType "mummy")}} <a class="item" data-tab="utterances">{{ localize "MTA.Mummy.TabMummyUtterances" }}</a> {{/if}}
       {{#if (eq system.characterType "deviant")}} <a class="item" data-tab="deviantPowers">{{ localize "MTA.TabDeviantPowers" }}</a> {{/if}}
       {{#if show.tab_alchemy}} <a class="item" data-tab="prometheanPowers">{{ localize "MTA.TabPrometheanPowers" }}</a> {{/if}}
-      <a class="item" data-tab="inventory">{{ localize "MTA.TabItems" }}</a>
-      <a class="item" data-tab="description">{{ localize "MTA.TabTraits" }}</a>
+      <a class="item vtr-tab" data-tab="inventory">
+        <img class="tab-icon" src="systems/vampire-the-requiem-2e/icons/gui/equipment.webp" alt="">
+        <span class="tab-label">
+          <span class="tab-name">{{ localize "MTA.TabItems" }}</span>
+          <span class="tab-subtitle">Equipment</span>
+        </span>
+      </a>
+      <a class="item vtr-tab" data-tab="description">
+        <img class="tab-icon" src="systems/vampire-the-requiem-2e/icons/gui/the_human.webp" alt="">
+        <span class="tab-label">
+          <span class="tab-name">{{ localize "MTA.TabTraits" }}</span>
+          <span class="tab-subtitle">The Human</span>
+        </span>
+      </a>
       {{#if show.tab_mage}} <a class="item" data-tab="magePersona">{{ localize "MTA.TabMageTraits" }}</a> {{/if}}
-      {{#if (eq system.characterType "vampire")}} <a class="item" data-tab="vampirePersona">{{ localize "MTA.TabVampireTraits" }}</a> {{/if}}
+      {{#if (eq system.characterType "vampire")}}
+      <a class="item vtr-tab" data-tab="vampirePersona">
+        <img class="tab-icon" src="systems/vampire-the-requiem-2e/icons/gui/the_beast.webp" alt="">
+        <span class="tab-label">
+          <span class="tab-name">{{ localize "MTA.TabVampireTraits" }}</span>
+          <span class="tab-subtitle">The Beast</span>
+        </span>
+      </a>
+      {{/if}}
       {{#if show.tab_changeling}} <a class="item" data-tab="changelingPersona">{{ localize "MTA.TabChangelingTraits" }}</a> {{/if}}
       {{#if (eq system.characterType "werewolf")}} <a class="item" data-tab="werewolfPersona">{{ localize "MTA.TabWerewolfraits" }}</a> {{/if}}
       {{#if (eq system.characterType "demon")}} <a class="item" data-tab="demonPersona">{{ localize "MTA.TabDemonTraits" }}</a> {{/if}}

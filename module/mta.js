@@ -604,6 +604,36 @@ Hooks.once("ready", function () {
 
 
 /* -------------------------------------------- */
+/*  Custom pause icon                           */
+/* -------------------------------------------- */
+
+Hooks.on("renderPause", (app, html) => {
+  const root = html instanceof HTMLElement ? html : (html[0] ?? html);
+  if (!root || root.querySelector(".vtr-pause-icon")) return;
+
+  const defaultImg = root.querySelector("img");
+  if (defaultImg) defaultImg.style.display = "none";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "vtr-pause-icon";
+
+  const border = document.createElement("img");
+  border.className = "vtr-pause-border";
+  border.src = "systems/vampire-the-requiem-2e/ui/Pause_Border.webp";
+
+  const overlay = document.createElement("img");
+  overlay.className = "vtr-pause-overlay";
+  overlay.src = "systems/vampire-the-requiem-2e/ui/Pause_Overlay.webp";
+
+  wrapper.appendChild(border);
+  wrapper.appendChild(overlay);
+
+  const caption = root.querySelector("figcaption, label, p");
+  if (caption) root.insertBefore(wrapper, caption);
+  else root.prepend(wrapper);
+});
+
+/* -------------------------------------------- */
 /*  Dice So Nice integration                    */
 /* -------------------------------------------- */
 
