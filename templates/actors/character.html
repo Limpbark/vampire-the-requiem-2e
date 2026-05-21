@@ -13,8 +13,14 @@
 
       <!-- Column #2 -->
       <div>
-        <!-- Row #1 -->
-        <h1 class="character-name"><input type="text" name="name" value="{{actor.name}}" placeholder="Name"> </h1>
+        <!-- Row #1: character name + optional title (edited via the pencil dialog) -->
+        <div class="vtr-namebar">
+          <div class="vtr-namebar-text">
+            <h1 class="character-name vtr-name">{{actor.name}}</h1>
+            {{#if system.title}}<div class="vtr-title">{{system.title}}</div>{{/if}}
+          </div>
+          <button type="button" class="vtr-name-edit" title="Edit name and title"><i class="fas fa-pen-to-square"></i></button>
+        </div>
 
         <!-- Row #2 -->
         <div class="bottomCharaBlock">

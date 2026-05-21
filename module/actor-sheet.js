@@ -1660,6 +1660,43 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.daysleep();
     });
 
+    // Pencil button on the character-name bar: opens a small Dialog to edit
+    // both the actor's name and the new free-text title underneath it.
+    html.find('.vtr-name-edit').click(ev => {
+      ev.preventDefault();
+      const currentName = this.actor.name ?? "";
+      const currentTitle = this.actor.system?.title ?? "";
+      const dlg = new foundry.appv1.api.Dialog({
+        title: "Edit Name & Title",
+        content: `
+          <form class="vtr-name-edit-form">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" name="vtr-edit-name" value="${foundry.utils.escapeHTML(currentName)}" autofocus>
+            </div>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="vtr-edit-title" value="${foundry.utils.escapeHTML(currentTitle)}" placeholder="e.g. Daeva Tattoo Artist Reeve">
+            </div>
+          </form>`,
+        buttons: {
+          save: {
+            icon: '<i class="fas fa-check"></i>',
+            label: "Save",
+            callback: (dlgHtml) => {
+              const root = dlgHtml instanceof jQuery ? dlgHtml[0] : dlgHtml;
+              const name = root.querySelector('[name="vtr-edit-name"]').value.trim() || this.actor.name;
+              const title = root.querySelector('[name="vtr-edit-title"]').value;
+              this.actor.update({ name, "system.title": title });
+            }
+          },
+          cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
+        },
+        default: "save"
+      });
+      dlg.render(true);
+    });
+
     // The macro-bar Vitae pool input is intentionally not bound to the form
     // (its name attribute is omitted to avoid colliding with the Disciplines-
     // tab Vitae input), so update the actor directly on change.

@@ -216,6 +216,70 @@
 .codex-body li { margin: 2px 0; }
 .codex-body em { opacity: 0.75; }
 
+/* Custom fonts bundled with the system for the character-name flair. */
+@font-face {
+  font-family: "Trajan VTR";
+  src: url("../fonts/TRAJAN_N.TTF") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cezanne VTR";
+  src: url("../fonts/Cezanne.ttf") format("truetype");
+  font-display: swap;
+}
+
+/* Character-name bar: large name in Trajan, optional title in Cezanne below.
+   The pencil button on the right opens a dialog to edit both. */
+.characterSheet .vtr-namebar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.characterSheet .vtr-namebar-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.characterSheet .vtr-name {
+  font-family: "Trajan VTR", "Trajan Pro", serif;
+  font-size: 32px;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  line-height: 1.1;
+}
+.characterSheet .vtr-title {
+  font-family: "Cezanne VTR", cursive;
+  font-size: 18px;
+  color: #a86038;
+  margin-top: 2px;
+  line-height: 1.1;
+}
+.characterSheet .vtr-name-edit {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #5a4030;
+  border-radius: 3px;
+  color: #d8b878;
+  cursor: pointer;
+  padding: 0;
+}
+.characterSheet .vtr-name-edit:hover {
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffe2ab;
+  box-shadow: 0 0 4px rgba(216, 184, 120, 0.5);
+}
+.vtr-name-edit-form .form-group { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.vtr-name-edit-form label { flex: 0 0 4rem; font-weight: bold; }
+.vtr-name-edit-form input[type="text"] { flex: 1 1 auto; }
+
 /* Themed character-sheet tabs: icon on the left, thematic name beside it. */
 .mta-sheet .sheet-tabs a.item.vtr-tab {
   gap: 8px;
