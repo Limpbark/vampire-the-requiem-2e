@@ -31,6 +31,7 @@ export class DiceRollerDialogue extends Application {
     exceptionalTarget = 5,
     specialties = [],
     damageType = "lethal",
+    attribute = null,
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -66,6 +67,7 @@ export class DiceRollerDialogue extends Application {
     this.exceptionalTarget = exceptionalTarget;
     this.specialties = specialties;
     this.damageType = damageType;
+    this.attribute = attribute;
   }
 
   /* -------------------------------------------- */
@@ -112,6 +114,26 @@ export class DiceRollerDialogue extends Application {
     data.hasHunger = !!(hungerActor && hungerActor.system?.characterType === "vampire"
       && game.settings.get("vampire-the-requiem-2e", "hungerDice"));
     data.vitae = hungerActor?.system?.vitae?.value ?? 0;
+
+    // Dice-roller window background: choose by Attribute, falling back to
+    // ui/dice_bg_neutral.png for skill-only / item-only / damage rolls.
+    const KNOWN_ATTRS = [
+      "strength", "dexterity", "stamina",
+      "presence", "manipulation", "composure",
+      "intelligence", "wits", "resolve"
+    ];
+    const attrSlug = (this.attribute && KNOWN_ATTRS.includes(String(this.attribute).toLowerCase()))
+      ? String(this.attribute).toLowerCase()
+      : "neutral";
+    data.attribute = attrSlug;
+    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${attrSlug}.png`;
+
+    // Initial dice visual counts. The live updater in activateListeners
+    // recomputes these whenever the pool / bonuses / Willpower change.
+    const initialPool = Math.max(0, this.dicePool);
+    const initialHunger = data.hasHunger ? Math.max(0, this.dicePool - data.vitae) : 0;
+    data.initialNormalDice = Math.max(0, initialPool - initialHunger);
+    data.initialHungerDice = initialHunger;
 
     return data;
   }
@@ -189,8 +211,9 @@ export class DiceRollerDialogue extends Application {
     html.find('.roll-execute').click(ev => this._executeRoll(html, ev));
 
     // Live Hunger dice preview for Vampires/Ghouls: updates as the pool changes.
-    if (this.actorOverride?.system?.characterType === "vampire"
-      && game.settings.get("vampire-the-requiem-2e", "hungerDice")) {
+    const isHungerVamp = this.actorOverride?.system?.characterType === "vampire"
+      && game.settings.get("vampire-the-requiem-2e", "hungerDice");
+    if (isHungerVamp) {
       const vitae = this.actorOverride.system?.vitae?.value ?? 0;
       const base = this.dicePool;
       const updateHunger = () => {
@@ -204,6 +227,40 @@ export class DiceRollerDialogue extends Application {
       html.find('[name="dicePoolBonus"]').on("change", updateHunger);
       html.find('input[name^="specialty_"]').on("change", updateHunger);
       updateHunger();
+    }
+
+    // Live dice-pool visualiser: renders one d10 icon per die in the pool,
+    // with Hunger dice (if any) rendered as red d10s. Reacts to the pool
+    // bonus input, specialty toggles, and the Willpower (+3) toggle.
+    const container = html.find('.dice-pool-visual');
+    if (container.length) {
+      const base = this.dicePool;
+      const vitae = this.actorOverride?.system?.vitae?.value ?? 0;
+      const updateVisual = () => {
+        const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
+        const bonus = (raw === "" || raw === "-") ? 0 : parseInt(raw, 10);
+        let specialties = 0;
+        html.find('input[name^="specialty_"]').each(function () { if ($(this).prop("checked")) specialties++; });
+        const wpBonus = html.find('input[name="willpower"]').is(":checked") ? 3 : 0;
+        const prePool = Math.max(0, base + bonus + specialties);
+        const totalPool = Math.max(0, prePool + wpBonus);
+        // Hunger dice apply to the pre-Willpower pool only; Willpower dice
+        // always count as normal (white).
+        const hunger = isHungerVamp ? Math.max(0, prePool - vitae) : 0;
+        const normal = Math.max(0, totalPool - hunger);
+        const pieces = [];
+        for (let i = 0; i < normal; i++) {
+          pieces.push('<img class="dpv-die" src="systems/vampire-the-requiem-2e/icons/gui/d10_white.png" alt="">');
+        }
+        for (let i = 0; i < hunger; i++) {
+          pieces.push('<img class="dpv-die hunger" src="systems/vampire-the-requiem-2e/icons/gui/d10_red_hunger.png" alt="">');
+        }
+        container.html(pieces.join(""));
+      };
+      html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
+      html.find('input[name^="specialty_"]').on("change", updateVisual);
+      html.find('input[name="willpower"]').on("change", updateVisual);
+      updateVisual();
     }
   }
 

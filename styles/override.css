@@ -393,6 +393,59 @@ game-pause .vtr-pause-icon img {
 .characterSheet .attribute.rollableInput .attribute-value { max-width: 2rem; }
 
 /* ---------------------------------------------------------------------------
+   Dice roller dialog flair
+   ------------------------
+   - .vtr-dice-dialog is the kUltraBlock root; getData() emits an inline
+     background-image based on the selected Attribute (or the neutral
+     fallback for skill-only / item-only / damage rolls).
+   - .dice-pool-visual is a CSS-grid wrap of d10 icons that fills the empty
+     space in the right column. White dice are normal; red dice are Hunger.
+--------------------------------------------------------------------------- */
+.kUltraBlock.vtr-dice-dialog {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-color: #050505;
+}
+.kUltraBlock.vtr-dice-dialog .flexBlock > .vtr-dice-right-col {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 220px;
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+.kUltraBlock.vtr-dice-dialog .dice-pool-visual {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 260px;
+  padding: 6px 4px;
+  flex: 1 1 auto;
+  align-self: stretch;
+}
+.kUltraBlock.vtr-dice-dialog .dice-pool-visual .dpv-die {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+}
+.kUltraBlock.vtr-dice-dialog .dice-pool-visual .dpv-die.hunger {
+  filter: drop-shadow(0 0 4px rgba(224, 32, 58, 0.7));
+}
+/* Make sure the existing .dl labels/inputs stay readable on top of the
+   textured background (some attribute textures are bright). */
+.kUltraBlock.vtr-dice-dialog dl dt,
+.kUltraBlock.vtr-dice-dialog dl dd label,
+.kUltraBlock.vtr-dice-dialog dl dd span {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* ---------------------------------------------------------------------------
    Splat selector (top-right of the actor sheet).
    - Single rectangle: lock checkbox + dropdown left-justified inside it.
    - Mortals and Ghouls keep the default rock texture from default.css.

@@ -1,4 +1,4 @@
-<div class="kUltraBlock">
+<div class="kUltraBlock vtr-dice-dialog" data-attribute="{{attribute}}" style="background-image: url('{{diceBgUrl}}');">
 
   <div class="flexBlock">
     <div>
@@ -167,7 +167,13 @@
         {{/if}}
       </dl>
     </div>
-    <div>
+    <div class="vtr-dice-right-col">
+      {{!-- Visual readout of the current dice pool. The container is
+            populated by the live updater in dialogue-diceRoller.js: one d10
+            icon per die, with Hunger dice (if any) rendered as red d10s.
+            Left empty here — activateListeners() fills it synchronously
+            before the dialog becomes visible. --}}
+      <div class="dice-pool-visual" data-normal="{{initialNormalDice}}" data-hunger="{{initialHungerDice}}"></div>
       <div class="megaBtn">
         <button type="button" class="button roll-execute stoneButton">{{ localize "MTA.Execute" }}</button>
       </div>

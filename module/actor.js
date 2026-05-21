@@ -537,13 +537,13 @@ export class ActorMtA extends Actor {
    */
   roll({ traits = [], diceBonus = 0, rollName = "Skill check", rollType = "dialogue", damageRoll = false }) {
 
-    const { dicePool, flavor, specialties } = this.assembleDicePool({ traits, diceBonus });
+    const { dicePool, flavor, specialties, attribute } = this.assembleDicePool({ traits, diceBonus });
 
     switch (rollType) {
       case 'dialogue':
         let title = "";
         title = rollName + ": " + flavor;
-        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties });
+        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute });
         diceRoller.render(true);
         break;
       case 'quick':
@@ -607,6 +607,10 @@ export class ActorMtA extends Actor {
     let isSocialRoll = false;
     let isMentalRoll = false;
     let specialties = [];
+    // The specific Attribute key (e.g. "composure", "dexterity") used to
+    // choose the dice-roller window's background texture. First attribute
+    // encountered wins; null when no Attribute is part of the pool.
+    let attribute = null;
 
     if (traits.length > 0) {
       // Get dice pool according to the item's dice pool attributes from the actor
@@ -660,6 +664,14 @@ export class ActorMtA extends Actor {
 
           if (skillType === "skills_mental" || skillType === "attributes_mental")
             isMentalRoll = true;
+
+          // Capture the specific attribute name (first one wins) so the
+          // dice-roller dialog can pick a matching background texture.
+          if (!attribute && (skillType === "attributes_physical"
+                          || skillType === "attributes_social"
+                          || skillType === "attributes_mental")) {
+            attribute = split[1];
+          }
         }
         else {
           const item = itemList.get(split[1]);
@@ -715,7 +727,7 @@ export class ActorMtA extends Actor {
       flavor += " (Wound penalties: -" + woundPenalty + ")";
     }
 
-    return { dicePool, flavor, specialties };
+    return { dicePool, flavor, specialties, attribute };
   }
 
   async werewolfTransform(form) {
