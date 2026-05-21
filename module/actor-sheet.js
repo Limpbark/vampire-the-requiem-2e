@@ -308,6 +308,19 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     
     sheetData.showVariants = Object.keys(sheetData.characterVariants).length > 1;
 
+    // Splat selector background: Mortals and Ghouls keep the default rock
+    // texture; Vampires get a clan-specific texture from the ui/ folder.
+    // Unknown / unset clans fall back to clanless_texture.png. If a clan's
+    // texture file is missing, the browser silently shows no image and the
+    // selector remains usable.
+    sheetData.splatBgUrl = (function () {
+      if (systemData.characterVariant !== "vampire") return null;
+      const clan = String(systemData.clan || "").toLowerCase().trim();
+      const known = ["daeva", "gangrel", "mekhet", "nosferatu", "ventrue"];
+      const slug = known.includes(clan) ? clan : "clanless";
+      return `systems/vampire-the-requiem-2e/ui/${slug}_texture.png`;
+    })();
+
     if(sheetData.show.dreadPowers) {
       systemData.usesDreadPowers = true;
     }

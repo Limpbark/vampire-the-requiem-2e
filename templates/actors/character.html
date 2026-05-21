@@ -176,7 +176,10 @@
 
     {{!-- Sheet Side --}}
     <div class="conditions">
-      <div class="character-type">
+      {{!-- Splat selector: a single rectangle. Lock + dropdown are pinned
+            left. For Vampires the background image is the clan texture;
+            Mortals and Ghouls use the default textured background. --}}
+      <div class="character-type{{#if splatBgUrl}} vamp-textured{{/if}}"{{#if splatBgUrl}} style="background-image: url('{{splatBgUrl}}');"{{/if}}>
         <span class="tooltip left">
           <span class="tooltip-text">{{ localize "MTA.TooltipTypeVisible" }}</span>
           <label class="checkBox">
@@ -199,6 +202,9 @@
           </select>
         {{/if}}
       </div>
+      {{!-- charclassHeader hidden via CSS: for Mortal/Vampire/Ghoul it carries
+            no content (deviant/promethean-only flags). Kept in the DOM so any
+            splat-specific warnings could be reintroduced later. --}}
       <div class="charclassHeader {{#if system.isFeral}}feral{{else if system.isGuardian}}guardian{{else if system.isDevoted}}devoted{{/if}}">
         {{#if show.origin}}
           <div class="form-line">

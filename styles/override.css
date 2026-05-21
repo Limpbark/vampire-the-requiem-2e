@@ -371,3 +371,59 @@
 /* Shrink the attribute/skill value input slightly to make room for the
    row of five dots without forcing the row to wrap. */
 .characterSheet .attribute.rollableInput .attribute-value { max-width: 2rem; }
+
+/* ---------------------------------------------------------------------------
+   Splat selector (top-right of the actor sheet).
+   - Single rectangle: lock checkbox + dropdown left-justified inside it.
+   - Mortals and Ghouls keep the default rock texture from default.css.
+   - Vampires get a clan-specific texture, supplied as background-image inline
+     from getData (see actor-sheet.js -> splatBgUrl). The inline image stacks
+     on top of the rock texture via background-image only, so it always wins.
+   - The empty charclassHeader rectangle below the selector is hidden so the
+     selector reads as a single box. (For our splats it never carries content.)
+--------------------------------------------------------------------------- */
+.mta-sheet .character-type {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+}
+.mta-sheet .character-type .tooltip.left,
+.mta-sheet .character-type .checkBox {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.mta-sheet .character-type .splat-select {
+  flex: 0 0 auto;
+  margin: 0;
+  width: auto;
+  min-width: 8rem;
+}
+
+/* Vampires: stamp the clan texture on top of the default rock background.
+   background-size: cover keeps the texture filling the rectangle even when
+   the box is short; the rock-and-gold gradient underneath stays in place
+   so the rectangle border still reads correctly at the seams. */
+.mta-sheet .character-type.vamp-textured {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.mta-sheet .character-type.vamp-textured .splat-select {
+  background: rgba(0, 0, 0, 0.55);
+  color: #f4ead8;
+  border: 1px solid #1a0d0f;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+.mta-sheet .character-type.vamp-textured .checkBox > span {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* Hide the second rectangle below the splat selector: for Mortal/Vampire/Ghoul
+   the charclassHeader has no rendered content (its inner conditionals are all
+   deviant/promethean-only) so it just looked like an empty bar. */
+.mta-sheet .charclassHeader {
+  display: none;
+}
