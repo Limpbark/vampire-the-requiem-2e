@@ -3,7 +3,7 @@
   "name": "Add Beats (Custom)",
   "type": "script",
   "author": "rgSvVH0I52G7WbzM",
-  "img": "systems/mta/icons/macros/beat_custom.svg",
+  "img": "systems/vampire-the-requiem-2e/icons/macros/beat_custom.svg",
   "scope": "global",
   "command": "for(let token of canvas.tokens.controlled){\nif(token){\nif(token.actor){\ntoken.actor.addProgressDialogue();\nChatMessage.create({\nuser: game.user._id,\nspeaker: ChatMessage.getSpeaker({actor: token.actor}),\ncontent: \"Got some Beats!\"\n});\n}\n}}",
   "folder": null,

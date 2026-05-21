@@ -109,6 +109,24 @@ MTA.traitMaximum = 100; // The absolute trait buff maximum (though it could be i
 MTA.traitMaximumLower = 5; // The maximum used for buffs without the checkbox, only used for attributes&skills, not derived traits
 
 /**
+ * Homebrew "Phases of Night" labels. Indexed 0-9. Used by the actor sheet
+ * ribbon and by the shipped macro that advances the clock for selected
+ * tokens (kept in a single place so the chat readout matches the sheet).
+ */
+MTA.phaseOfNightLabels = [
+  "Early Dawn (~6 PM - ~7 PM)",
+  "Late Dawn (~7 PM - ~8 PM)",
+  "Early Evening (~8 PM - ~9 PM)",
+  "Late Evening (~9 PM - ~10 PM)",
+  "Early Night (~10 PM - ~11 PM)",
+  "Late Night (~11 PM - ~12 AM)",
+  "Early Dark (~12 AM - ~1 AM)",
+  "Late Dark (~1 AM - ~2 AM)",
+  "Early Dawn (~2 AM - ~3 AM)",
+  "Late Dawn (~4 AM - ~5 AM)"
+];
+
+/**
  * The character configuration determines what sheet features are shown and how certain things are calculated.
  * For each type (character, ephemeral) it has each characterType (mortal, mage, ...) with a certain amount of
  * variants set by characterVariant (sleepwalker, etc.).

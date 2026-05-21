@@ -3,7 +3,7 @@
   "name": "+1 Arcane Beats (Obsession)",
   "type": "script",
   "author": "rgSvVH0I52G7WbzM",
-  "img": "systems/mta/icons/macros/beat_obsession.svg",
+  "img": "systems/vampire-the-requiem-2e/icons/macros/beat_obsession.svg",
   "scope": "global",
   "command": "for(let token of canvas.tokens.controlled){\nif(token){\nif(token.actor){\ntoken.actor.addProgress(\"Obsession\", 0, 1);\nChatMessage.create({\nuser: game.user._id,\nspeaker: ChatMessage.getSpeaker({actor: token.actor}),\ncontent: \"Got an Arcane Beat for an Obsession!\"\n});\n}\n}\n}",
   "folder": null,

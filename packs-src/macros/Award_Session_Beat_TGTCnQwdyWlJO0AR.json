@@ -1,0 +1,16 @@
+{
+  "_id": "TGTCnQwdyWlJO0AR",
+  "name": "Award Session Beat",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "systems/vampire-the-requiem-2e/icons/macros/beat_session.svg",
+  "scope": "global",
+  "command": "// Award a Session Beat to every selected token.\n// Prompts once for the session number, then adds a single Beat to each\n// selected actor with name \"Session <N>\".\nconst tokens = canvas.tokens?.controlled ?? [];\nif (!tokens.length) {\n  ui.notifications.warn(\"Select at least one token first.\");\n  return;\n}\nnew foundry.appv1.api.Dialog({\n  title: \"Award Session Beat\",\n  content: `\n    <form>\n      <div class=\"form-group\">\n        <label>Session number</label>\n        <input type=\"number\" name=\"session\" min=\"1\" step=\"1\" value=\"1\" autofocus>\n      </div>\n    </form>`,\n  buttons: {\n    award: {\n      icon: '<i class=\"fas fa-check\"></i>',\n      label: \"Award\",\n      callback: async (html) => {\n        const raw = html.find('input[name=\"session\"]').val();\n        const n = Math.max(1, Math.floor(Number(raw) || 0));\n        const label = `Session ${n}`;\n        const awarded = [];\n        for (const token of tokens) {\n          const actor = token.actor;\n          if (!actor) continue;\n          await actor.addProgress(label, 1, 0);\n          awarded.push(actor.name);\n        }\n        if (awarded.length) {\n          const list = awarded.map(a => `<li>${a}</li>`).join(\"\");\n          await ChatMessage.create({\n            user: game.user.id,\n            speaker: { alias: \"Storyteller\" },\n            content: `<p><strong>${label}</strong> Beat awarded to:</p><ul>${list}</ul>`\n          });\n        }\n      }\n    },\n    cancel: { icon: '<i class=\"fas fa-times\"></i>', label: \"Cancel\" }\n  },\n  default: \"award\"\n}).render(true);",
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!TGTCnQwdyWlJO0AR"
+}

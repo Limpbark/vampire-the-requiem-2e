@@ -314,18 +314,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // exists on the actor (see template.json base) so toggling the setting
     // off and on again preserves whatever the player last picked.
     sheetData.showPhasesOfNight = game.settings.get("vampire-the-requiem-2e", "phasesOfNight");
-    const PHASE_LABELS = [
-      "Early Dawn (~6 PM - ~7 PM)",
-      "Late Dawn (~7 PM - ~8 PM)",
-      "Early Evening (~8 PM - ~9 PM)",
-      "Late Evening (~9 PM - ~10 PM)",
-      "Early Night (~10 PM - ~11 PM)",
-      "Late Night (~11 PM - ~12 AM)",
-      "Early Dark (~12 AM - ~1 AM)",
-      "Late Dark (~1 AM - ~2 AM)",
-      "Early Dawn (~2 AM - ~3 AM)",
-      "Late Dawn (~4 AM - ~5 AM)"
-    ];
+    const PHASE_LABELS = CONFIG.MTA.phaseOfNightLabels;
     const rawPhase = Number(systemData.phaseOfNight ?? 0) || 0;
     const phaseIdx = Math.max(0, Math.min(9, Math.floor(rawPhase)));
     sheetData.phaseOfNight = {

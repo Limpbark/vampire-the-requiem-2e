@@ -3,7 +3,7 @@
   "name": "+1 Beat (Dram. Failure)",
   "type": "script",
   "author": "rgSvVH0I52G7WbzM",
-  "img": "systems/mta/icons/macros/beat_dramatic-failure.svg",
+  "img": "systems/vampire-the-requiem-2e/icons/macros/beat_dramatic-failure.svg",
   "scope": "global",
   "command": "for(let token of canvas.tokens.controlled){\nif(token){\nif(token.actor){\ntoken.actor.addProgress(\"Dram. Failure\", 1, 0);\nChatMessage.create({\nuser: game.user._id,\nspeaker: ChatMessage.getSpeaker({actor: token.actor}),\ncontent: \"Got a Beat for a dramatic failure!\"\n});\n}\n}\n}",
   "folder": null,

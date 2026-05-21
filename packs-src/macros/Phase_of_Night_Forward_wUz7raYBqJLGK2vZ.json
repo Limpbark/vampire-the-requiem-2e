@@ -1,0 +1,16 @@
+{
+  "_id": "wUz7raYBqJLGK2vZ",
+  "name": "Phase of Night: Forward",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "icons/svg/clockwork.svg",
+  "scope": "global",
+  "command": "// Move every selected token's Phase of Night marker one step forward\n// (wraps at the end of the night). Posts a single chat message listing\n// every affected actor and the phase they ended up in.\nconst tokens = canvas.tokens?.controlled ?? [];\nif (!tokens.length) {\n  ui.notifications.warn(\"Select at least one token first.\");\n  return;\n}\nconst LABELS = (CONFIG.MTA && CONFIG.MTA.phaseOfNightLabels) || [];\nconst moved = [];\nfor (const token of tokens) {\n  const actor = token.actor;\n  if (!actor) continue;\n  if (typeof actor.advancePhaseOfNight === \"function\") {\n    await actor.advancePhaseOfNight(1);\n  } else {\n    const cur = Number(actor.system?.phaseOfNight ?? 0) || 0;\n    const next = (((cur + 1) % 10) + 10) % 10;\n    await actor.update({ \"system.phaseOfNight\": next });\n  }\n  const phaseIdx = Math.max(0, Math.min(9, Math.floor(Number(actor.system?.phaseOfNight ?? 0) || 0)));\n  moved.push({ name: actor.name, label: LABELS[phaseIdx] ?? `Phase ${phaseIdx}` });\n}\nif (moved.length) {\n  const list = moved.map(m => `<li><strong>${m.name}</strong> &mdash; ${m.label}</li>`).join(\"\");\n  await ChatMessage.create({\n    user: game.user.id,\n    speaker: { alias: \"Storyteller\" },\n    content: `<p>Your Storyteller moved the clock forward for&hellip;</p><ul>${list}</ul>`\n  });\n}",
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!wUz7raYBqJLGK2vZ"
+}
