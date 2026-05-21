@@ -95,6 +95,21 @@ export const registerSystemSettings = function () {
     requiresReload: true
   });
 
+  game.settings.register("vampire-the-requiem-2e", "phasesOfNight", {
+    name: "Homebrew rule: Phases of Night",
+    hint: "Adds a 'Phases of Night' ribbon to the character sheet's macro bar showing where the character is in the night (10 segments from ~6 PM through ~6 AM). Daysleep resets the marker to Early Dawn.",
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean,
+    onChange: () => {
+      // Re-render every open character sheet so the ribbon shows/hides immediately.
+      for (const app of Object.values(ui.windows)) {
+        if (app?.actor?.type === "character") app.render(false);
+      }
+    }
+  });
+
   game.settings.register("vampire-the-requiem-2e", "hungerDice", {
     name: "Homebrew rule: Hunger Dice",
     hint: "For Vampires and Ghouls, when a dice pool exceeds current Vitae the excess dice become Hunger dice (a 10 causes a messy success, a 1 on a failed roll causes a messy failure). The dice roller calculates and displays this automatically.",

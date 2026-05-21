@@ -13,6 +13,7 @@
         "title": "",
         "description": "",
         "notes": "",
+        "phaseOfNight": 0,
         "derivedTraits": {
           "size": {
             "value": 0,

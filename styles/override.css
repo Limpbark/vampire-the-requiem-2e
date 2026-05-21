@@ -427,3 +427,85 @@
 .mta-sheet .charclassHeader {
   display: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Homebrew Phases of Night ribbon
+   --------------------------------
+   - Sits inline on the macro bar between the macro icons and the Vitae pool.
+   - Top row: ankh-shaped arrows flank the phase label text.
+   - Bottom row: phase_of_night.png as a horizontal strip of 10 segments; the
+     skull marker is absolutely positioned via an inline `left: N%` style
+     emitted by getData() (centre of the active 10% segment).
+   - Reserve room on the right (~90px) so the absolutely-positioned Vitae pool
+     doesn't overlap the ribbon's right edge.
+--------------------------------------------------------------------------- */
+.characterSheet .phase-ribbon {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 0.5rem 0 0.25rem;
+  user-select: none;
+}
+.characterSheet .phase-ribbon .phase-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.characterSheet .phase-ribbon .phase-arrow {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s, transform 0.1s;
+  flex: 0 0 auto;
+}
+.characterSheet .phase-ribbon .phase-arrow:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+.characterSheet .phase-ribbon .phase-arrow:active {
+  transform: scale(0.95);
+}
+/* Mirror the right arrow so the ankh "points" the other way. attributes.png
+   is symmetrical-ish, but the flip makes the directional intent obvious. */
+.characterSheet .phase-ribbon .phase-arrow-left {
+  transform: scaleX(-1);
+}
+.characterSheet .phase-ribbon .phase-arrow-left:hover {
+  transform: scaleX(-1) scale(1.1);
+}
+.characterSheet .phase-ribbon .phase-arrow-left:active {
+  transform: scaleX(-1) scale(0.95);
+}
+.characterSheet .phase-ribbon .phase-label {
+  font-family: "Trajan VTR", "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #f4ead8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.characterSheet .phase-ribbon .phase-track {
+  position: relative;
+  width: 320px;
+  height: 42px;
+  background-image: url("../ui/phase_of_night.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  border-radius: 2px;
+}
+.characterSheet .phase-ribbon .phase-skull {
+  position: absolute;
+  bottom: -2px;
+  width: 30px;
+  height: auto;
+  transform: translateX(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9));
+  transition: left 0.18s ease-out;
+}

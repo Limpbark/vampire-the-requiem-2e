@@ -660,6 +660,24 @@
         </div>
         {{/if}}
 
+        {{!-- Homebrew Phases of Night ribbon. Sits between the macro icons
+              and the Vitae pool when the "phasesOfNight" world setting is on.
+              The label + ankh arrows are above the ribbon; the skull marker
+              is absolutely positioned over the appropriate one of the ten
+              ribbon segments via an inline `left:` percentage. --}}
+        {{#if showPhasesOfNight}}
+        <div class="phase-ribbon" data-phase="{{phaseOfNight.index}}">
+          <div class="phase-label-row">
+            <img class="phase-arrow phase-arrow-left" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Previous phase" title="Earlier phase">
+            <span class="phase-label">{{phaseOfNight.label}}</span>
+            <img class="phase-arrow phase-arrow-right" src="systems/vampire-the-requiem-2e/ui/attributes.png" alt="Next phase" title="Later phase">
+          </div>
+          <div class="phase-track">
+            <img class="phase-skull" src="systems/vampire-the-requiem-2e/ui/requiem_skull_sepia.webp" alt="" style="left: {{phaseOfNight.skullPosPct}}%;">
+          </div>
+        </div>
+        {{/if}}
+
         {{!-- Prominent Vitae blood pool counter (Vampires + Ghouls).
               The input intentionally has no `name` attribute so it does not
               clash with the canonical system.vitae.value input on the

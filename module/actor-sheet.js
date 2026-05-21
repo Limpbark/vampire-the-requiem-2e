@@ -308,6 +308,34 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     
     sheetData.showVariants = Object.keys(sheetData.characterVariants).length > 1;
 
+    // Homebrew Phases of Night ribbon: a ten-segment marker shown between
+    // the macro buttons and the Vitae pool. The ribbon is hidden unless the
+    // "phasesOfNight" world setting is enabled. The stored index always
+    // exists on the actor (see template.json base) so toggling the setting
+    // off and on again preserves whatever the player last picked.
+    sheetData.showPhasesOfNight = game.settings.get("vampire-the-requiem-2e", "phasesOfNight");
+    const PHASE_LABELS = [
+      "Early Dawn (~6 PM - ~7 PM)",
+      "Late Dawn (~7 PM - ~8 PM)",
+      "Early Evening (~8 PM - ~9 PM)",
+      "Late Evening (~9 PM - ~10 PM)",
+      "Early Night (~10 PM - ~11 PM)",
+      "Late Night (~11 PM - ~12 AM)",
+      "Early Dark (~12 AM - ~1 AM)",
+      "Late Dark (~1 AM - ~2 AM)",
+      "Early Dawn (~2 AM - ~3 AM)",
+      "Late Dawn (~4 AM - ~5 AM)"
+    ];
+    const rawPhase = Number(systemData.phaseOfNight ?? 0) || 0;
+    const phaseIdx = Math.max(0, Math.min(9, Math.floor(rawPhase)));
+    sheetData.phaseOfNight = {
+      index: phaseIdx,
+      label: PHASE_LABELS[phaseIdx],
+      // Centre of each 10% slice: 5%, 15%, …, 95%. The inline style on the
+      // skull element pins it to that horizontal position over the ribbon.
+      skullPosPct: phaseIdx * 10 + 5
+    };
+
     // Splat selector background: Mortals and Ghouls keep the default rock
     // texture; Vampires get a clan-specific texture from the ui/ folder.
     // Unknown / unset clans fall back to clanless_texture.png. If a clan's
@@ -1671,6 +1699,17 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     html.find('.daysleepButton').click(ev => {
       this.actor.daysleep();
+    });
+
+    // Phases of Night ribbon: ankh-shaped arrows step the marker forward or
+    // backwards. Both wrap at the ends (Late Dawn -> Early Dawn going right).
+    html.find('.phase-arrow-right').click(ev => {
+      ev.preventDefault();
+      this.actor.advancePhaseOfNight(1);
+    });
+    html.find('.phase-arrow-left').click(ev => {
+      ev.preventDefault();
+      this.actor.advancePhaseOfNight(-1);
     });
 
     // Pencil button on the character-name bar: opens a small Dialog to edit

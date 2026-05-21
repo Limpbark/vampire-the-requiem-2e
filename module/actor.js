@@ -1490,7 +1490,13 @@ export class ActorMtA extends Actor {
     const sys = this.system;
     const currentVitae = sys.vitae?.value ?? 0;
     const newVitae = Math.max(0, currentVitae - 1);
-    await this.update({ "system.vitae.value": newVitae });
+    // Daysleep also resets the Phases of Night marker back to Early Dawn,
+    // regardless of whether the homebrew setting is currently enabled — the
+    // stored phase index always lives on the actor.
+    await this.update({
+      "system.vitae.value": newVitae,
+      "system.phaseOfNight": 0
+    });
 
     const speaker = ChatMessage.getSpeaker({ actor: this });
     await ChatMessage.create({
@@ -1505,6 +1511,22 @@ export class ActorMtA extends Actor {
         content: `<p><em><strong>${this.name}</strong> has injuries &mdash; during daysleep the Beast heals them automatically (1 Vitae per 2 bashing or 1 lethal; 5 Vitae per aggravated). Spend 1 Willpower per wound to preserve it through the rest.</em></p>`
       });
     }
+  }
+
+  /**
+   * Homebrew Phases of Night: advance (or rewind) the actor's position on the
+   * ten-segment night ribbon. Wraps around at both ends so the right arrow at
+   * Late Dawn returns to Early Dawn and the left arrow at Early Dawn jumps to
+   * Late Dawn.
+   * @param {number} direction +1 to advance, -1 to rewind. Other values are
+   *                           coerced to +1.
+   */
+  async advancePhaseOfNight(direction = 1) {
+    const step = direction < 0 ? -1 : 1;
+    const current = Number(this.system?.phaseOfNight ?? 0) || 0;
+    // ((x % 10) + 10) % 10 gives a non-negative modulus for negative inputs.
+    const next = (((current + step) % 10) + 10) % 10;
+    await this.update({ "system.phaseOfNight": next });
   }
 
   scourPattern() {
