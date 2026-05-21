@@ -314,25 +314,45 @@
   white-space: nowrap;
 }
 
-/* Custom CoD pause icon: two-layer pause with rotating border */
-.vtr-pause-icon {
+/* Custom CoD pause icon: two-layer pause with rotating border.
+   Lives inside Foundry's pause element (#pause on v13, <game-pause> on v14).
+   The installer in module/mta.js hides whatever default content Foundry put
+   in there; this stylesheet renders our two image layers in its place. */
+#pause .vtr-pause-icon,
+game-pause .vtr-pause-icon {
   position: relative;
+  display: block;
   width: 200px;
   height: 200px;
   margin: 0 auto;
+  pointer-events: none;
 }
-.vtr-pause-border,
-.vtr-pause-overlay {
+#pause .vtr-pause-border,
+#pause .vtr-pause-overlay,
+game-pause .vtr-pause-border,
+game-pause .vtr-pause-overlay {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
-.vtr-pause-border {
+#pause .vtr-pause-border,
+game-pause .vtr-pause-border {
   animation: vtr-pause-spin 8s linear infinite;
+  transform-origin: 50% 50%;
 }
 @keyframes vtr-pause-spin {
-  to { transform: rotate(360deg); }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Defensively ensure the host element doesn't get a `display:none` on our
+   icon via core's grid/flex rules, and clear any backdrop/text inherited
+   from Foundry's default pause caption. */
+#pause .vtr-pause-icon img,
+game-pause .vtr-pause-icon img {
+  display: block;
 }
 
 /* Attribute / Skill dots: a tabletop-style row of pips after the value.

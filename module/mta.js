@@ -606,13 +606,30 @@ Hooks.once("ready", function () {
 /* -------------------------------------------- */
 /*  Custom pause icon                           */
 /* -------------------------------------------- */
+/* Foundry v13 rendered pause as <aside id="pause"> (an AppV1 Application)
+   and fired `renderPause`. v14 swapped it for a <game-pause> custom element
+   that lives in the DOM at all times and just toggles visibility, so the old
+   hook never fires. This installer:
+     1. Looks for either #pause or <game-pause>.
+     2. Hides whatever default content Foundry put inside.
+     3. Injects our two-layer icon (rotating Pause_Border + static
+        Pause_Overlay).
+   It's run once on ready, again on every pauseGame toggle, and a
+   MutationObserver re-runs it if Foundry re-renders the pause element. */
 
-Hooks.on("renderPause", (app, html) => {
-  const root = html instanceof HTMLElement ? html : (html[0] ?? html);
-  if (!root || root.querySelector(".vtr-pause-icon")) return;
+function _vtrInstallPauseIcon() {
+  const root = document.getElementById("pause") || document.querySelector("game-pause");
+  if (!root) return false;
+  if (root.querySelector(".vtr-pause-icon")) return true;
 
-  const defaultImg = root.querySelector("img");
-  if (defaultImg) defaultImg.style.display = "none";
+  // Hide Foundry's default content (logo img + caption text) without
+  // removing it, so any other module that expects it to be there still
+  // finds it.
+  for (const child of Array.from(root.children)) {
+    if (!child.classList || !child.classList.contains("vtr-pause-icon")) {
+      child.style.display = "none";
+    }
+  }
 
   const wrapper = document.createElement("div");
   wrapper.className = "vtr-pause-icon";
@@ -620,17 +637,50 @@ Hooks.on("renderPause", (app, html) => {
   const border = document.createElement("img");
   border.className = "vtr-pause-border";
   border.src = "systems/vampire-the-requiem-2e/ui/Pause_Border.webp";
+  border.alt = "";
 
   const overlay = document.createElement("img");
   overlay.className = "vtr-pause-overlay";
   overlay.src = "systems/vampire-the-requiem-2e/ui/Pause_Overlay.webp";
+  overlay.alt = "";
 
   wrapper.appendChild(border);
   wrapper.appendChild(overlay);
+  root.prepend(wrapper);
+  return true;
+}
 
-  const caption = root.querySelector("figcaption, label, p");
-  if (caption) root.insertBefore(wrapper, caption);
-  else root.prepend(wrapper);
+Hooks.once("ready", () => {
+  _vtrInstallPauseIcon();
+
+  // Cover both v13 and v14 render hooks plus the always-fires state toggle.
+  Hooks.on("renderPause", () => requestAnimationFrame(_vtrInstallPauseIcon));
+  Hooks.on("renderGamePause", () => requestAnimationFrame(_vtrInstallPauseIcon));
+  Hooks.on("pauseGame", () => requestAnimationFrame(_vtrInstallPauseIcon));
+
+  // Safety net: if the pause element is replaced/repopulated by core, the
+  // observer reinstalls our icon. If the element isn't in the DOM yet (e.g.
+  // setup screen), watch body for it to appear and then attach.
+  const attachInnerObserver = (root) => {
+    const obs = new MutationObserver(() => {
+      if (!root.querySelector(".vtr-pause-icon")) _vtrInstallPauseIcon();
+    });
+    obs.observe(root, { childList: true });
+  };
+  const root = document.getElementById("pause") || document.querySelector("game-pause");
+  if (root) {
+    attachInnerObserver(root);
+  } else {
+    const bodyObs = new MutationObserver(() => {
+      const r = document.getElementById("pause") || document.querySelector("game-pause");
+      if (r) {
+        bodyObs.disconnect();
+        _vtrInstallPauseIcon();
+        attachInnerObserver(r);
+      }
+    });
+    bodyObs.observe(document.body, { childList: true, subtree: true });
+  }
 });
 
 /* -------------------------------------------- */
