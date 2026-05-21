@@ -216,15 +216,19 @@
 .codex-body li { margin: 2px 0; }
 .codex-body em { opacity: 0.75; }
 
-/* Custom fonts bundled with the system for the character-name flair. */
+/* Custom fonts bundled with the system for the character-name flair.
+   The original TTFs failed the browser's OpenType Sanitiser; fontTools
+   re-emits clean WOFF2 versions that load reliably. */
 @font-face {
   font-family: "Trajan VTR";
-  src: url("../fonts/TRAJAN_N.TTF") format("truetype");
+  src: url("../fonts/TRAJAN_N.woff2") format("woff2"),
+       url("../fonts/TRAJAN_N.TTF") format("truetype");
   font-display: swap;
 }
 @font-face {
   font-family: "Cezanne VTR";
-  src: url("../fonts/Cezanne.ttf") format("truetype");
+  src: url("../fonts/Cezanne.woff2") format("woff2"),
+       url("../fonts/Cezanne.ttf") format("truetype");
   font-display: swap;
 }
 
