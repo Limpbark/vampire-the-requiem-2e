@@ -1774,13 +1774,19 @@ export class ActorMtA extends Actor {
         const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
         const pool = Math.max(0, bp + attrVal + modifier);
 
+        const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
           dicePool: pool,
           flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`,
           title: "Lashing Out",
           actorOverride: this,
-          hungerDice: 0
+          hungerDice: 0,
+          rollReturn
         });
+        // Only show the contested-response / Condition card when the lash-out
+        // actually landed. A failed roll never reaches the opposed step.
+        const hits = Math.max(0, rollReturn.roll?.total ?? 0);
+        if (hits < 1) return;
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: this }),
           content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
