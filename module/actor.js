@@ -7,6 +7,22 @@ import {
 import {
   UtteranceDialogue
 } from "./dialogue-utterance.js";
+
+/**
+ * Short, original explanations of the Conditions the Frenzy / Lashing Out /
+ * Detachment flows can apply. Used by applyConditionByName() as a fallback
+ * when the world has no matching Condition item, so play is never interrupted
+ * by talk of missing assets. `tone` only picks the card colour.
+ */
+const CONDITION_BLURBS = {
+  bestial: { tone: "bad", text: "The Beast shows plainly. The character reads as an open predator &mdash; mortals are unnerved, Social rolls to sway them suffer, and animals shy away. It eases once she lets the Beast act on its instincts." },
+  wanton: { tone: "bad", text: "The seductive Beast is loose. The character is pulled toward indulgence and a moment of throwaway gratification, and is hard-pressed to resist that pull until she gives in to it." },
+  competitive: { tone: "bad", text: "The Beast-as-alpha takes hold. The character is driven to win, command, and prove herself atop the hierarchy, and chafes until she dominates a contest of her choosing." },
+  tempted: { tone: "bad", text: "The Beast offers an easy, selfish way out. The character is presented with a tempting shortcut that serves her at someone else's expense; resolving it means taking the bait &mdash; or refusing it at real cost." },
+  jaded: { tone: "bad", text: "Something that should move the character no longer does. She is numb to a particular kind of experience and meets it with cold indifference." },
+  inspired: { tone: "good", text: "The character is seized by clear, driving purpose. She gains an edge while pursuing that inspiration, and the Condition resolves once she acts decisively on it." }
+};
+
 /**
  * Override and extend the basic :class:`Actor` implementation
  */
@@ -1565,13 +1581,20 @@ export class ActorMtA extends Actor {
     if (cond) {
       await this.createEmbeddedDocuments("Item", [cond.toObject()]);
       ui.notifications.info(`${cond.name} Condition added to ${this.name}.`);
-    } else {
-      await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor: this }),
-        content: `<p><em>Apply the <strong>${name}</strong> Condition to ${this.name} `
-          + `&mdash; no matching Condition item was found in this world.</em></p>`
-      });
+      return;
     }
+    // No matching Condition item in this world: post a short explanation of
+    // the Condition instead. Don't mention missing assets — that's noise
+    // during play.
+    const blurb = CONDITION_BLURBS[String(name).toLowerCase()];
+    const tone = blurb?.tone === "good" ? "messy-success" : "messy-failure";
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      content: `<div class="vtr-roll"><div class="hunger-messy ${tone}">`
+        + `<span class="hunger-messy-title">${name} Condition</span>`
+        + (blurb?.text ? `<span class="hunger-messy-text">${blurb.text}</span>` : "")
+        + `</div></div>`
+    });
   }
 
   /**
