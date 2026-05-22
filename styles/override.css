@@ -422,12 +422,16 @@ game-pause .vtr-pause-icon img {
 .characterSheet .touchstone-br { bottom: 3px; right: 3px; }
 /* Pull the Humanity +/- buttons out of flow and place them clear of the
    top-left Touchstone icon. Taking them out of the flex flow leaves the
-   number centred in the box rather than shifted by the buttons' width. */
+   number centred in the box rather than shifted by the buttons' width.
+   An explicit height is required: out of flow the numBtns box would size to
+   content, and its `flex: 1 0 0` children (basis 0) would collapse to zero.
+   The buttons remain hover-revealed, as on every other stat box. */
 .characterSheet .statBox.big.touchstone-host .split .niceNumber.buttonsLeft .numBtns {
   position: absolute;
   left: 34px;
   top: 50%;
   transform: translateY(-50%);
+  height: 3.4rem;
   z-index: 2;
 }
 /* Shrink the attribute/skill value input slightly to make room for the
