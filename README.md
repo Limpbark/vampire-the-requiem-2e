@@ -5,6 +5,9 @@ An unofficial (fan-made) Foundry VTT game system for **Vampire: The Requiem 2nd 
 This is a personal **offshoot of the [Chronicles of Darkness 2E](https://gitlab.com/MarlQ/mta)
 system by SoulCake**, trimmed down to Vampire play and updated for **Foundry VTT v14**.
 
+I never meant this for public release; be aware that this offshoot contains homebrew tweaks 
+to the ruleset! 
+
 ## Differences from the upstream Chronicles of Darkness 2E system
 
 - **Foundry v14 compatible** — verified against Release 14.361. Compatibility fixes:
