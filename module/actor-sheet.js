@@ -1750,11 +1750,22 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Codex panel: when a trait is selected (its attribute-check is toggled
     // on), show that trait's reference text. When deselections leave nothing
     // checked, clear the panel.
+    // Also maintain `_traitSelectionOrder` — the order traits were checked in
+    // (most recent last). The roll button uses this to tell the dice roller
+    // which trait was picked last, so the background reflects the latest
+    // selection rather than always favouring the Attribute.
+    this._traitSelectionOrder = [];
     html.find('.attribute-check').on('change', (ev) => {
       const cb = ev.currentTarget;
+      const trait = cb.dataset.trait || cb.parentElement?.dataset?.trait;
       if (cb.checked) {
-        this._updateCodex(cb.dataset.trait);
+        if (trait) {
+          this._traitSelectionOrder = this._traitSelectionOrder.filter(t => t !== trait);
+          this._traitSelectionOrder.push(trait);
+        }
+        this._updateCodex(trait);
       } else {
+        if (trait) this._traitSelectionOrder = this._traitSelectionOrder.filter(t => t !== trait);
         const stillChecked = html.find('.attribute-check:checked');
         if (stillChecked.length) {
           this._updateCodex(stillChecked.last().get(0).dataset.trait);
@@ -1801,20 +1812,29 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
       const rollAttributes = attributeInputs.map(v => v.attr("data-trait"));
 
+      // The most recently selected trait that is part of this roll — used by
+      // the dice roller to pick the window background (latest selection wins).
+      let lastTrait = null;
+      const order = this._traitSelectionOrder || [];
+      for (let i = order.length - 1; i >= 0; i--) {
+        if (rollAttributes.includes(order[i])) { lastTrait = order[i]; break; }
+      }
+
       switch (ev.which) {
         case 1:
-          this.actor.roll({ traits: rollAttributes })
+          this.actor.roll({ traits: rollAttributes, lastTrait })
           break;
         case 2:
           break;
         case 3:
           //Quick Roll
-          this.actor.roll({ traits: rollAttributes, rollType: 'quick' })
+          this.actor.roll({ traits: rollAttributes, rollType: 'quick', lastTrait })
           break;
       }
 
       //Uncheck attributes/skills and reset
       attributeChecks.prop("checked", !attributeChecks.prop("checked"));
+      this._traitSelectionOrder = [];
       this._updateCodex(null);
     });
 

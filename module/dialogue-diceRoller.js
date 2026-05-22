@@ -33,6 +33,7 @@ export class DiceRollerDialogue extends Application {
     damageType = "lethal",
     attribute = null,
     skill = null,
+    lastTrait = null,
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -70,6 +71,7 @@ export class DiceRollerDialogue extends Application {
     this.damageType = damageType;
     this.attribute = attribute;
     this.skill = skill;
+    this.lastTrait = lastTrait;
   }
 
   /* -------------------------------------------- */
@@ -140,8 +142,20 @@ export class DiceRollerDialogue extends Application {
       .toLowerCase();
     const NEUTRAL_COUNT = 4; // ui/dice_bg_neutral_1.png … _4.png
 
-    const attrSlug = toSlug(this.attribute);
-    const skillSlug = toSlug(this.skill);
+    // Resolve which trait drives the background. If we know the trait that
+    // was selected last (lastTrait, e.g. "skills_mental.occult"), it wins —
+    // so picking an Attribute and then a Skill shows the Skill. Otherwise
+    // fall back to: Attribute, then Skill, then a random neutral.
+    let attrCandidate = this.attribute;
+    let skillCandidate = this.skill;
+    if (this.lastTrait && String(this.lastTrait).includes(".")) {
+      const [group, key] = String(this.lastTrait).split(".");
+      if (group.startsWith("attributes_")) { attrCandidate = key; skillCandidate = null; }
+      else if (group.startsWith("skills_")) { skillCandidate = key; attrCandidate = null; }
+    }
+
+    const attrSlug = toSlug(attrCandidate);
+    const skillSlug = toSlug(skillCandidate);
     let bgName;
     if (attrSlug && KNOWN_ATTRS.includes(attrSlug)) {
       bgName = `dice_bg_${attrSlug}`;

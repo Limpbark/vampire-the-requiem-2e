@@ -535,7 +535,7 @@ export class ActorMtA extends Actor {
    *
    * @returns {number} The result of the roll.
    */
-  roll({ traits = [], diceBonus = 0, rollName = "Skill check", rollType = "dialogue", damageRoll = false }) {
+  roll({ traits = [], diceBonus = 0, rollName = "Skill check", rollType = "dialogue", damageRoll = false, lastTrait = null }) {
 
     const { dicePool, flavor, specialties, attribute, skill } = this.assembleDicePool({ traits, diceBonus });
 
@@ -543,7 +543,7 @@ export class ActorMtA extends Actor {
       case 'dialogue':
         let title = "";
         title = rollName + ": " + flavor;
-        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill });
+        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill, lastTrait });
         diceRoller.render(true);
         break;
       case 'quick':
