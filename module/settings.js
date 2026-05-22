@@ -73,18 +73,6 @@ export const registerSystemSettings = function () {
     requiresReload: false
   });
 
-  game.settings.register("vampire-the-requiem-2e", "angelCiphers", {
-    name: "Angel names display as cipher text",
-    hint: "Changes the names of angel ephemeral entities to render in cipher text. Require the import of the PigpenCipher font through foundry.",
-    scope: "world",
-    config: true,
-    default: false,
-    type: Boolean,
-    onChange: s => {
-
-    }
-  });
-
   game.settings.register("vampire-the-requiem-2e", "homebrewDemons", {
     name: "Homebrew rule: ephemeral demons",
     hint: "Adds a demon-type ephemeral entity, with lores, etc.",

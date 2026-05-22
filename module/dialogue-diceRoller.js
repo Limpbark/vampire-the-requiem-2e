@@ -361,20 +361,26 @@ export class DiceRollerDialogue extends Application {
    * @param {Roll}    roll          The resolved roll.
    * @param {boolean} willpowerUsed Whether the Willpower toggle fed this roll.
    */
-  static async _maybeGrantExceptionalWillpower(actor, roll, willpowerUsed) {
+  static _maybeGrantExceptionalWillpower(actor, roll, willpowerUsed) {
     if (!actor || willpowerUsed) return;
     if (!game.settings.get("vampire-the-requiem-2e", "homebrewWillpower")) return;
     if (!roll?.exceptionalSuccess || roll?.messySuccess) return;
-    const wp = actor.system?.willpower;
-    if (!wp) return;
-    const cur = Number(wp.value ?? 0);
-    const max = Number(wp.max ?? cur);
-    if (cur >= max) return;
-    await actor.update({ "system.willpower.value": Math.min(max, cur + 1) });
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor }),
-      content: `<p><em><strong>${actor.name}</strong> gains 1 Willpower from an exceptional success.</em></p>`
-    });
+    if (!actor.system?.willpower) return;
+    // Defer the update so it lands cleanly after the roll's chat/render
+    // pipeline (and any actor-sheet re-render) has settled, rather than
+    // racing with it — an inline update here was being overwritten.
+    setTimeout(async () => {
+      const wp = actor.system?.willpower;
+      if (!wp) return;
+      const cur = Number(wp.value ?? 0);
+      const max = Number(wp.max ?? cur);
+      if (cur >= max) return;
+      await actor.update({ "system.willpower.value": Math.min(max, cur + 1) });
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: `<p><em><strong>${actor.name}</strong> gains 1 Willpower from an exceptional success.</em></p>`
+      });
+    }, 120);
   }
 
   static async _roll({ dicePool = 1, targetNumber = 8, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, chanceDie = false, exceptionalTarget = 5, advancedAction = false, hungerDice = 0 }) {
@@ -634,7 +640,7 @@ export class DiceRollerDialogue extends Application {
     }
 
     // Homebrew alternative Willpower: an unaided exceptional success grants 1 WP.
-    await DiceRollerDialogue._maybeGrantExceptionalWillpower(actorOverride, rollReturn.roll, willpowerUsed);
+    DiceRollerDialogue._maybeGrantExceptionalWillpower(actorOverride, rollReturn.roll, willpowerUsed);
 
     // Create the chat message
     return msg;

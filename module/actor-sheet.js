@@ -314,6 +314,9 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // exists on the actor (see template.json base) so toggling the setting
     // off and on again preserves whatever the player last picked.
     sheetData.showPhasesOfNight = game.settings.get("vampire-the-requiem-2e", "phasesOfNight");
+    // Homebrew alternative Willpower: surfaced so the Daysleep tooltip can
+    // mention the 1 Willpower recovery when the rule is enabled.
+    sheetData.homebrewWillpower = game.settings.get("vampire-the-requiem-2e", "homebrewWillpower");
     const PHASE_LABELS = CONFIG.MTA.phaseOfNightLabels;
     const rawPhase = Number(systemData.phaseOfNight ?? 0) || 0;
     const phaseIdx = Math.max(0, Math.min(9, Math.floor(rawPhase)));

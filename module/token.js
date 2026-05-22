@@ -93,11 +93,4 @@ export class TokenMTA extends foundry.canvas.placeables.Token {
     return super._drawBar(number, bar, data);
   }
 
-  _getTextStyle() {
-    const style = super._getTextStyle();
-    if (game.settings.get('vampire-the-requiem-2e', 'angelCiphers')) {
-      if (this.document?.actor?.system?.typeConf.sheet.cipherName) style.fontFamily = "PigpenCipher";
-    }
-    return style;
-  }
 }
