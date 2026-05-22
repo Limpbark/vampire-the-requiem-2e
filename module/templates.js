@@ -407,8 +407,8 @@ export const registerHandlebarsHelpers = function () {
               </div>
             </div>
             `: ''}
+          ${touchstoneCorners}
         </div>
-        ${touchstoneCorners}
       </div>`
   });
 

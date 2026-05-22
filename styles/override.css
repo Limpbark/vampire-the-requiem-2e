@@ -392,10 +392,11 @@ game-pause .vtr-pause-icon img {
 /* ---------------------------------------------------------------------------
    Touchstone corner icons on the Vampire Humanity box.
    One macro-touchstone.svg per filled Touchstone (max 4, highest-Humanity
-   first), pinned to the four corners. Informational only — hover or click
+   first), pinned to the four corners of the number field (.split) — below
+   the title, never overlapping it. Informational only — hover or click
    shows "Touchstone - Humanity X - <name>".
 --------------------------------------------------------------------------- */
-.characterSheet .statBox.big.touchstone-host {
+.characterSheet .statBox.big.touchstone-host .split {
   position: relative;
 }
 .characterSheet .touchstone-corner {
