@@ -32,6 +32,7 @@ export class DiceRollerDialogue extends Application {
     specialties = [],
     damageType = "lethal",
     attribute = null,
+    skill = null,
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -68,6 +69,7 @@ export class DiceRollerDialogue extends Application {
     this.specialties = specialties;
     this.damageType = damageType;
     this.attribute = attribute;
+    this.skill = skill;
   }
 
   /* -------------------------------------------- */
@@ -115,18 +117,45 @@ export class DiceRollerDialogue extends Application {
       && game.settings.get("vampire-the-requiem-2e", "hungerDice"));
     data.vitae = hungerActor?.system?.vitae?.value ?? 0;
 
-    // Dice-roller window background: choose by Attribute, falling back to
-    // ui/dice_bg_neutral.png for skill-only / item-only / damage rolls.
+    // Dice-roller window background: prefer the Attribute texture; if the
+    // pool has no Attribute, fall back to the Skill texture; if neither is
+    // present (item-only / damage / generic rolls) pick a random neutral.
     const KNOWN_ATTRS = [
       "strength", "dexterity", "stamina",
       "presence", "manipulation", "composure",
       "intelligence", "wits", "resolve"
     ];
-    const attrSlug = (this.attribute && KNOWN_ATTRS.includes(String(this.attribute).toLowerCase()))
-      ? String(this.attribute).toLowerCase()
-      : "neutral";
-    data.attribute = attrSlug;
-    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${attrSlug}.png`;
+    // Skills that have a dice_bg_<skill>.png in ui/. "brawl" is intentionally
+    // absent — there's no texture for it yet, so Brawl rolls go neutral.
+    const KNOWN_SKILLS = [
+      "athletics", "drive", "firearms", "larceny", "stealth", "survival", "weaponry",
+      "animal_ken", "empathy", "expression", "intimidation", "persuasion",
+      "socialize", "streetwise", "subterfuge",
+      "academics", "computer", "crafts", "investigation", "medicine",
+      "occult", "politics", "science"
+    ];
+    // Skill keys are camelCase in the data model (e.g. "animalKen"); the
+    // texture filenames are snake_case (dice_bg_animal_ken.png).
+    const toSlug = (s) => String(s ?? "")
+      .replace(/([a-z])([A-Z])/g, "$1_$2")
+      .toLowerCase();
+    const NEUTRAL_COUNT = 4; // ui/dice_bg_neutral_1.png … _4.png
+
+    const attrSlug = toSlug(this.attribute);
+    const skillSlug = toSlug(this.skill);
+    let bgName;
+    if (attrSlug && KNOWN_ATTRS.includes(attrSlug)) {
+      bgName = `dice_bg_${attrSlug}`;
+      data.attribute = attrSlug;
+    } else if (skillSlug && KNOWN_SKILLS.includes(skillSlug)) {
+      bgName = `dice_bg_${skillSlug}`;
+      data.attribute = skillSlug;
+    } else {
+      const pick = 1 + Math.floor(Math.random() * NEUTRAL_COUNT);
+      bgName = `dice_bg_neutral_${pick}`;
+      data.attribute = "neutral";
+    }
+    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/${bgName}.png`;
 
     // Initial dice visual counts. The live updater in activateListeners
     // recomputes these whenever the pool / bonuses / Willpower change.
