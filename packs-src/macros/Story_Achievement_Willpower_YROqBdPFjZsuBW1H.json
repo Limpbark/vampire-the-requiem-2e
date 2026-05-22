@@ -1,0 +1,16 @@
+{
+  "_id": "YROqBdPFjZsuBW1H",
+  "name": "Story Achievement: Refresh Willpower",
+  "type": "script",
+  "author": "rgSvVH0I52G7WbzM",
+  "img": "systems/vampire-the-requiem-2e/icons/macros/beat_session.svg",
+  "scope": "global",
+  "command": "// Homebrew alternative Willpower rule: a major story achievement refreshes\n// all Willpower. Restores every selected token's Willpower pool to full.\nif (!game.settings.get(\"vampire-the-requiem-2e\", \"homebrewWillpower\")) {\n  ui.notifications.warn(\"Homebrew alternative Willpower gain is turned off (see system settings).\");\n  return;\n}\nconst tokens = canvas.tokens?.controlled ?? [];\nif (!tokens.length) {\n  ui.notifications.warn(\"Select at least one token first.\");\n  return;\n}\nconst refreshed = [];\nfor (const token of tokens) {\n  const actor = token.actor;\n  if (!actor || !actor.system?.willpower) continue;\n  const max = Number(actor.system.willpower.max ?? 0);\n  await actor.update({ \"system.willpower.value\": max });\n  refreshed.push(actor.name);\n}\nif (refreshed.length) {\n  const list = refreshed.map(a => `<li>${a}</li>`).join(\"\");\n  await ChatMessage.create({\n    user: game.user.id,\n    speaker: { alias: \"Storyteller\" },\n    content: `<p><strong>Story achievement</strong> &mdash; Willpower fully restored for:</p><ul>${list}</ul>`\n  });\n}",
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!YROqBdPFjZsuBW1H"
+}

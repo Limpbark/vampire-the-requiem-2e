@@ -1531,15 +1531,29 @@ export class ActorMtA extends Actor {
     // Daysleep also resets the Phases of Night marker back to Early Dawn,
     // regardless of whether the homebrew setting is currently enabled — the
     // stored phase index always lives on the actor.
-    await this.update({
+    const update = {
       "system.vitae.value": newVitae,
       "system.phaseOfNight": 0
-    });
+    };
+
+    // Homebrew alternative Willpower: rising for the night also restores
+    // 1 Willpower (capped at the pool maximum).
+    let gainedWillpower = false;
+    if (game.settings.get("vampire-the-requiem-2e", "homebrewWillpower") && sys.willpower) {
+      const curWP = Number(sys.willpower.value ?? 0);
+      const maxWP = Number(sys.willpower.max ?? curWP);
+      if (curWP < maxWP) {
+        update["system.willpower.value"] = curWP + 1;
+        gainedWillpower = true;
+      }
+    }
+    await this.update(update);
 
     const speaker = ChatMessage.getSpeaker({ actor: this });
     await ChatMessage.create({
       speaker,
-      content: `<p><strong>${this.name}</strong> wakes and expends a point of Vitae.</p>`
+      content: `<p><strong>${this.name}</strong> wakes and expends a point of Vitae`
+        + `${gainedWillpower ? " and recovers 1 Willpower" : ""}.</p>`
     });
 
     const damaged = sys.health && (sys.health.value ?? sys.health.max) < (sys.health.max ?? 0);

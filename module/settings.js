@@ -119,6 +119,15 @@ export const registerSystemSettings = function () {
     type: Boolean
   });
 
+  game.settings.register("vampire-the-requiem-2e", "homebrewWillpower", {
+    name: "Homebrew rule: alternative Willpower gain",
+    hint: "Replaces the Anchor-based Willpower recovery with: Daysleep restores 1 Willpower (alongside the usual 1 Vitae spent); an unaided exceptional success grants 1 Willpower (exceptional successes helped by the Willpower toggle do not count); and the shipped 'Story Achievement' macro refreshes all Willpower for a major milestone.",
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+
   game.settings.register("vampire-the-requiem-2e", "hungerDice", {
     name: "Homebrew rule: Hunger Dice",
     hint: "For Vampires and Ghouls, when a dice pool exceeds current Vitae the excess dice become Hunger dice (a 10 causes a messy success, a 1 on a failed roll causes a messy failure). The dice roller calculates and displays this automatically.",

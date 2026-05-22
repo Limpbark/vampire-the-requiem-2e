@@ -325,7 +325,7 @@ export class DiceRollerDialogue extends Application {
     const targetNumber = Math.clamp(modifiers.dicePool_difficulty, 1, 10);
     const rollReturn = {};
     if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice });
-    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice });
+    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice, willpowerUsed: willpowerBonus > 0 });
 
     if (modifiers.extended) {
       let successes = rollReturn.roll.total;
@@ -350,6 +350,31 @@ export class DiceRollerDialogue extends Application {
     if (actor.system?.characterType !== "vampire") return 0;
     const vitae = actor.system?.vitae?.value ?? 0;
     return Math.max(0, Math.floor(realPool) - vitae);
+  }
+
+  /**
+   * Homebrew alternative Willpower: an unaided exceptional success grants the
+   * roller 1 Willpower. Messy successes and rolls helped by the Willpower
+   * toggle do not qualify (so players can't spend Willpower to farm it).
+   * No-op unless the "homebrewWillpower" setting is enabled.
+   * @param {Actor}   actor         The rolling actor (actorOverride).
+   * @param {Roll}    roll          The resolved roll.
+   * @param {boolean} willpowerUsed Whether the Willpower toggle fed this roll.
+   */
+  static async _maybeGrantExceptionalWillpower(actor, roll, willpowerUsed) {
+    if (!actor || willpowerUsed) return;
+    if (!game.settings.get("vampire-the-requiem-2e", "homebrewWillpower")) return;
+    if (!roll?.exceptionalSuccess || roll?.messySuccess) return;
+    const wp = actor.system?.willpower;
+    if (!wp) return;
+    const cur = Number(wp.value ?? 0);
+    const max = Number(wp.max ?? cur);
+    if (cur >= max) return;
+    await actor.update({ "system.willpower.value": Math.min(max, cur + 1) });
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: `<p><em><strong>${actor.name}</strong> gains 1 Willpower from an exceptional success.</em></p>`
+    });
   }
 
   static async _roll({ dicePool = 1, targetNumber = 8, tenAgain = true, nineAgain = false, eightAgain = false, roteAction = false, chanceDie = false, exceptionalTarget = 5, advancedAction = false, hungerDice = 0 }) {
@@ -545,7 +570,8 @@ export class DiceRollerDialogue extends Application {
     comment = "",
     macro,
     actor,
-    hungerDice
+    hungerDice,
+    willpowerUsed = false
   }) {
 
     // Quick rolls don't pass a Hunger count; derive it from the actor's Vitae.
@@ -606,6 +632,9 @@ export class DiceRollerDialogue extends Application {
     if (macro && actor) {
       macro.execute({ actor, token: actor.token ?? actor.getActiveTokens[0], item: this.itemRef });
     }
+
+    // Homebrew alternative Willpower: an unaided exceptional success grants 1 WP.
+    await DiceRollerDialogue._maybeGrantExceptionalWillpower(actorOverride, rollReturn.roll, willpowerUsed);
 
     // Create the chat message
     return msg;
