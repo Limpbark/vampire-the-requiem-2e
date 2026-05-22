@@ -1711,6 +1711,14 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.rollDetachment();
     });
 
+    // Touchstone corner icons on the Humanity box: purely informational —
+    // clicking one announces "Touchstone - Humanity X - <name>".
+    html.find('.touchstone-corner').click(ev => {
+      ev.preventDefault();
+      const tip = ev.currentTarget.dataset.touchstoneTip;
+      if (tip) ui.notifications.info(tip);
+    });
+
     // Phases of Night ribbon: ankh-shaped arrows step the marker forward or
     // backwards. Both wrap at the ends (Late Dawn -> Early Dawn going right).
     html.find('.phase-arrow-right').click(ev => {

@@ -1829,13 +1829,16 @@ export class ActorMtA extends Actor {
     const sys = this.system;
     const humanity = Number(sys.integrity ?? 7);
 
-    // Touchstone modifier: count filled touchstones_vampire slots.
-    const filled = Object.values(sys.touchstones_vampire ?? {})
-      .filter(t => String(t ?? "").trim().length > 0).length;
+    // Touchstone modifier: count filled touchstones_vampire slots. The label
+    // names the Touchstones so the dialog shows who they are.
+    const tsNames = Object.values(sys.touchstones_vampire ?? {})
+      .map(t => String(t ?? "").trim())
+      .filter(t => t.length > 0);
+    const filled = tsNames.length;
     const tsMod = filled === 0 ? -2 : filled === 1 ? 2 : 3;
-    const tsLabel = filled === 0 ? "no Touchstones (−2)"
-      : filled === 1 ? "one Touchstone (+2)"
-      : `${filled} Touchstones (+3)`;
+    const tsLabel = filled === 0
+      ? "no Touchstones (&minus;2)"
+      : `${tsNames.join(", ")} (${tsMod >= 0 ? "+" : ""}${tsMod})`;
 
     const body = `
       <p class="vtr-rite-summary">Humanity <strong>${humanity}</strong> &middot; Touchstones: ${tsLabel}</p>

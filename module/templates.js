@@ -358,15 +358,38 @@ export const registerHandlebarsHelpers = function () {
 
     // TODO: Support x_per_turn and calculateMaxResource button
 
+    // Touchstone corner icons — Vampire Humanity box only. Renders up to four
+    // macro-touchstone.svg markers (one per corner) for the actor's four
+    // highest-Humanity Touchstones. Purely informational; a click handler in
+    // actor-sheet.js shows each Touchstone's details.
+    let touchstoneCorners = "";
+    let extraClass = "";
+    if (traitName === "vampire_traits.humanity") {
+      extraClass = " touchstone-host";
+      const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const corners = Object.entries(actor.system?.touchstones_vampire ?? {})
+        .map(([lvl, name]) => ({ humanity: Number(lvl), name: String(name ?? "").trim() }))
+        .filter(t => t.name.length > 0)
+        .sort((a, b) => b.humanity - a.humanity)
+        .slice(0, 4);
+      const positions = ["tl", "tr", "bl", "br"];
+      touchstoneCorners = corners.map((t, i) => {
+        const tip = esc(`Touchstone - Humanity ${t.humanity} - ${t.name}`);
+        return `<span class="touchstone-corner touchstone-${positions[i]}" title="${tip}" data-touchstone-tip="${tip}">`
+          + `<img src="systems/vampire-the-requiem-2e/icons/gui/macro-touchstone.svg" alt="Touchstone"></span>`;
+      }).join("");
+    }
+
     return `
-    <div class="kInput statBox big">
+    <div class="kInput statBox big${extraClass}">
         <h4>
           <input class="attribute-check" id="${actor._id + traitName}" data-trait="${traitName}" type="checkbox" data-dtype="Boolean">
           <label class="button attribute-button" for="${actor._id + traitName}">${localisedName}</label>
         </h4>
         <div class="gold-border"></div>
         <div class="split">
-          <div class="niceNumber buttonsLeft">            
+          <div class="niceNumber buttonsLeft">
             <input type="number" name="system.${isInteger ? traitName : traitName + ".value"}" value=${traitValue} data-dtype="Number" min=0 max=999>
             <span class="attribute-mod ${trait.isModified ? (`${trait.final >= trait.value ? "positive" : "negative"}`) : ''}">${trait.isModified ? (Number.isInteger(trait.final) ? "(" + trait.final + ")" : "") : ''}</span>
             <div class="numBtns">
@@ -385,6 +408,7 @@ export const registerHandlebarsHelpers = function () {
             </div>
             `: ''}
         </div>
+        ${touchstoneCorners}
       </div>`
   });
 
