@@ -1750,6 +1750,132 @@ export class ActorMtA extends Actor {
     }).render(true);
   }
 
+  /**
+   * Detachment roll for Vampires (VtR 2E p. 107-108). The dice pool is the
+   * breaking point's severity plus a Touchstone modifier (−2 none / +2 one /
+   * +3 multiple). Failure (or dramatic failure) costs a Humanity dot. Facing
+   * any breaking point grants a Beat. Conditions are offered as card buttons.
+   */
+  async rollDetachment() {
+    const sys = this.system;
+    const humanity = Number(sys.integrity ?? 7);
+
+    // Touchstone modifier: count filled touchstones_vampire slots.
+    const filled = Object.values(sys.touchstones_vampire ?? {})
+      .filter(t => String(t ?? "").trim().length > 0).length;
+    const tsMod = filled === 0 ? -2 : filled === 1 ? 2 : 3;
+    const tsLabel = filled === 0 ? "no Touchstones (−2)"
+      : filled === 1 ? "one Touchstone (+2)"
+      : `${filled} Touchstones (+3)`;
+
+    const content = `
+      <form class="vtr-detachment-form">
+        <p>Detachment roll &mdash; current Humanity <strong>${humanity}</strong>. Touchstones: ${tsLabel}.</p>
+        <div class="form-group">
+          <label>Breaking point severity (dice)</label>
+          <select name="severity">
+            <option value="5">5 dice &mdash; Humanity 10-9 acts</option>
+            <option value="4">4 dice &mdash; Humanity 8-7 acts</option>
+            <option value="3" selected>3 dice &mdash; Humanity 6-5 acts</option>
+            <option value="2">2 dice &mdash; Humanity 4-3 acts</option>
+            <option value="1">1 die &mdash; Humanity 2 acts</option>
+            <option value="0">0 dice (chance die) &mdash; Humanity 1 acts</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Extra modifier (Masquerade, Requiem, &hellip;)</label>
+          <input type="number" name="modifier" value="0">
+        </div>
+      </form>`;
+
+    new foundry.appv1.api.Dialog({
+      title: "Detachment Roll",
+      content,
+      buttons: {
+        roll: {
+          icon: '<i class="fas fa-dice-d10"></i>',
+          label: "Roll",
+          callback: async (html) => {
+            const severity = Math.round(Number(html.find('[name="severity"]').val()) || 0);
+            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+            const pool = severity + tsMod + modifier; // may be <= 0 -> chance die
+
+            const rollReturn = {};
+            await DiceRollerDialogue.rollToChat({
+              dicePool: pool,
+              flavor: `Detachment (severity ${severity}, Touchstones ${tsMod >= 0 ? "+" : ""}${tsMod}`
+                + `${modifier ? `, modifier ${modifier >= 0 ? "+" : ""}${modifier}` : ""})`,
+              title: "Detachment",
+              actorOverride: this,
+              hungerDice: 0,
+              rollReturn
+            });
+            await this._resolveDetachmentOutcome(rollReturn.roll);
+          }
+        },
+        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
+      },
+      default: "roll"
+    }).render(true);
+  }
+
+  /**
+   * Interpret a Detachment roll, apply Humanity loss on failure, grant the
+   * breaking-point Beat, and post a card with Condition buttons.
+   * @param {Roll} roll  The resolved roll (from rollToChat's rollReturn).
+   */
+  async _resolveDetachmentOutcome(roll) {
+    const hits = Math.max(0, roll?.total ?? 0);
+    await this.addProgress("Faced a breaking point", 1, 0);
+
+    const condBtn = (name, label) => `<button type="button" class="vtr-frenzy-button" `
+      + `data-vtr-apply-condition="${name}" data-actor-id="${this.id}">${label ?? `Apply ${name}`}</button>`;
+    const sinButtons = condBtn("Bestial") + condBtn("Competitive") + condBtn("Wanton");
+
+    let cls, title, body, buttons, loseHumanity = false;
+    if (roll?.dramaticFailure) {
+      cls = "messy-failure";
+      title = "Detachment &mdash; Dramatic failure";
+      body = "The breaking point means nothing to her. She loses a dot of Humanity and gains the Jaded Condition.";
+      buttons = condBtn("Jaded");
+      loseHumanity = true;
+    } else if (hits < 1) {
+      cls = "messy-failure";
+      title = "Detachment &mdash; Failure";
+      body = "She moves toward monstrosity, losing a dot of Humanity. Gain Bestial, Competitive, or Wanton. "
+        + "(Optional: take a Bane and a Beat instead of losing Humanity.)";
+      buttons = sinButtons;
+      loseHumanity = true;
+    } else if (roll?.exceptionalSuccess || hits >= 5) {
+      cls = "messy-success";
+      title = "Detachment &mdash; Exceptional success";
+      body = "She steps away from the conflict renewed. Humanity holds; gain the Inspired Condition.";
+      buttons = condBtn("Inspired");
+    } else {
+      cls = "messy-success";
+      title = "Detachment &mdash; Success";
+      body = "She holds onto a scrap of empathy. Humanity holds, but gain Bestial, Competitive, or Wanton.";
+      buttons = sinButtons;
+    }
+
+    let humanityNote = "";
+    if (loseHumanity) {
+      const cur = Number(this.system?.integrity ?? 7);
+      const next = Math.max(0, cur - 1);
+      await this.update({ "system.integrity": next });
+      humanityNote = ` <strong>Humanity ${cur} &rarr; ${next}.</strong>`;
+    }
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      content: `<div class="vtr-roll"><div class="hunger-messy ${cls}">`
+        + `<span class="hunger-messy-title">${title}</span>`
+        + `<span class="hunger-messy-text">${body}${humanityNote}</span>`
+        + buttons
+        + `</div></div>`
+    });
+  }
+
   scourPattern() {
     const reduceAttribute = (attribute) => {
       const itemData = {
