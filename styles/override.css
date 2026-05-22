@@ -463,46 +463,38 @@ game-pause .vtr-pause-icon img {
    Frenzy / Lashing Out / Detachment dialogs
    -----------------------------------------
    Styled to match the main dice roller. The mta-sheet/vtr-rite-dialog classes
-   and the ui/dice_bg_<variant>.png texture are stamped onto the window in the
-   render callback of _renderRiteDialog (module/actor.js) — the texture is set
-   inline on .window-content there, so only the framing rules live here.
+   and the ui/dice_bg_<variant>.png texture (every background longhand,
+   including background-size: 100% 100%) are stamped onto .window-content in
+   the render callback of _renderRiteDialog (module/actor.js), so the whole
+   texture always fills the window. Only the framing rules live here.
 --------------------------------------------------------------------------- */
 .vtr-rite-dialog .window-content {
   padding: 0;
-  background-color: #050505;
-  background-repeat: no-repeat;
-  background-position: center;
-  /* Stretch to fill: the textures were authored at the wide dice-roller
-     proportions, so `cover` cropped them to a quarter. 100% 100% shows the
-     whole image (the rite windows are close to the roller's aspect ratio,
-     so the stretch is negligible). */
-  background-size: 100% 100%;
 }
-/* A dark scrim over the texture so form text stays readable. */
+/* No scrim — the form sits directly on the texture like the dice roller,
+   relying on text-shadow and the dark input boxes for legibility. */
 .vtr-rite-dialog .vtr-rite-block {
   padding: 14px 18px;
-  background: linear-gradient(rgba(5, 5, 5, 0.62), rgba(5, 5, 5, 0.78));
 }
 .vtr-rite-dialog .vtr-rite-summary {
   text-align: center;
   margin: 0 0 10px;
   font-size: 14px;
   color: #f4ead8;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
 }
 .vtr-rite-dialog .vtr-rite-block dl dt {
   color: #f4ead8;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
 }
 .vtr-rite-dialog .vtr-rite-block dl dd input,
 .vtr-rite-dialog .vtr-rite-block dl dd select {
   width: 100%;
 }
-/* Button row: a dark strip with themed buttons, below the scrimmed body. */
+/* Button row: themed buttons sit directly on the texture, no backing strip. */
 .vtr-rite-dialog .dialog-buttons {
   padding: 8px 12px 10px;
   gap: 8px;
-  background: rgba(5, 5, 5, 0.82);
 }
 /* Roll / Cancel buttons share the blue-marble look of the dice roller's
    Roll button (the .stoneButton background: a blue gradient over rock.jpg). */

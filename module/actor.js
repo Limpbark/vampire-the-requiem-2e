@@ -1606,7 +1606,15 @@ export class ActorMtA extends Actor {
         if (!root) return;
         root.classList.add("mta-sheet", "theme-dark", "vtr-rite-dialog", `vtr-rite-${variant}`);
         const wc = root.querySelector(".window-content");
-        if (wc) wc.style.backgroundImage = `url("${bgUrl}")`;
+        if (wc) {
+          // Set every background longhand inline so the whole texture fills
+          // the window regardless of CSS load order or specificity.
+          wc.style.backgroundColor = "#050505";
+          wc.style.backgroundImage = `url("${bgUrl}")`;
+          wc.style.backgroundSize = "100% 100%";
+          wc.style.backgroundRepeat = "no-repeat";
+          wc.style.backgroundPosition = "center";
+        }
       }
     }, {
       classes: ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`],
