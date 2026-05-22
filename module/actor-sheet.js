@@ -1692,16 +1692,19 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     html.find('.frenzyButton').click(ev => {
       ev.preventDefault();
+      this._updateCodex("rite.frenzy");
       this.actor.rollFrenzy();
     });
 
     html.find('.lashingOutButton').click(ev => {
       ev.preventDefault();
+      this._updateCodex("rite.lashingOut");
       this.actor.rollLashingOut();
     });
 
     html.find('.detachmentButton').click(ev => {
       ev.preventDefault();
+      this._updateCodex("rite.detachment");
       this.actor.rollDetachment();
     });
 

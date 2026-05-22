@@ -402,5 +402,36 @@ export const CODEX_ENTRIES = {
       <p>Miracles are not cast quickly or casually. Each requires a physical sacrament &mdash; a symbolic item that crumbles to dust at the ritual's crescendo. Performing a miracle is an act of concentrated faith, mentally exhausting, and not interrupted without failure.</p>
       <p>Mechanically, casting is an extended roll of Intelligence + Academics + Theban Sorcery. Like Crúac, dots in the Discipline are the capacity; miracles are purchased separately (2 Experiences each; one free per dot). A ritualist can only access miracles rated at or below his dot count.</p>
       <p>Theban miracles are oriented toward revelation, punishment, and divination. Sample miracles include: compelling a victim to speak only truth (beetles swarm from the mouth on any lie); rendering a target incapable of speech or writing; calling down damage that upgrades bashing to lethal or lethal to aggravated; destroying a target's blood; animating corpses as servants; and the Gift of Lazarus, which can restore a dead mortal to temporary life.</p>`
+  },
+
+  /* ------------------------- KINDRED ACTIONS (macro-bar buttons) ------------------------- */
+  "rite.frenzy": {
+    title: "Frenzy Resistance",
+    body: `
+      <p>Danger, hunger, fury, or fear can goad the Beast into demanding an immediate, violent answer. Holding it back is a reflexive roll &mdash; it costs no action.</p>
+      <p>The Storyteller assigns a modifier for the provocation: a slain friend or lover, an open flame, deep hunger, or a public humiliation can all swing the pool up or down. Enter that total in the dialog's modifier field.</p>
+      <p>Willpower behaves differently here. It does <em>not</em> grant the usual three dice. Instead, each point spent buys one turn of visibly wrestling the Beast down &mdash; snarling, smashing, fleeing &mdash; and when the character finally stops, every point spent that way is added to the roll as a bonus die.</p>
+      <p>Gangrel suffer their clan curse: their resistance pool can never exceed their Humanity dots.</p>
+      <p><strong>Outcomes.</strong> Dramatic failure &mdash; frenzy that cannot end until a breaking point is reached. Failure &mdash; frenzy; the Beast decides what it wants. Success &mdash; the Beast is held back, but the character is left Tempted. Exceptional success &mdash; control held, and spent Willpower returns. Entering frenzy is worth a Beat.</p>
+      <p class="codex-rolls"><strong>Roll:</strong> Resolve + Composure + provocation modifier + Willpower spent (reflexive).</p>`
+  },
+  "rite.detachment": {
+    title: "Detachment",
+    body: `
+      <p>When a character commits an act that strains her conscience &mdash; a breaking point &mdash; she risks detaching from her remaining Humanity. Facing a breaking point at all is worth a Beat.</p>
+      <p>The dice pool reflects how severe the act is, measured against her current Humanity: comparatively minor transgressions are rolled with more dice, genuinely monstrous ones with very few or none. Choose the severity in the dialog.</p>
+      <p>Touchstones anchor her to the living world. One attached Touchstone adds +2 dice; several attached add +3; having none imposes a &minus;2 penalty. Willpower cannot be spent to help this roll.</p>
+      <p><strong>Outcomes.</strong> Dramatic failure &mdash; lose a dot of Humanity and gain the Jaded Condition. Failure &mdash; lose a dot of Humanity and gain Bestial, Competitive, or Wanton. Success &mdash; Humanity holds, but she still withdraws into one of those same Conditions. Exceptional success &mdash; Humanity holds and she gains the Inspired Condition.</p>
+      <p>As an alternative to losing the dot, the character may instead take a Bane &mdash; a personal supernatural flaw &mdash; along with a Beat. Each Bane taken this way makes every future detachment roll a little harder.</p>
+      <p class="codex-rolls"><strong>Roll:</strong> breaking-point severity dice + Touchstone modifier (no Willpower).</p>`
+  },
+  "rite.lashingOut": {
+    title: "Lashing Out (Predatory Aura)",
+    body: `
+      <p>Every Kindred carries a predatory aura &mdash; the unspoken pressure of the Beast that other monsters can feel. A vampire can deliberately flare it to force a reaction. Doing so is an instant action; it costs a Willpower point when aimed at another vampire, and nothing when aimed at a mortal.</p>
+      <p>The Beast shows one of three faces. <strong>Monstrous</strong> (Strength) threatens destruction and provokes fight-or-flight. <strong>Seductive</strong> (Presence) promises abandon and provokes reckless desire. <strong>Competitive</strong> (Intelligence) demands dominance and provokes power games.</p>
+      <p>The target answers with <em>fight</em> &mdash; meeting the challenge with a Power Attribute + Blood Potency of their own, which costs them a Willpower point if their Blood Potency is lower than the aggressor's &mdash; or with <em>flight</em>, a graceful but diminishing withdrawal.</p>
+      <p><strong>Outcomes.</strong> Whoever scores more successes imposes the Condition tied to their aspect &mdash; Bestial (monstrous), Wanton (seductive), or Competitive &mdash; and gains +2 dice to pursue that drive for the rest of the scene. On a tie, both Conditions land and neither side takes the bonus. A mortal can resist, but can never impose a Condition back on a vampire.</p>
+      <p class="codex-rolls"><strong>Roll:</strong> Blood Potency + Strength / Presence / Intelligence, contested.</p>`
   }
 };
