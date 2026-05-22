@@ -420,6 +420,11 @@ game-pause .vtr-pause-icon img {
 .characterSheet .touchstone-tr { top: 3px;    right: 3px; }
 .characterSheet .touchstone-bl { bottom: 3px; left: 3px; }
 .characterSheet .touchstone-br { bottom: 3px; right: 3px; }
+/* Shift the Humanity +/- buttons right so the plus clears the top-left
+   Touchstone icon. */
+.characterSheet .statBox.big.touchstone-host .split .niceNumber.buttonsLeft .numBtns {
+  margin-left: 30px;
+}
 /* Shrink the attribute/skill value input slightly to make room for the
    row of five dots without forcing the row to wrap. */
 .characterSheet .attribute.rollableInput .attribute-value { max-width: 2rem; }

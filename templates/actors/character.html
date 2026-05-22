@@ -942,12 +942,17 @@
             <label> {{localize "MTA.Sex"}} </label> <input name="system.sex" type="text" value="{{system.sex}}" data-koptions="Female/Male"/>
           </div>
           <div class="form-line">
-            <label> {{localize "MTA.Faction"}} </label> <input name="system.faction" type="text" value="{{system.faction}}" />
-          </div>
-          <div class="form-line">
             <label> {{localize "MTA.Aspirations"}} </label>
             <textarea name="system.aspirations" placeholder="{{localize 'MTA.Aspirations'}}">{{system.aspirations}}</textarea>
           </div>
+          {{#if (eq system.characterVariant "vampire")}}
+          <div class="form-line">
+            <label class="wide">{{localize "MTA.Touchstones"}}</label>
+            {{#each system.touchstones_vampire as |touchstone key|}}
+              <label class="{{#if (isActiveVampTouchstone key ../system.vampire_traits.humanity.final)}} activeTouchstone {{/if}}"> {{convertVampTouchstone key}} </label> <input name="system.touchstones_vampire.{{key}}" type="text" value="{{touchstone}}" />
+            {{/each}}
+          </div>
+          {{/if}}
         </div>
         {{!-- Relationships --}}
         <table class="item-table">
@@ -989,11 +994,6 @@
           </tbody>
         </table>
         <div class="item-stat-block">
-          <div class="form-line">
-            <label> {{localize "MTA.Notes"}} </label>
-            <textarea name="system.notes" placeholder="{{localize 'MTA.Notes'}}">{{system.notes}}</textarea>
-          </div>
-
           <div class="form-line">
             <label class="wide"> {{localize "MTA.Description"}} </label>
             <div class="wide editor-container">
@@ -1046,6 +1046,9 @@
           <div class="form-line">
             <label>{{localize "MTA.Covenant"}}</label> <input name="system.covenant" type="text" value="{{system.covenant}}" />
           </div>
+          <div class="form-line">
+            <label>Coterie</label> <input name="system.faction" type="text" value="{{system.faction}}" />
+          </div>
           {{#if (eq system.characterVariant "ghoul")}}
           <div class="form-line">
             <label>{{localize "MTA.Family"}}</label> <input name="system.family" type="text" value="{{system.family}}" data-koptions="The Alley Men/Angustri/Crassus/Gravenor/The Children of Nirriti">
@@ -1062,12 +1065,6 @@
             <label>{{localize "MTA.Banes"}}</label>
             <textarea name="system.banes" placeholder="Banes">{{system.banes}}</textarea>
           </div>
-          <div class="form-line">
-            <label class="wide">{{localize "MTA.Touchstones"}}</label>
-            {{#each system.touchstones_vampire as |touchstone key|}}
-              <label class="{{#if (isActiveVampTouchstone key ../system.vampire_traits.humanity.final)}} activeTouchstone {{/if}}"> {{convertVampTouchstone key}} </label> <input name="system.touchstones_vampire.{{key}}" type="text" value="{{touchstone}}" />
-            {{/each}}
-          </div> 
           {{/if}}
         </div>
         {{#if (eq system.characterVariant "vampire")}}
@@ -1105,6 +1102,12 @@
           {{/each}}
         </table>
         {{/if}}
+        <div class="item-stat-block">
+          <div class="form-line">
+            <label> {{localize "MTA.Notes"}} </label>
+            <textarea name="system.notes" placeholder="{{localize 'MTA.Notes'}}">{{system.notes}}</textarea>
+          </div>
+        </div>
       </div>
 
       {{!-- Changeling Persona Tab --}}
