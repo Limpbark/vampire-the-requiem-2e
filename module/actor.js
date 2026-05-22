@@ -1575,7 +1575,33 @@ export class ActorMtA extends Actor {
   }
 
   /**
-   * Frenzy resistance (VtR 2E p. 104). Opens a small dialog for the provocation
+   * Render a dice-roller-styled Dialog for the Frenzy / Lashing Out /
+   * Detachment flows so they share the look of the main dice roller: the dark
+   * theme (via the mta-sheet class + the system's theme-dark observer) and the
+   * matching ui/dice_bg_<variant>.png texture behind a kUltraBlock body.
+   * @param {object}   opts
+   * @param {string}   opts.title    Window title.
+   * @param {string}   opts.variant  "frenzy" | "lashing" | "detachment".
+   * @param {string}   opts.body     Inner HTML, wrapped in a kUltraBlock.
+   * @param {Function} opts.onRoll   Async callback(html) for the Roll button.
+   */
+  _renderRiteDialog({ title, variant, body, onRoll }) {
+    new foundry.appv1.api.Dialog({
+      title,
+      content: `<div class="kUltraBlock vtr-rite-block">${body}</div>`,
+      buttons: {
+        roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll },
+        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
+      },
+      default: "roll"
+    }, {
+      classes: ["worldbuilding", "dialogue", "mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`],
+      width: 430
+    }).render(true);
+  }
+
+  /**
+   * Frenzy resistance (VtR 2E p. 104). Opens a dialog for the provocation
    * modifier and any Willpower spent fighting the Beast, rolls Resolve +
    * Composure, and posts an outcome card. The Gangrel bane caps the pool at
    * Humanity dots. Entering frenzy grants a Beat.
@@ -1588,50 +1614,39 @@ export class ActorMtA extends Actor {
     const humanity = Number(sys.integrity ?? 10);
     const isGangrel = String(sys.clan ?? "").toLowerCase() === "gangrel";
 
-    const content = `
-      <form class="vtr-frenzy-form">
-        <p>Resist Frenzy &mdash; Resolve + Composure = <strong>${basePool}</strong>${isGangrel
-          ? ` <em>(Gangrel bane: pool capped at Humanity ${humanity})</em>` : ""}</p>
-        <div class="form-group">
-          <label>Provocation modifier</label>
-          <input type="number" name="modifier" value="0" autofocus>
-        </div>
-        <div class="form-group">
-          <label>Willpower spent fighting (turns) &mdash; +1 die each</label>
-          <input type="number" name="willpower" value="0" min="0">
-        </div>
-      </form>`;
+    const body = `
+      <p class="vtr-rite-summary">Resolve + Composure = <strong>${basePool}</strong>${isGangrel
+        ? ` <em>(Gangrel bane: pool capped at Humanity ${humanity})</em>` : ""}</p>
+      <dl>
+        <dt>Provocation modifier:</dt>
+        <dd><input type="number" name="modifier" value="0" autofocus></dd>
+        <dt>Willpower spent fighting (turns) &mdash; +1 die each:</dt>
+        <dd><input type="number" name="willpower" value="0" min="0"></dd>
+      </dl>`;
 
-    new foundry.appv1.api.Dialog({
+    this._renderRiteDialog({
       title: "Resist Frenzy",
-      content,
-      buttons: {
-        roll: {
-          icon: '<i class="fas fa-dice-d10"></i>',
-          label: "Roll",
-          callback: async (html) => {
-            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
-            const willpower = Math.max(0, Math.round(Number(html.find('[name="willpower"]').val()) || 0));
-            let pool = basePool + modifier + willpower;
-            if (isGangrel) pool = Math.min(pool, humanity);
-            pool = Math.max(0, pool);
+      variant: "frenzy",
+      body,
+      onRoll: async (html) => {
+        const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+        const willpower = Math.max(0, Math.round(Number(html.find('[name="willpower"]').val()) || 0));
+        let pool = basePool + modifier + willpower;
+        if (isGangrel) pool = Math.min(pool, humanity);
+        pool = Math.max(0, pool);
 
-            const rollReturn = {};
-            await DiceRollerDialogue.rollToChat({
-              dicePool: pool,
-              flavor: "Frenzy Resistance",
-              title: "Frenzy Resistance",
-              actorOverride: this,
-              hungerDice: 0,
-              rollReturn
-            });
-            await this._resolveFrenzyOutcome(rollReturn.roll, willpower);
-          }
-        },
-        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
-      },
-      default: "roll"
-    }).render(true);
+        const rollReturn = {};
+        await DiceRollerDialogue.rollToChat({
+          dicePool: pool,
+          flavor: "Frenzy Resistance",
+          title: "Frenzy Resistance",
+          actorOverride: this,
+          hungerDice: 0,
+          rollReturn
+        });
+        await this._resolveFrenzyOutcome(rollReturn.roll, willpower);
+      }
+    });
   }
 
   /**
@@ -1646,22 +1661,22 @@ export class ActorMtA extends Actor {
     if (roll?.dramaticFailure) {
       cls = "messy-failure";
       title = "Frenzy! &mdash; Dramatic failure";
-      body = "The Beast seizes control. The frenzy cannot end until a breaking point is reached. Take a Beat (or two, if you turn the failure into a dramatic failure).";
+      body = "The Beast seizes control. The frenzy cannot end until you reach a breaking point. Take a Beat (or two, if you turn the failure into a dramatic failure).";
       await this.addProgress("Entered frenzy", 1, 0);
     } else if (hits < 1) {
       cls = "messy-failure";
       title = "Frenzy!";
-      body = "The vampire succumbs &mdash; the Beast decides what it wants. Take a Beat.";
+      body = "You succumb &mdash; the Beast decides what it wants. Take a Beat.";
       await this.addProgress("Entered frenzy", 1, 0);
     } else if (roll?.exceptionalSuccess || hits >= 5) {
       cls = "messy-success";
       title = "Frenzy resisted &mdash; Exceptional success";
-      body = `The Beast is mastered. Regain a point of spent Willpower${willpower > 0
+      body = `You master the Beast. Regain a point of spent Willpower${willpower > 0
         ? `, plus the ${willpower} Willpower spent fighting the frenzy this scene` : ""}.`;
     } else {
       cls = "messy-success";
       title = "Frenzy resisted";
-      body = "The vampire holds the Beast back, but is left with the Tempted Condition.";
+      body = "You hold the Beast back, but are left with the Tempted Condition.";
       conditionBtn = `<button type="button" class="vtr-frenzy-button" `
         + `data-vtr-apply-condition="Tempted" data-actor-id="${this.id}">Apply Tempted Condition</button>`;
     }
@@ -1691,63 +1706,52 @@ export class ActorMtA extends Actor {
       competitive: { label: "Competitive", attr: "Intelligence", path: ["attributes_mental", "intelligence"],   condition: "Competitive" }
     };
 
-    const content = `
-      <form class="vtr-lashing-form">
-        <p>Lash out with the Beast &mdash; Blood Potency = <strong>${bp}</strong></p>
-        <div class="form-group">
-          <label>Aspect of the Beast</label>
-          <select name="aspect">
-            <option value="monstrous">Monstrous &mdash; Strength (inflicts Bestial)</option>
-            <option value="seductive">Seductive &mdash; Presence (inflicts Wanton)</option>
-            <option value="competitive">Competitive &mdash; Intelligence (inflicts Competitive)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Situational modifier (territory, hunger, &hellip;)</label>
-          <input type="number" name="modifier" value="0">
-        </div>
-      </form>`;
+    const body = `
+      <p class="vtr-rite-summary">Blood Potency = <strong>${bp}</strong></p>
+      <dl>
+        <dt>Aspect of the Beast:</dt>
+        <dd><select name="aspect">
+          <option value="monstrous">Monstrous &mdash; Strength (inflicts Bestial)</option>
+          <option value="seductive">Seductive &mdash; Presence (inflicts Wanton)</option>
+          <option value="competitive">Competitive &mdash; Intelligence (inflicts Competitive)</option>
+        </select></dd>
+        <dt>Situational modifier (territory, hunger, &hellip;):</dt>
+        <dd><input type="number" name="modifier" value="0"></dd>
+      </dl>`;
 
-    new foundry.appv1.api.Dialog({
+    this._renderRiteDialog({
       title: "Lash Out with the Predatory Aura",
-      content,
-      buttons: {
-        roll: {
-          icon: '<i class="fas fa-dice-d10"></i>',
-          label: "Roll",
-          callback: async (html) => {
-            const aspect = ASPECTS[html.find('[name="aspect"]').val()] ?? ASPECTS.monstrous;
-            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
-            const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
-            const pool = Math.max(0, bp + attrVal + modifier);
+      variant: "lashing",
+      body,
+      onRoll: async (html) => {
+        const aspect = ASPECTS[html.find('[name="aspect"]').val()] ?? ASPECTS.monstrous;
+        const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+        const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
+        const pool = Math.max(0, bp + attrVal + modifier);
 
-            await DiceRollerDialogue.rollToChat({
-              dicePool: pool,
-              flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`,
-              title: "Lashing Out",
-              actorOverride: this,
-              hungerDice: 0
-            });
-            await ChatMessage.create({
-              speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
-                + `<span class="hunger-messy-title">Predatory Aura &mdash; ${aspect.label} Beast</span>`
-                + `<span class="hunger-messy-text">The opposition responds with <em>fight</em> `
-                + `(a Power Attribute + Blood Potency &mdash; costs 1 Willpower if their Blood Potency is lower) `
-                + `or <em>flight</em>. If the aggressor scores more successes, the loser gains the `
-                + `<strong>${aspect.condition}</strong> Condition and the winner takes +2 to pursue their `
-                + `aspect for the scene.</span>`
-                + `<button type="button" class="vtr-frenzy-button" data-vtr-apply-condition="${aspect.condition}" `
-                + `data-vtr-apply-to="selected" data-actor-id="${this.id}">`
-                + `Apply ${aspect.condition} to selected token</button>`
-                + `</div></div>`
-            });
-          }
-        },
-        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
-      },
-      default: "roll"
-    }).render(true);
+        await DiceRollerDialogue.rollToChat({
+          dicePool: pool,
+          flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`,
+          title: "Lashing Out",
+          actorOverride: this,
+          hungerDice: 0
+        });
+        await ChatMessage.create({
+          speaker: ChatMessage.getSpeaker({ actor: this }),
+          content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
+            + `<span class="hunger-messy-title">Predatory Aura &mdash; ${aspect.label} Beast</span>`
+            + `<span class="hunger-messy-text">Your target responds with <em>fight</em> `
+            + `(a Power Attribute + Blood Potency &mdash; it costs them 1 Willpower if their Blood `
+            + `Potency is lower than yours) or <em>flight</em>. If you score more successes, they gain `
+            + `the <strong>${aspect.condition}</strong> Condition and you take +2 to pursue your `
+            + `aspect for the scene.</span>`
+            + `<button type="button" class="vtr-frenzy-button" data-vtr-apply-condition="${aspect.condition}" `
+            + `data-vtr-apply-to="selected" data-actor-id="${this.id}">`
+            + `Apply ${aspect.condition} to selected token</button>`
+            + `</div></div>`
+        });
+      }
+    });
   }
 
   /**
@@ -1768,55 +1772,44 @@ export class ActorMtA extends Actor {
       : filled === 1 ? "one Touchstone (+2)"
       : `${filled} Touchstones (+3)`;
 
-    const content = `
-      <form class="vtr-detachment-form">
-        <p>Detachment roll &mdash; current Humanity <strong>${humanity}</strong>. Touchstones: ${tsLabel}.</p>
-        <div class="form-group">
-          <label>Breaking point severity (dice)</label>
-          <select name="severity">
-            <option value="5">5 dice &mdash; Humanity 10-9 acts</option>
-            <option value="4">4 dice &mdash; Humanity 8-7 acts</option>
-            <option value="3" selected>3 dice &mdash; Humanity 6-5 acts</option>
-            <option value="2">2 dice &mdash; Humanity 4-3 acts</option>
-            <option value="1">1 die &mdash; Humanity 2 acts</option>
-            <option value="0">0 dice (chance die) &mdash; Humanity 1 acts</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Extra modifier (Masquerade, Requiem, &hellip;)</label>
-          <input type="number" name="modifier" value="0">
-        </div>
-      </form>`;
+    const body = `
+      <p class="vtr-rite-summary">Humanity <strong>${humanity}</strong> &middot; Touchstones: ${tsLabel}</p>
+      <dl>
+        <dt>Breaking point severity:</dt>
+        <dd><select name="severity">
+          <option value="5">5 dice &mdash; Humanity 10-9 acts</option>
+          <option value="4">4 dice &mdash; Humanity 8-7 acts</option>
+          <option value="3" selected>3 dice &mdash; Humanity 6-5 acts</option>
+          <option value="2">2 dice &mdash; Humanity 4-3 acts</option>
+          <option value="1">1 die &mdash; Humanity 2 acts</option>
+          <option value="0">0 dice (chance die) &mdash; Humanity 1 acts</option>
+        </select></dd>
+        <dt>Extra modifier (Masquerade, Requiem, &hellip;):</dt>
+        <dd><input type="number" name="modifier" value="0"></dd>
+      </dl>`;
 
-    new foundry.appv1.api.Dialog({
+    this._renderRiteDialog({
       title: "Detachment Roll",
-      content,
-      buttons: {
-        roll: {
-          icon: '<i class="fas fa-dice-d10"></i>',
-          label: "Roll",
-          callback: async (html) => {
-            const severity = Math.round(Number(html.find('[name="severity"]').val()) || 0);
-            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
-            const pool = severity + tsMod + modifier; // may be <= 0 -> chance die
+      variant: "detachment",
+      body,
+      onRoll: async (html) => {
+        const severity = Math.round(Number(html.find('[name="severity"]').val()) || 0);
+        const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+        const pool = severity + tsMod + modifier; // may be <= 0 -> chance die
 
-            const rollReturn = {};
-            await DiceRollerDialogue.rollToChat({
-              dicePool: pool,
-              flavor: `Detachment (severity ${severity}, Touchstones ${tsMod >= 0 ? "+" : ""}${tsMod}`
-                + `${modifier ? `, modifier ${modifier >= 0 ? "+" : ""}${modifier}` : ""})`,
-              title: "Detachment",
-              actorOverride: this,
-              hungerDice: 0,
-              rollReturn
-            });
-            await this._resolveDetachmentOutcome(rollReturn.roll);
-          }
-        },
-        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
-      },
-      default: "roll"
-    }).render(true);
+        const rollReturn = {};
+        await DiceRollerDialogue.rollToChat({
+          dicePool: pool,
+          flavor: `Detachment (severity ${severity}, Touchstones ${tsMod >= 0 ? "+" : ""}${tsMod}`
+            + `${modifier ? `, modifier ${modifier >= 0 ? "+" : ""}${modifier}` : ""})`,
+          title: "Detachment",
+          actorOverride: this,
+          hungerDice: 0,
+          rollReturn
+        });
+        await this._resolveDetachmentOutcome(rollReturn.roll);
+      }
+    });
   }
 
   /**
@@ -1836,25 +1829,25 @@ export class ActorMtA extends Actor {
     if (roll?.dramaticFailure) {
       cls = "messy-failure";
       title = "Detachment &mdash; Dramatic failure";
-      body = "The breaking point means nothing to her. She loses a dot of Humanity and gains the Jaded Condition.";
+      body = "The breaking point means nothing to you. You lose a dot of Humanity and gain the Jaded Condition.";
       buttons = condBtn("Jaded");
       loseHumanity = true;
     } else if (hits < 1) {
       cls = "messy-failure";
       title = "Detachment &mdash; Failure";
-      body = "She moves toward monstrosity, losing a dot of Humanity. Gain Bestial, Competitive, or Wanton. "
+      body = "You move toward monstrosity, losing a dot of Humanity. Gain Bestial, Competitive, or Wanton. "
         + "(Optional: take a Bane and a Beat instead of losing Humanity.)";
       buttons = sinButtons;
       loseHumanity = true;
     } else if (roll?.exceptionalSuccess || hits >= 5) {
       cls = "messy-success";
       title = "Detachment &mdash; Exceptional success";
-      body = "She steps away from the conflict renewed. Humanity holds; gain the Inspired Condition.";
+      body = "You step away from the conflict renewed. Humanity holds; gain the Inspired Condition.";
       buttons = condBtn("Inspired");
     } else {
       cls = "messy-success";
       title = "Detachment &mdash; Success";
-      body = "She holds onto a scrap of empathy. Humanity holds, but gain Bestial, Competitive, or Wanton.";
+      body = "You hold onto a scrap of empathy. Humanity holds, but gain Bestial, Competitive, or Wanton.";
       buttons = sinButtons;
     }
 
