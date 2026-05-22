@@ -472,7 +472,11 @@ game-pause .vtr-pause-icon img {
   background-color: #050505;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;
+  /* Stretch to fill: the textures were authored at the wide dice-roller
+     proportions, so `cover` cropped them to a quarter. 100% 100% shows the
+     whole image (the rite windows are close to the roller's aspect ratio,
+     so the stretch is negligible). */
+  background-size: 100% 100%;
 }
 /* A dark scrim over the texture so form text stays readable. */
 .vtr-rite-dialog .vtr-rite-block {
@@ -500,16 +504,17 @@ game-pause .vtr-pause-icon img {
   gap: 8px;
   background: rgba(5, 5, 5, 0.82);
 }
+/* Roll / Cancel buttons share the blue-marble look of the dice roller's
+   Roll button (the .stoneButton background: a blue gradient over rock.jpg). */
 .vtr-rite-dialog .dialog-buttons button {
-  background: rgba(20, 16, 14, 0.92);
-  color: #f4ead8;
-  border: 1px solid #6e5a3e;
-  border-radius: 3px;
+  background: var(--background-button);
+  border: var(--border-button);
+  box-shadow: inset 0 0 1px 1px #252517;
+  color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 .vtr-rite-dialog .dialog-buttons button:hover {
-  border-color: #d59861;
-  box-shadow: 0 0 6px rgba(213, 152, 97, 0.5);
+  box-shadow: var(--box-shadow-button-hover);
 }
 
 /* ---------------------------------------------------------------------------
