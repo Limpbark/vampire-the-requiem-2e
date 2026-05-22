@@ -137,6 +137,76 @@ export class ItemMtA extends Item {
     return this.system.damage != undefined && this.system.isWeapon !== false /* this.type === "firearm" || this.type === "melee" || this.system.isWeapon || this.type === "explosive" || this.type === "combat_dice_pool" */;
   }
 
+  /**
+   * Best-effort Vitae cost for a Discipline Power or Devotion.
+   * Devotion cost is structured ({value, perTurn}); Discipline Power cost is
+   * free text ("1 Vitae", "3-9 Vitae and 1 Willpower", "None", "Varies; …"),
+   * so the first integer in a string that mentions Vitae is used as a guess.
+   * @returns {number} The guessed cost, 0 if none.
+   */
+  _parseVitaeCost() {
+    const cost = this.system?.cost;
+    if (this.type === "devotion") return Math.max(0, Number(cost?.value) || 0);
+    if (typeof cost === "string") {
+      if (!/vitae/i.test(cost)) return 0;
+      const m = cost.match(/\d+/);
+      return m ? Number(m[0]) : 0;
+    }
+    return 0;
+  }
+
+  /**
+   * If the autoVitaeSpend setting is on and this is a Discipline Power or
+   * Devotion with a Vitae cost, prompt to deduct it from the actor's Vitae
+   * pool. The amount is pre-filled (a guess for free-text costs) and editable.
+   * Resolves once the prompt is dismissed so roll() can continue.
+   * @param {Actor} actor  The actor activating the power.
+   */
+  async _maybeSpendVitae(actor) {
+    if (!game.settings.get("vampire-the-requiem-2e", "autoVitaeSpend")) return;
+    if (this.type !== "discipline_power" && this.type !== "devotion") return;
+    if (!actor?.system?.vitae) return;
+
+    const cost = this._parseVitaeCost();
+    if (cost <= 0) return;
+
+    const current = Number(actor.system.vitae.value ?? 0);
+    const costLabel = typeof this.system.cost === "string" && this.system.cost.trim()
+      ? this.system.cost : `${cost} Vitae`;
+
+    await new Promise((resolve) => {
+      new foundry.appv1.api.Dialog({
+        title: `Spend Vitae — ${this.name}`,
+        content: `
+          <form class="vtr-vitae-spend-form">
+            <p>Listed cost: <strong>${costLabel}</strong></p>
+            <p>Current Vitae: <strong>${current}</strong></p>
+            <div class="form-group">
+              <label>Vitae to spend</label>
+              <input type="number" name="vitae" value="${cost}" min="0" autofocus>
+            </div>
+          </form>`,
+        buttons: {
+          spend: {
+            icon: '<i class="fas fa-tint"></i>',
+            label: "Spend",
+            callback: async (html) => {
+              const n = Math.max(0, Math.round(Number(html.find('[name="vitae"]').val()) || 0));
+              if (n > 0) {
+                if (n > current) ui.notifications.warn(`${actor.name}: not enough Vitae — pool emptied.`);
+                await actor.update({ "system.vitae.value": Math.max(0, current - n) });
+              }
+              resolve();
+            }
+          },
+          skip: { icon: '<i class="fas fa-times"></i>', label: "Skip", callback: () => resolve() }
+        },
+        default: "spend",
+        close: () => resolve()
+      }).render(true);
+    });
+  }
+
   async showChatCard() {
     const token = this.actor.token;
     const templateData = {
@@ -197,6 +267,10 @@ export class ItemMtA extends Item {
     }
 
     await actor.setFlag('vampire-the-requiem-2e', 'lastRolledItem', this.id);
+
+    // Discipline Power / Devotion: offer to deduct the Vitae cost. Runs before
+    // the no-dice-pool early return below so powers with no roll still prompt.
+    await this._maybeSpendVitae(actor);
 
     let { traits, diceBonus } = this.getRollTraits();
 

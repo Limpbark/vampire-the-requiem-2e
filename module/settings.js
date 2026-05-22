@@ -110,6 +110,15 @@ export const registerSystemSettings = function () {
     }
   });
 
+  game.settings.register("vampire-the-requiem-2e", "autoVitaeSpend", {
+    name: "Automatic Vitae spend",
+    hint: "When a Vampire or Ghoul rolls a Discipline Power or Devotion that costs Vitae, prompt to deduct the cost from their Vitae pool. The amount is pre-filled (a best guess for free-text Discipline costs) and editable.",
+    scope: "world",
+    config: true,
+    default: true,
+    type: Boolean
+  });
+
   game.settings.register("vampire-the-requiem-2e", "hungerDice", {
     name: "Homebrew rule: Hunger Dice",
     hint: "For Vampires and Ghouls, when a dice pool exceeds current Vitae the excess dice become Hunger dice (a 10 causes a messy success, a 1 on a failed roll causes a messy failure). The dice roller calculates and displays this automatically.",
