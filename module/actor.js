@@ -1676,6 +1676,80 @@ export class ActorMtA extends Actor {
     });
   }
 
+  /**
+   * Lashing Out with the Predatory Aura (VtR 2E p. 91-92). Opens a dialog to
+   * choose the aspect of the Beast, rolls Blood Potency + the matching Power
+   * Attribute, and posts a card describing the contested response and the
+   * Condition the loser gains.
+   */
+  async rollLashingOut() {
+    const sys = this.system;
+    const bp = sys.vampire_traits?.bloodPotency?.final ?? 0;
+    const ASPECTS = {
+      monstrous:   { label: "Monstrous",   attr: "Strength",     path: ["attributes_physical", "strength"],     condition: "Bestial" },
+      seductive:   { label: "Seductive",   attr: "Presence",     path: ["attributes_social", "presence"],       condition: "Wanton" },
+      competitive: { label: "Competitive", attr: "Intelligence", path: ["attributes_mental", "intelligence"],   condition: "Competitive" }
+    };
+
+    const content = `
+      <form class="vtr-lashing-form">
+        <p>Lash out with the Beast &mdash; Blood Potency = <strong>${bp}</strong></p>
+        <div class="form-group">
+          <label>Aspect of the Beast</label>
+          <select name="aspect">
+            <option value="monstrous">Monstrous &mdash; Strength (inflicts Bestial)</option>
+            <option value="seductive">Seductive &mdash; Presence (inflicts Wanton)</option>
+            <option value="competitive">Competitive &mdash; Intelligence (inflicts Competitive)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Situational modifier (territory, hunger, &hellip;)</label>
+          <input type="number" name="modifier" value="0">
+        </div>
+      </form>`;
+
+    new foundry.appv1.api.Dialog({
+      title: "Lash Out with the Predatory Aura",
+      content,
+      buttons: {
+        roll: {
+          icon: '<i class="fas fa-dice-d10"></i>',
+          label: "Roll",
+          callback: async (html) => {
+            const aspect = ASPECTS[html.find('[name="aspect"]').val()] ?? ASPECTS.monstrous;
+            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+            const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
+            const pool = Math.max(0, bp + attrVal + modifier);
+
+            await DiceRollerDialogue.rollToChat({
+              dicePool: pool,
+              flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`,
+              title: "Lashing Out",
+              actorOverride: this,
+              hungerDice: 0
+            });
+            await ChatMessage.create({
+              speaker: ChatMessage.getSpeaker({ actor: this }),
+              content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
+                + `<span class="hunger-messy-title">Predatory Aura &mdash; ${aspect.label} Beast</span>`
+                + `<span class="hunger-messy-text">The opposition responds with <em>fight</em> `
+                + `(a Power Attribute + Blood Potency &mdash; costs 1 Willpower if their Blood Potency is lower) `
+                + `or <em>flight</em>. If the aggressor scores more successes, the loser gains the `
+                + `<strong>${aspect.condition}</strong> Condition and the winner takes +2 to pursue their `
+                + `aspect for the scene.</span>`
+                + `<button type="button" class="vtr-frenzy-button" data-vtr-apply-condition="${aspect.condition}" `
+                + `data-vtr-apply-to="selected" data-actor-id="${this.id}">`
+                + `Apply ${aspect.condition} to selected token</button>`
+                + `</div></div>`
+            });
+          }
+        },
+        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
+      },
+      default: "roll"
+    }).render(true);
+  }
+
   scourPattern() {
     const reduceAttribute = (attribute) => {
       const itemData = {

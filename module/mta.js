@@ -594,11 +594,24 @@ Hooks.once("ready", function () {
   });
 
   // Outcome-card buttons that apply a named Condition to an actor (Frenzy,
-  // Lashing Out, Detachment cards all emit these).
+  // Lashing Out, Detachment cards all emit these). data-vtr-apply-to="selected"
+  // targets the controlled token's actor (used when the recipient is not the
+  // card's actor, e.g. the loser of a Predatory Aura clash); otherwise the
+  // Condition goes on the card's own actor.
   document.body.addEventListener("click", (event) => {
     const btn = event.target.closest("button[data-vtr-apply-condition]");
     if (!btn) return;
-    const actor = game.actors.get(btn.dataset.actorId);
+    let actor;
+    if (btn.dataset.vtrApplyTo === "selected") {
+      const tokens = canvas.tokens?.controlled ?? [];
+      if (tokens.length !== 1) {
+        ui.notifications.warn("Select exactly one token to receive the Condition.");
+        return;
+      }
+      actor = tokens[0].actor;
+    } else {
+      actor = game.actors.get(btn.dataset.actorId);
+    }
     if (!actor) { ui.notifications.warn("Apply Condition: actor not found."); return; }
     actor.applyConditionByName(btn.dataset.vtrApplyCondition);
   });
