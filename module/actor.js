@@ -1577,15 +1577,21 @@ export class ActorMtA extends Actor {
   /**
    * Render a dice-roller-styled Dialog for the Frenzy / Lashing Out /
    * Detachment flows so they share the look of the main dice roller: the dark
-   * theme (via the mta-sheet class + the system's theme-dark observer) and the
-   * matching ui/dice_bg_<variant>.png texture behind a kUltraBlock body.
+   * theme and the matching ui/dice_bg_<variant>.png texture behind a
+   * kUltraBlock body.
+   *
+   * The styling classes and the background image are stamped directly onto the
+   * rendered window in the `render` callback — passing `classes` through the
+   * appv1 Dialog options does not reliably reach the window element.
    * @param {object}   opts
    * @param {string}   opts.title    Window title.
-   * @param {string}   opts.variant  "frenzy" | "lashing" | "detachment".
+   * @param {string}   opts.variant  Matches ui/dice_bg_<variant>.png — one of
+   *                                 "frenzy" | "lashing_out" | "detachment".
    * @param {string}   opts.body     Inner HTML, wrapped in a kUltraBlock.
    * @param {Function} opts.onRoll   Async callback(html) for the Roll button.
    */
   _renderRiteDialog({ title, variant, body, onRoll }) {
+    const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.png`;
     new foundry.appv1.api.Dialog({
       title,
       content: `<div class="kUltraBlock vtr-rite-block">${body}</div>`,
@@ -1593,10 +1599,18 @@ export class ActorMtA extends Actor {
         roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll },
         cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
       },
-      default: "roll"
+      default: "roll",
+      render: (html) => {
+        const el = html instanceof HTMLElement ? html : html?.[0];
+        const root = el?.closest(".window-app, .application, .app");
+        if (!root) return;
+        root.classList.add("mta-sheet", "theme-dark", "vtr-rite-dialog", `vtr-rite-${variant}`);
+        const wc = root.querySelector(".window-content");
+        if (wc) wc.style.backgroundImage = `url("${bgUrl}")`;
+      }
     }, {
-      classes: ["worldbuilding", "dialogue", "mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`],
-      width: 430
+      classes: ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`],
+      width: 440
     }).render(true);
   }
 
@@ -1721,7 +1735,7 @@ export class ActorMtA extends Actor {
 
     this._renderRiteDialog({
       title: "Lash Out with the Predatory Aura",
-      variant: "lashing",
+      variant: "lashing_out",
       body,
       onRoll: async (html) => {
         const aspect = ASPECTS[html.find('[name="aspect"]').val()] ?? ASPECTS.monstrous;

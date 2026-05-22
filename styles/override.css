@@ -462,9 +462,10 @@ game-pause .vtr-pause-icon img {
 /* ---------------------------------------------------------------------------
    Frenzy / Lashing Out / Detachment dialogs
    -----------------------------------------
-   Lightweight Dialogs styled to match the main dice roller: the dark theme
-   (mta-sheet class + the system's theme-dark observer) and a matching
-   ui/dice_bg_<variant>.png texture behind a kUltraBlock body.
+   Styled to match the main dice roller. The mta-sheet/vtr-rite-dialog classes
+   and the ui/dice_bg_<variant>.png texture are stamped onto the window in the
+   render callback of _renderRiteDialog (module/actor.js) — the texture is set
+   inline on .window-content there, so only the framing rules live here.
 --------------------------------------------------------------------------- */
 .vtr-rite-dialog .window-content {
   padding: 0;
@@ -473,33 +474,42 @@ game-pause .vtr-pause-icon img {
   background-position: center;
   background-size: cover;
 }
-.vtr-rite-frenzy .window-content     { background-image: url("../ui/dice_bg_frenzy.png"); }
-.vtr-rite-lashing .window-content    { background-image: url("../ui/dice_bg_lashing_out.png"); }
-.vtr-rite-detachment .window-content { background-image: url("../ui/dice_bg_detachment.png"); }
-
 /* A dark scrim over the texture so form text stays readable. */
 .vtr-rite-dialog .vtr-rite-block {
-  padding: 12px 16px;
-  background: linear-gradient(rgba(5, 5, 5, 0.55), rgba(5, 5, 5, 0.72));
+  padding: 14px 18px;
+  background: linear-gradient(rgba(5, 5, 5, 0.62), rgba(5, 5, 5, 0.78));
 }
 .vtr-rite-dialog .vtr-rite-summary {
   text-align: center;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 14px;
   color: #f4ead8;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
-.vtr-rite-dialog dl dt {
+.vtr-rite-dialog .vtr-rite-block dl dt {
+  color: #f4ead8;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
-.vtr-rite-dialog dl dd input,
-.vtr-rite-dialog dl dd select {
+.vtr-rite-dialog .vtr-rite-block dl dd input,
+.vtr-rite-dialog .vtr-rite-block dl dd select {
   width: 100%;
 }
-/* The dialog button row sits on the texture, below the scrimmed body. */
+/* Button row: a dark strip with themed buttons, below the scrimmed body. */
 .vtr-rite-dialog .dialog-buttons {
-  padding: 6px 10px 8px;
-  background: rgba(5, 5, 5, 0.72);
+  padding: 8px 12px 10px;
+  gap: 8px;
+  background: rgba(5, 5, 5, 0.82);
+}
+.vtr-rite-dialog .dialog-buttons button {
+  background: rgba(20, 16, 14, 0.92);
+  color: #f4ead8;
+  border: 1px solid #6e5a3e;
+  border-radius: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.vtr-rite-dialog .dialog-buttons button:hover {
+  border-color: #d59861;
+  box-shadow: 0 0 6px rgba(213, 152, 97, 0.5);
 }
 
 /* ---------------------------------------------------------------------------
