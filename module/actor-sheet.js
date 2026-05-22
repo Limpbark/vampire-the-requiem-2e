@@ -1690,6 +1690,11 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.daysleep();
     });
 
+    html.find('.frenzyButton').click(ev => {
+      ev.preventDefault();
+      this.actor.rollFrenzy();
+    });
+
     // Phases of Night ribbon: ankh-shaped arrows step the marker forward or
     // backwards. Both wrap at the ends (Late Dawn -> Early Dawn going right).
     html.find('.phase-arrow-right').click(ev => {

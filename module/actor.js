@@ -1551,6 +1551,131 @@ export class ActorMtA extends Actor {
     await this.update({ "system.phaseOfNight": next });
   }
 
+  /**
+   * Look up a Condition item by name in the world's item directory and add a
+   * copy to this actor. The user keeps their Conditions in the world (no
+   * shipped compendium), so this resolves against `game.items`. If no match
+   * is found, posts a chat note for manual application instead.
+   * @param {string} name  The Condition's name (case-insensitive).
+   */
+  async applyConditionByName(name) {
+    if (!name) return;
+    const cond = game.items.find(i => i.type === "condition"
+      && i.name?.toLowerCase() === String(name).toLowerCase());
+    if (cond) {
+      await this.createEmbeddedDocuments("Item", [cond.toObject()]);
+      ui.notifications.info(`${cond.name} Condition added to ${this.name}.`);
+    } else {
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        content: `<p><em>Apply the <strong>${name}</strong> Condition to ${this.name} `
+          + `&mdash; no matching Condition item was found in this world.</em></p>`
+      });
+    }
+  }
+
+  /**
+   * Frenzy resistance (VtR 2E p. 104). Opens a small dialog for the provocation
+   * modifier and any Willpower spent fighting the Beast, rolls Resolve +
+   * Composure, and posts an outcome card. The Gangrel bane caps the pool at
+   * Humanity dots. Entering frenzy grants a Beat.
+   */
+  async rollFrenzy() {
+    const sys = this.system;
+    const resolve = sys.attributes_mental?.resolve?.final ?? 0;
+    const composure = sys.attributes_social?.composure?.final ?? 0;
+    const basePool = resolve + composure;
+    const humanity = Number(sys.integrity ?? 10);
+    const isGangrel = String(sys.clan ?? "").toLowerCase() === "gangrel";
+
+    const content = `
+      <form class="vtr-frenzy-form">
+        <p>Resist Frenzy &mdash; Resolve + Composure = <strong>${basePool}</strong>${isGangrel
+          ? ` <em>(Gangrel bane: pool capped at Humanity ${humanity})</em>` : ""}</p>
+        <div class="form-group">
+          <label>Provocation modifier</label>
+          <input type="number" name="modifier" value="0" autofocus>
+        </div>
+        <div class="form-group">
+          <label>Willpower spent fighting (turns) &mdash; +1 die each</label>
+          <input type="number" name="willpower" value="0" min="0">
+        </div>
+      </form>`;
+
+    new foundry.appv1.api.Dialog({
+      title: "Resist Frenzy",
+      content,
+      buttons: {
+        roll: {
+          icon: '<i class="fas fa-dice-d10"></i>',
+          label: "Roll",
+          callback: async (html) => {
+            const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+            const willpower = Math.max(0, Math.round(Number(html.find('[name="willpower"]').val()) || 0));
+            let pool = basePool + modifier + willpower;
+            if (isGangrel) pool = Math.min(pool, humanity);
+            pool = Math.max(0, pool);
+
+            const rollReturn = {};
+            await DiceRollerDialogue.rollToChat({
+              dicePool: pool,
+              flavor: "Frenzy Resistance",
+              title: "Frenzy Resistance",
+              actorOverride: this,
+              hungerDice: 0,
+              rollReturn
+            });
+            await this._resolveFrenzyOutcome(rollReturn.roll, willpower);
+          }
+        },
+        cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
+      },
+      default: "roll"
+    }).render(true);
+  }
+
+  /**
+   * Interpret a frenzy-resistance roll and post the outcome card.
+   * @param {Roll} roll        The resolved roll (from rollToChat's rollReturn).
+   * @param {number} willpower Willpower spent fighting, for the exceptional note.
+   */
+  async _resolveFrenzyOutcome(roll, willpower = 0) {
+    const hits = Math.max(0, roll?.total ?? 0);
+    let cls, title, body, conditionBtn = "";
+
+    if (roll?.dramaticFailure) {
+      cls = "messy-failure";
+      title = "Frenzy! &mdash; Dramatic failure";
+      body = "The Beast seizes control. The frenzy cannot end until a breaking point is reached. Take a Beat (or two, if you turn the failure into a dramatic failure).";
+      await this.addProgress("Entered frenzy", 1, 0);
+    } else if (hits < 1) {
+      cls = "messy-failure";
+      title = "Frenzy!";
+      body = "The vampire succumbs &mdash; the Beast decides what it wants. Take a Beat.";
+      await this.addProgress("Entered frenzy", 1, 0);
+    } else if (roll?.exceptionalSuccess || hits >= 5) {
+      cls = "messy-success";
+      title = "Frenzy resisted &mdash; Exceptional success";
+      body = `The Beast is mastered. Regain a point of spent Willpower${willpower > 0
+        ? `, plus the ${willpower} Willpower spent fighting the frenzy this scene` : ""}.`;
+    } else {
+      cls = "messy-success";
+      title = "Frenzy resisted";
+      body = "The vampire holds the Beast back, but is left with the Tempted Condition.";
+      conditionBtn = `<button type="button" class="vtr-frenzy-button" `
+        + `data-vtr-apply-condition="Tempted" data-actor-id="${this.id}">Apply Tempted Condition</button>`;
+    }
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      content: `<div class="vtr-roll"><div class="hunger-messy ${cls}">`
+        + `<span class="hunger-messy-title">${title}</span>`
+        + `<span class="hunger-messy-text">${body}</span>`
+        + conditionBtn
+        + `</div></div>`
+    });
+  }
+
   scourPattern() {
     const reduceAttribute = (attribute) => {
       const itemData = {
