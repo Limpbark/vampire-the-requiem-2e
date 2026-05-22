@@ -125,10 +125,9 @@ export class DiceRollerDialogue extends Application {
       "presence", "manipulation", "composure",
       "intelligence", "wits", "resolve"
     ];
-    // Skills that have a dice_bg_<skill>.png in ui/. "brawl" is intentionally
-    // absent — there's no texture for it yet, so Brawl rolls go neutral.
+    // Skills that have a dice_bg_<skill>.png in ui/ — all 24 CofD skills.
     const KNOWN_SKILLS = [
-      "athletics", "drive", "firearms", "larceny", "stealth", "survival", "weaponry",
+      "athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry",
       "animal_ken", "empathy", "expression", "intimidation", "persuasion",
       "socialize", "streetwise", "subterfuge",
       "academics", "computer", "crafts", "investigation", "medicine",
