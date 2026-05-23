@@ -754,6 +754,12 @@ game-pause .vtr-pause-icon img {
 }
 .characterSheet .sheet-header .portrait .blush-icon-active {
   opacity: 1;
-  filter: drop-shadow(0 0 5px rgba(220, 60, 60, 0.95))
-          drop-shadow(0 0 10px rgba(220, 60, 60, 0.65));
+  filter: drop-shadow(0 0 4px rgba(220, 30, 30, 1))
+          drop-shadow(0 0 9px rgba(220, 30, 30, 0.85));
+}
+/* Recolour the SVG to a solid red when active. The filter chain takes a
+   light-coloured source and remaps it to ~#c8102e (a known recipe; see
+   codepen.io/sosuke/pen/Pjoqqp for the generator). */
+.characterSheet .sheet-header .portrait .blush-icon-active img {
+  filter: brightness(0) saturate(100%) invert(15%) sepia(99%) saturate(7400%) hue-rotate(353deg) brightness(95%) contrast(115%);
 }

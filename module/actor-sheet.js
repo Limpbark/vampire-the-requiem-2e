@@ -1756,8 +1756,15 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
         openBlushPicker();
         return;
       }
+      // Click while active: drop the Blush, revert the portrait. No Vitae
+      // refund — once spent, the blood is spent; the player just stops
+      // sustaining the illusion.
       if (this.actor.getFlag("vampire-the-requiem-2e", "blushActive")) {
-        ui.notifications.info("Blush of Life is already active.");
+        await this.actor.update({ "flags.vampire-the-requiem-2e.blushActive": false });
+        await ChatMessage.create({
+          speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+          content: `<p><em><strong>${this.actor.name}</strong> lets the Blush of Life fade.</em></p>`
+        });
         return;
       }
       const cur = Number(this.actor.system?.vitae?.value ?? 0);
