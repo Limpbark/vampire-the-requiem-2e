@@ -98,6 +98,20 @@ export const registerSystemSettings = function () {
     }
   });
 
+  game.settings.register("vampire-the-requiem-2e", "homebrewBlushOfLife", {
+    name: "Homebrew rule: Blush of Life portrait swap",
+    hint: "Adds a small icon to the Vampire portrait. Left-click spends 1 Vitae and swaps the sheet portrait to a player-supplied 'alive-looking' variant (token and canonical portrait are not touched); right-click picks the alternate image. The portrait reverts when the Phase of Night changes or the character takes a daysleep. Requires the Phases of Night setting to be enabled.",
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean,
+    onChange: () => {
+      for (const app of Object.values(ui.windows)) {
+        if (app?.actor?.type === "character") app.render(false);
+      }
+    }
+  });
+
   game.settings.register("vampire-the-requiem-2e", "autoVitaeSpend", {
     name: "Automatic Vitae spend",
     hint: "When a Vampire or Ghoul rolls a Discipline Power or Devotion that costs Vitae, prompt to deduct the cost from their Vitae pool. The amount is pre-filled (a best guess for free-text Discipline costs) and editable.",

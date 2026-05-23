@@ -709,3 +709,40 @@ game-pause .vtr-pause-icon img {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9));
   transition: left 0.18s ease-out;
 }
+
+/* ---------------------------------------------------------------------------
+   Blush of Life corner icon on the Vampire portrait.
+   Only rendered when the homebrew Blush setting (and Phases of Night) are on
+   — see actor-sheet.js getData. Left-click activates / first-time picks the
+   alternate portrait; right-click always picks. .blush-icon-active adds a
+   warm red glow so the swapped state is unmistakable.
+--------------------------------------------------------------------------- */
+.characterSheet .portrait {
+  position: relative;
+}
+.characterSheet .blush-icon {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  z-index: 4;
+  cursor: pointer;
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  transition: opacity 0.15s, transform 0.1s, filter 0.15s;
+}
+.characterSheet .blush-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+.characterSheet .blush-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.characterSheet .blush-icon-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(220, 60, 60, 0.95))
+          drop-shadow(0 0 12px rgba(220, 60, 60, 0.65));
+}

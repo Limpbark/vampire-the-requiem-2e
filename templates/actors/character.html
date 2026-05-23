@@ -8,7 +8,13 @@
 
       <!-- Column #1-->
       <div class="portrait">
-        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}">
+        <img class="profile-img" src="{{portraitImg}}" data-edit="img" title="{{actor.name}}">
+        {{#if blushEnabled}}
+        <span class="blush-icon{{#if blushActive}} blush-icon-active{{/if}}"
+              title="Blush of Life &mdash; left-click to spend 1 Vitae, right-click to pick the alternate portrait">
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-blush-of-life.svg" alt="Blush of Life">
+        </span>
+        {{/if}}
       </div>
 
       <!-- Column #2 -->

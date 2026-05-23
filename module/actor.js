@@ -1533,7 +1533,10 @@ export class ActorMtA extends Actor {
     // stored phase index always lives on the actor.
     const update = {
       "system.vitae.value": newVitae,
-      "system.phaseOfNight": 0
+      "system.phaseOfNight": 0,
+      // Blush of Life (homebrew) reverts on daysleep — the night is over and
+      // the trick wears off.
+      "flags.vampire-the-requiem-2e.blushActive": false
     };
 
     // Homebrew alternative Willpower: rising for the night also restores
@@ -1578,7 +1581,11 @@ export class ActorMtA extends Actor {
     const current = Number(this.system?.phaseOfNight ?? 0) || 0;
     // ((x % 10) + 10) % 10 gives a non-negative modulus for negative inputs.
     const next = (((current + step) % 10) + 10) % 10;
-    await this.update({ "system.phaseOfNight": next });
+    // Also clear the Blush of Life flag — the night has moved on.
+    await this.update({
+      "system.phaseOfNight": next,
+      "flags.vampire-the-requiem-2e.blushActive": false
+    });
   }
 
   /**

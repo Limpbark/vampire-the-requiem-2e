@@ -317,6 +317,19 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Homebrew alternative Willpower: surfaced so the Daysleep tooltip can
     // mention the 1 Willpower recovery when the rule is enabled.
     sheetData.homebrewWillpower = game.settings.get("vampire-the-requiem-2e", "homebrewWillpower");
+    // Homebrew Blush of Life portrait swap: only available for Vampires, and
+    // only when BOTH the Phases of Night setting AND the Blush setting are on
+    // (Blush is subordinate to Phases of Night, since the phase-change is one
+    // of the two automatic revert triggers). blushActive is a flag, not a
+    // system field; cleared on phase change / daysleep in actor.js.
+    sheetData.blushEnabled = sheetData.showPhasesOfNight
+      && game.settings.get("vampire-the-requiem-2e", "homebrewBlushOfLife")
+      && systemData.characterVariant === "vampire";
+    sheetData.blushActive = !!actor.getFlag("vampire-the-requiem-2e", "blushActive");
+    sheetData.blushOfLifeImg = systemData.blushOfLifeImg || "";
+    sheetData.portraitImg = (sheetData.blushEnabled && sheetData.blushActive && sheetData.blushOfLifeImg)
+      ? sheetData.blushOfLifeImg
+      : actor.img;
     const PHASE_LABELS = CONFIG.MTA.phaseOfNightLabels;
     const rawPhase = Number(systemData.phaseOfNight ?? 0) || 0;
     const phaseIdx = Math.max(0, Math.min(9, Math.floor(rawPhase)));
@@ -1717,6 +1730,54 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       ev.preventDefault();
       const tip = ev.currentTarget.dataset.touchstoneTip;
       if (tip) ui.notifications.info(tip);
+    });
+
+    // Blush of Life corner icon on the Vampire portrait. Left-click spends 1
+    // Vitae and toggles the sheet portrait to the alternate; right-click opens
+    // a FilePicker to set/change that alternate. Going through FilePicker
+    // directly bypasses portrait mods like Tokenizer — they hook actor.img
+    // edits, not arbitrary FilePicker invocations, which is what we want for
+    // this simple secondary image slot.
+    const openBlushPicker = () => {
+      const current = this.actor.system?.blushOfLifeImg || "";
+      const FP = foundry.applications?.apps?.FilePicker?.implementation ?? FilePicker;
+      new FP({
+        type: "image",
+        current,
+        callback: (path) => this.actor.update({ "system.blushOfLifeImg": path })
+      }).render(true);
+    };
+
+    html.find('.blush-icon').on('click', async (ev) => {
+      ev.preventDefault();
+      const altImg = this.actor.system?.blushOfLifeImg || "";
+      if (!altImg) {
+        ui.notifications.info("Pick an alternate portrait first.");
+        openBlushPicker();
+        return;
+      }
+      if (this.actor.getFlag("vampire-the-requiem-2e", "blushActive")) {
+        ui.notifications.info("Blush of Life is already active.");
+        return;
+      }
+      const cur = Number(this.actor.system?.vitae?.value ?? 0);
+      if (cur < 1) {
+        ui.notifications.warn(`${this.actor.name}: not enough Vitae for Blush of Life.`);
+        return;
+      }
+      await this.actor.update({
+        "system.vitae.value": cur - 1,
+        "flags.vampire-the-requiem-2e.blushActive": true
+      });
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+        content: `<p><em><strong>${this.actor.name}</strong> kindles the Blush of Life &mdash; 1 Vitae spent.</em></p>`
+      });
+    });
+
+    html.find('.blush-icon').on('contextmenu', (ev) => {
+      ev.preventDefault();
+      openBlushPicker();
     });
 
     // Phases of Night ribbon: ankh-shaped arrows step the marker forward or
