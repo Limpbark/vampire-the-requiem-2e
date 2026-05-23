@@ -763,3 +763,13 @@ game-pause .vtr-pause-icon img {
 .characterSheet .sheet-header .portrait .blush-icon-active img {
   filter: brightness(0) saturate(100%) invert(15%) sepia(99%) saturate(7400%) hue-rotate(353deg) brightness(95%) contrast(115%);
 }
+
+/* Portrait images: show the whole image without cropping, regardless of
+   aspect ratio. The default rule uses object-fit: cover which crops the
+   image to fill the 195x195 box — fine for square/Tokenizer-cropped
+   actor.img but it zooms into uploaded Blush of Life alternates that have
+   different proportions. With contain, both the canonical portrait and the
+   alternate render predictably (the full image, letterboxed if needed). */
+.characterSheet .sheet-header .portrait img.profile-img {
+  object-fit: contain;
+}
