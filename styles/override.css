@@ -786,17 +786,33 @@ game-pause .vtr-pause-icon img {
    light parchment.
 --------------------------------------------------------------------------- */
 .worldbuilding.chat-card {
+  /* The parchment image often has decorative transparent borders. Generous
+     padding keeps the title, image, and body text inside the visible
+     parchment area. */
   background: url("../ui/chat_card_01.webp") center / 100% 100% no-repeat,
               #e8d8b6;
-  padding: 22px 22px 24px !important;
+  padding: 42px 36px 38px !important;
   border-radius: 4px;
   color: #1a1a1a;
-  min-height: 140px;
+  min-height: 180px;
   box-sizing: border-box;
-  overflow: visible;
+  overflow: visible !important;
+  max-height: none !important;
 }
-.worldbuilding.chat-card .card-header {
-  display: block;
+/* Foundry's default .card-header / .card-content / .card-description rules
+   can clip height or hide overflow. Force them all to stay visible. */
+.worldbuilding.chat-card .card-header,
+.worldbuilding.chat-card .card-content,
+.worldbuilding.chat-card .card-description,
+.worldbuilding.chat-card .card-summary,
+.worldbuilding.chat-card .card-summaryAddendum {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  height: auto !important;
+  background: transparent !important;
 }
 .worldbuilding.chat-card .item-name {
   font-family: "Cezanne VTR", cursive, serif;
@@ -812,6 +828,9 @@ game-pause .vtr-pause-icon img {
   word-wrap: break-word;
   max-width: 100%;
 }
+/* Force-coerce all body-text colour so descriptions pasted from rulebook
+   sources (which often carry inline color: white / background) become
+   legible on the parchment. */
 .worldbuilding.chat-card .card-description,
 .worldbuilding.chat-card .card-description *,
 .worldbuilding.chat-card .card-content,
@@ -824,11 +843,14 @@ game-pause .vtr-pause-icon img {
 .worldbuilding.chat-card .card-footer * {
   color: #1a1a1a !important;
   background-color: transparent !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 .worldbuilding.chat-card .card-description {
   font-size: 13px;
-  line-height: 1.4;
-  margin-top: 4px;
+  line-height: 1.45;
+  margin-top: 6px;
+  min-height: 1.45em;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
