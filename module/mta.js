@@ -121,10 +121,6 @@ Hooks.once("init", async function () {
  */
 Hooks.once("setup", function () {
 
-  if (game.settings.get("vampire-the-requiem-2e", "homebrewDemons")) {
-    CONFIG.MTA.addHouseRules();
-  }
-
   game.tooltip.TOOLTIP_ACTIVATION_MS = 0;// God, the default tooltip duration is awful. Does anyone prefer it?
 
   // Localize CONFIG objects once up-front

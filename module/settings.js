@@ -82,16 +82,6 @@ export const registerSystemSettings = function () {
     requiresReload: false
   });
 
-  game.settings.register("vampire-the-requiem-2e", "homebrewDemons", {
-    name: "Homebrew rule: ephemeral demons",
-    hint: "Adds a demon-type ephemeral entity, with lores, etc.",
-    scope: "world",
-    config: true,
-    default: false,
-    type: Boolean,
-    requiresReload: true
-  });
-
   game.settings.register("vampire-the-requiem-2e", "phasesOfNight", {
     name: "Homebrew rule: Phases of Night",
     hint: "Adds a 'Phases of Night' ribbon to the character sheet's macro bar showing where the character is in the night (10 segments from ~6 PM through ~6 AM). Daysleep resets the marker to Early Dawn.",
