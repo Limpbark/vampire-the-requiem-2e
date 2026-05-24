@@ -35,6 +35,7 @@ export class DiceRollerDialogue extends Application {
     skill = null,
     lastTrait = null,
     rollContext = "",
+    isPhysicalRoll = false,
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -74,6 +75,7 @@ export class DiceRollerDialogue extends Application {
     this.skill = skill;
     this.lastTrait = lastTrait;
     this.rollContext = rollContext;
+    this.isPhysicalRoll = isPhysicalRoll;
   }
 
   /* -------------------------------------------- */
@@ -127,6 +129,8 @@ export class DiceRollerDialogue extends Application {
     data.isPerception = this.rollContext === "perception";
     data.isVampire = hungerActor?.system?.characterVariant === "vampire";
     data.bloodPotency = hungerActor?.system?.vampire_traits?.bloodPotency?.final ?? 0;
+    data.isPhysicalRoll = !!this.isPhysicalRoll;
+    data.currentVitae = hungerActor?.system?.vitae?.value ?? 0;
 
     // Dice-roller window background: prefer the Attribute texture; if the
     // pool has no Attribute, fall back to the Skill texture; if neither is
@@ -289,6 +293,7 @@ export class DiceRollerDialogue extends Application {
       const vitae = this.actorOverride?.system?.vitae?.value ?? 0;
       const isPerception = this.rollContext === "perception";
       const isVampire = this.actorOverride?.system?.characterVariant === "vampire";
+      const isPhysicalRoll = !!this.isPhysicalRoll;
       const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
       const updateVisual = () => {
         const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
@@ -306,6 +311,11 @@ export class DiceRollerDialogue extends Application {
         } else if (isVampire && html.find('input[name="addBloodPotency"]').is(":checked")) {
           // General Vampire toggle on non-Perception rolls: +Blood Potency.
           extraBonus += bp;
+        }
+        // Burn 1 Vitae for +2 Physical: stacks with anything else.
+        if (isPhysicalRoll && isVampire
+            && html.find('input[name="burnVitaePhysical"]').is(":checked")) {
+          extraBonus += 2;
         }
         const prePool = Math.max(0, base + bonus + specialties + extraBonus);
         const totalPool = Math.max(0, prePool + wpBonus);
@@ -325,7 +335,7 @@ export class DiceRollerDialogue extends Application {
       html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
       html.find('input[name^="specialty_"]').on("change", updateVisual);
       html.find('input[name="willpower"]').on("change", updateVisual);
-      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="addBloodPotency"]').on("change", updateVisual);
+      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="addBloodPotency"], input[name="burnVitaePhysical"]').on("change", updateVisual);
 
       // Trained Observer toggles sync the explodeThreshold radio at the
       // top of the dialog: 0 of 2 -> 10-again (default); 1 -> 9-again;
@@ -380,6 +390,23 @@ export class DiceRollerDialogue extends Application {
       const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
       modifiers.dicePool_userMod += bp;
       percFlavor += ` [Blood Potency +${bp}]`;
+    }
+
+    // Burn 1 Vitae for +2 Physical: Vampire-only toggle that appears on
+    // rolls involving a physical attribute or skill. The Vitae is deducted
+    // here (Roll time), not when the toggle is ticked. If the actor has no
+    // Vitae the bonus is skipped with a warning.
+    if (this.isPhysicalRoll
+        && this.actorOverride?.system?.characterVariant === "vampire"
+        && html.find('input[name="burnVitaePhysical"]').is(":checked")) {
+      const cur = Number(this.actorOverride?.system?.vitae?.value ?? 0);
+      if (cur >= 1) {
+        modifiers.dicePool_userMod += 2;
+        percFlavor += " [Burned 1 Vitae +2 Physical]";
+        await this.actorOverride.update({ "system.vitae.value": cur - 1 });
+      } else {
+        ui.notifications.warn(`${this.actorOverride.name}: not enough Vitae to burn — no bonus applied.`);
+      }
     }
 
     const realPool = this.dicePool + modifiers.dicePool_userMod;

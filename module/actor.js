@@ -553,13 +553,13 @@ export class ActorMtA extends Actor {
    */
   roll({ traits = [], diceBonus = 0, rollName = "Skill check", rollType = "dialogue", damageRoll = false, lastTrait = null }) {
 
-    const { dicePool, flavor, specialties, attribute, skill } = this.assembleDicePool({ traits, diceBonus });
+    const { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll } = this.assembleDicePool({ traits, diceBonus });
 
     switch (rollType) {
       case 'dialogue':
         let title = "";
         title = rollName + ": " + flavor;
-        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill, lastTrait });
+        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill, lastTrait, isPhysicalRoll });
         diceRoller.render(true);
         break;
       case 'quick':
@@ -753,7 +753,7 @@ export class ActorMtA extends Actor {
       flavor += " (Wound penalties: -" + woundPenalty + ")";
     }
 
-    return { dicePool, flavor, specialties, attribute, skill };
+    return { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll };
   }
 
   async werewolfTransform(form) {

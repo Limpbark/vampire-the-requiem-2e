@@ -103,6 +103,14 @@
               </label>
             </p>
             {{/unless}}{{/if}}
+            {{#if isVampire}}{{#if isPhysicalRoll}}
+            <p>
+              <label class="checkBox marginR" title="Spend 1 Vitae for a +2 bonus to this physical roll. Vitae is deducted when you press Roll.">
+                <input data-dtype="Boolean" name="burnVitaePhysical" type="checkbox">
+                <span>Burn 1 Vitae for +2 physical bonus this turn</span>
+              </label>
+            </p>
+            {{/if}}{{/if}}
           </div>
         </dd>
         {{#if spendAmmo}}
