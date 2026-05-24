@@ -321,7 +321,19 @@ export class DiceRollerDialogue extends Application {
       html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
       html.find('input[name^="specialty_"]').on("change", updateVisual);
       html.find('input[name="willpower"]').on("change", updateVisual);
-      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="trainedObserver1"], input[name="trainedObserver3"]').on("change", updateVisual);
+      html.find('input[name="dangerSense"], input[name="acuteSenses"]').on("change", updateVisual);
+
+      // Trained Observer toggles sync the explodeThreshold radio at the
+      // top of the dialog: 1 of 2 checked -> 9-again; both -> 8-again.
+      // The radio is the canonical input read by _executeRoll, so the user
+      // can still override manually after.
+      const toToggles = html.find('input[name="trainedObserverA"], input[name="trainedObserverB"]');
+      toToggles.on("change", () => {
+        const n = toToggles.filter(":checked").length;
+        if (n >= 2) html.find('input[name="explodeThreshold"][value="8"]').prop("checked", true);
+        else if (n === 1) html.find('input[name="explodeThreshold"][value="9"]').prop("checked", true);
+      });
+
       updateVisual();
     }
   }
@@ -331,32 +343,25 @@ export class DiceRollerDialogue extends Application {
     modifiers.dicePool_userMod += modifiers.specialties.length;
 
     // Perception Merit toggles (only shown for rollContext === "perception").
-    // - Trained Observer •: 9-again (upgrades 10-again/None to 9-again, but
-    //   never downgrades an 8-again pick).
-    // - Trained Observer •••: 8-again (always wins over the • version).
+    // - Trained Observer (2-toggle row): the change handler in
+    //   activateListeners syncs the existing explodeThreshold radio at the
+    //   top of the dialog — 1 toggle sets 9-again, 2 sets 8-again — so the
+    //   radio is the source of truth here. We only tag the flavor.
     // - Danger Sense: flat +2 dice (the player asserts the roll is a
-    //   reflexive ambush-detection roll).
-    // - Acute Senses (Vampire only): + Blood Potency dice. The card
-    //   warning about Obsession on exceptional success is left to the player
-    //   — this just applies the bonus.
+    //   reflexive Perception roll).
+    // - Acute Senses (Vampire only): + Blood Potency dice. The Obsession-on-
+    //   exceptional drawback is left to the player.
     let percFlavor = "";
     if (this.rollContext === "perception") {
-      const to1 = html.find('input[name="trainedObserver1"]').is(":checked");
-      const to3 = html.find('input[name="trainedObserver3"]').is(":checked");
-      const ds  = html.find('input[name="dangerSense"]').is(":checked");
-      const as  = html.find('input[name="acuteSenses"]').is(":checked");
-      if (to3) {
-        modifiers.explode_threshold = 8;
-        percFlavor += " [Trained Observer •••]";
-      } else if (to1) {
-        modifiers.explode_threshold = Math.min(modifiers.explode_threshold || 10, 9);
-        percFlavor += " [Trained Observer •]";
-      }
-      if (ds) {
+      const toCount = (html.find('input[name="trainedObserverA"]').is(":checked") ? 1 : 0)
+                    + (html.find('input[name="trainedObserverB"]').is(":checked") ? 1 : 0);
+      if (toCount >= 2) percFlavor += " [Trained Observer (8-again)]";
+      else if (toCount === 1) percFlavor += " [Trained Observer (9-again)]";
+      if (html.find('input[name="dangerSense"]').is(":checked")) {
         modifiers.dicePool_userMod += 2;
         percFlavor += " [Danger Sense +2]";
       }
-      if (as) {
+      if (html.find('input[name="acuteSenses"]').is(":checked")) {
         const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
         modifiers.dicePool_userMod += bp;
         percFlavor += ` [Acute Senses +${bp}]`;

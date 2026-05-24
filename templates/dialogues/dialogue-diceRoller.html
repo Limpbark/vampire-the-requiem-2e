@@ -170,21 +170,14 @@
         <dd>
           <div>
             <p>
-              <label class="checkBox marginR">
-                <input data-dtype="Boolean" name="trainedObserver1" type="checkbox">
-                <span>Trained Observer &bull; (9-again)</span>
-              </label>
-            </p>
-            <p>
-              <label class="checkBox marginR">
-                <input data-dtype="Boolean" name="trainedObserver3" type="checkbox">
-                <span>Trained Observer &bull;&bull;&bull; (8-again, overrides &bull;)</span>
-              </label>
+              <label class="checkBox marginR" title="One toggle sets 9-again; both toggles set 8-again."><input data-dtype="Boolean" name="trainedObserverA" type="checkbox"><span></span></label>
+              <label class="checkBox marginR" title="One toggle sets 9-again; both toggles set 8-again."><input data-dtype="Boolean" name="trainedObserverB" type="checkbox"><span></span></label>
+              <span>Trained Observer</span>
             </p>
             <p>
               <label class="checkBox marginR">
                 <input data-dtype="Boolean" name="dangerSense" type="checkbox">
-                <span>Danger Sense (+2, reflexive ambush rolls only)</span>
+                <span>Danger Sense (+2, reflexive Perception rolls only)</span>
               </label>
             </p>
             {{#if isVampire}}
