@@ -116,6 +116,7 @@ export class DiceRollerDialogue extends Application {
     data.config = CONFIG.MTA;
 
     if (game.settings.get("vampire-the-requiem-2e", "showRollDifficulty")) data.enableDifficulty = true;
+    data.showRoteAdvancedActions = game.settings.get("vampire-the-requiem-2e", "showRoteAdvancedActions");
 
     // Hunger dice (homebrew) — Vampires and Ghouls only.
     const hungerActor = this.actorOverride;

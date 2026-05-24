@@ -69,6 +69,7 @@
                 <label><input type="radio" name="explodeThreshold" value="11"><span>{{ localize "MTA.None" }}</span></label>
               </div>
             </div>
+            {{#if showRoteAdvancedActions}}
             <p>
               <label class="checkBox marginR">
                 <input data-dtype="Boolean" name="rote_action" type="checkbox" {{checked isMagical}}>
@@ -81,6 +82,7 @@
                 <span>{{ localize "MTA.AdvancedAction" }}</span>
               </label>
             </p>
+            {{/if}}
             <p>
               <label class="checkBox marginR">
                 <input data-dtype="Boolean" name="extended" type="checkbox" {{checked extended}}>

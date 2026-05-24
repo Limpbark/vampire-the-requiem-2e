@@ -50,6 +50,15 @@ export const registerSystemSettings = function () {
     }
   });
 
+  game.settings.register("vampire-the-requiem-2e", "showRoteAdvancedActions", {
+    name: "Show Rote/Advanced Action toggles",
+    hint: "Adds the Rote Action and Advanced Action checkboxes to the dice roller. These are Chronicles of Darkness mechanics not present in Vampire: the Requiem 2E proper, so they are hidden by default.",
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+
 
   /** Homebrew rules */
 
