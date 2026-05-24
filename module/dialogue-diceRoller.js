@@ -324,14 +324,14 @@ export class DiceRollerDialogue extends Application {
       html.find('input[name="dangerSense"], input[name="acuteSenses"]').on("change", updateVisual);
 
       // Trained Observer toggles sync the explodeThreshold radio at the
-      // top of the dialog: 1 of 2 checked -> 9-again; both -> 8-again.
-      // The radio is the canonical input read by _executeRoll, so the user
-      // can still override manually after.
+      // top of the dialog: 0 of 2 -> 10-again (default); 1 -> 9-again;
+      // both -> 8-again. The radio is the canonical input read by
+      // _executeRoll, so the user can still override manually after.
       const toToggles = html.find('input[name="trainedObserverA"], input[name="trainedObserverB"]');
       toToggles.on("change", () => {
         const n = toToggles.filter(":checked").length;
-        if (n >= 2) html.find('input[name="explodeThreshold"][value="8"]').prop("checked", true);
-        else if (n === 1) html.find('input[name="explodeThreshold"][value="9"]').prop("checked", true);
+        const val = n >= 2 ? "8" : n === 1 ? "9" : "10";
+        html.find(`input[name="explodeThreshold"][value="${val}"]`).prop("checked", true);
       });
 
       updateVisual();
