@@ -2724,7 +2724,22 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     if (!panel) return;
     const entry = traitKey ? CODEX_ENTRIES[traitKey] : null;
     if (!entry) { panel.innerHTML = ''; return; }
-    panel.innerHTML = `<h4 class="codex-title">${entry.title}</h4><div class="codex-body">${entry.body}</div>`;
+
+    // For Skill traits, append the actor's specialties for that skill to
+    // the title, e.g. "Persuasion (Disarming, Cold Reading)". No suffix if
+    // the skill has no specialties set.
+    let title = entry.title;
+    if (typeof traitKey === "string" && traitKey.startsWith("skills_")) {
+      const [group, name] = traitKey.split(".");
+      const raw = this.actor?.system?.[group]?.[name]?.specialties ?? [];
+      const filled = raw.map(s => String(s ?? "").trim()).filter(Boolean);
+      if (filled.length) {
+        const escaped = filled.map(s => foundry.utils.escapeHTML(s)).join(", ");
+        title += ` (${escaped})`;
+      }
+    }
+
+    panel.innerHTML = `<h4 class="codex-title">${title}</h4><div class="codex-body">${entry.body}</div>`;
   }
 
 } // End of class
