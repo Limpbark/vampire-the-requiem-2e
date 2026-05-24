@@ -1031,7 +1031,8 @@ export class ActorMtA extends Actor {
         flavor: flavor,
         title: flavor,
         blindGMRoll: true,
-        actorOverride: this
+        actorOverride: this,
+        rollContext: "perception"
       });
       diceRoller.render(true);
     }

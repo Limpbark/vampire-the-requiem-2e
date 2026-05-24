@@ -34,6 +34,7 @@ export class DiceRollerDialogue extends Application {
     attribute = null,
     skill = null,
     lastTrait = null,
+    rollContext = "",
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -72,6 +73,7 @@ export class DiceRollerDialogue extends Application {
     this.attribute = attribute;
     this.skill = skill;
     this.lastTrait = lastTrait;
+    this.rollContext = rollContext;
   }
 
   /* -------------------------------------------- */
@@ -118,6 +120,13 @@ export class DiceRollerDialogue extends Application {
     data.hasHunger = !!(hungerActor && hungerActor.system?.characterType === "vampire"
       && game.settings.get("vampire-the-requiem-2e", "hungerDice"));
     data.vitae = hungerActor?.system?.vitae?.value ?? 0;
+
+    // Perception-roll context: surface the Trained Observer / Danger Sense /
+    // Acute Senses Merit toggles. Acute Senses is Vampire-only and the
+    // Blood Potency rating is shown inline so the bonus is obvious.
+    data.isPerception = this.rollContext === "perception";
+    data.isVampire = hungerActor?.system?.characterVariant === "vampire";
+    data.bloodPotency = hungerActor?.system?.vampire_traits?.bloodPotency?.final ?? 0;
 
     // Dice-roller window background: prefer the Attribute texture; if the
     // pool has no Attribute, fall back to the Skill texture; if neither is
@@ -278,13 +287,23 @@ export class DiceRollerDialogue extends Application {
     if (container.length) {
       const base = this.dicePool;
       const vitae = this.actorOverride?.system?.vitae?.value ?? 0;
+      const isPerception = this.rollContext === "perception";
+      const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
       const updateVisual = () => {
         const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
         const bonus = (raw === "" || raw === "-") ? 0 : parseInt(raw, 10);
         let specialties = 0;
         html.find('input[name^="specialty_"]').each(function () { if ($(this).prop("checked")) specialties++; });
         const wpBonus = html.find('input[name="willpower"]').is(":checked") ? 3 : 0;
-        const prePool = Math.max(0, base + bonus + specialties);
+        // Perception Merits that grant dice (Danger Sense +2, Acute Senses
+        // +Blood Potency). Trained Observer only shifts the explode
+        // threshold so it doesn't enter the visual count.
+        let percBonus = 0;
+        if (isPerception) {
+          if (html.find('input[name="dangerSense"]').is(":checked")) percBonus += 2;
+          if (html.find('input[name="acuteSenses"]').is(":checked")) percBonus += bp;
+        }
+        const prePool = Math.max(0, base + bonus + specialties + percBonus);
         const totalPool = Math.max(0, prePool + wpBonus);
         // Hunger dice apply to the pre-Willpower pool only; Willpower dice
         // always count as normal (white).
@@ -302,6 +321,7 @@ export class DiceRollerDialogue extends Application {
       html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
       html.find('input[name^="specialty_"]').on("change", updateVisual);
       html.find('input[name="willpower"]').on("change", updateVisual);
+      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="trainedObserver1"], input[name="trainedObserver3"]').on("change", updateVisual);
       updateVisual();
     }
   }
@@ -309,6 +329,40 @@ export class DiceRollerDialogue extends Application {
   async _executeRoll(html, ev) {
     const modifiers = this._fetchInputs(html);
     modifiers.dicePool_userMod += modifiers.specialties.length;
+
+    // Perception Merit toggles (only shown for rollContext === "perception").
+    // - Trained Observer •: 9-again (upgrades 10-again/None to 9-again, but
+    //   never downgrades an 8-again pick).
+    // - Trained Observer •••: 8-again (always wins over the • version).
+    // - Danger Sense: flat +2 dice (the player asserts the roll is a
+    //   reflexive ambush-detection roll).
+    // - Acute Senses (Vampire only): + Blood Potency dice. The card
+    //   warning about Obsession on exceptional success is left to the player
+    //   — this just applies the bonus.
+    let percFlavor = "";
+    if (this.rollContext === "perception") {
+      const to1 = html.find('input[name="trainedObserver1"]').is(":checked");
+      const to3 = html.find('input[name="trainedObserver3"]').is(":checked");
+      const ds  = html.find('input[name="dangerSense"]').is(":checked");
+      const as  = html.find('input[name="acuteSenses"]').is(":checked");
+      if (to3) {
+        modifiers.explode_threshold = 8;
+        percFlavor += " [Trained Observer •••]";
+      } else if (to1) {
+        modifiers.explode_threshold = Math.min(modifiers.explode_threshold || 10, 9);
+        percFlavor += " [Trained Observer •]";
+      }
+      if (ds) {
+        modifiers.dicePool_userMod += 2;
+        percFlavor += " [Danger Sense +2]";
+      }
+      if (as) {
+        const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
+        modifiers.dicePool_userMod += bp;
+        percFlavor += ` [Acute Senses +${bp}]`;
+      }
+    }
+
     const realPool = this.dicePool + modifiers.dicePool_userMod;
     const defenseAdj = (this.damageRoll && modifiers.applyDefense) ? this.defense : 0;
     const willpowerBonus = modifiers.willpower ? 3 : 0;
@@ -320,6 +374,7 @@ export class DiceRollerDialogue extends Application {
     for (const specialty of modifiers.specialties) {
       flavor += ` [${specialty}]`;
     }
+    flavor += percFlavor;
     if (willpowerBonus) flavor += " [Willpower]";
     const explodeThreshold = modifiers.explode_threshold;
     const targetNumber = Math.clamp(modifiers.dicePool_difficulty, 1, 10);

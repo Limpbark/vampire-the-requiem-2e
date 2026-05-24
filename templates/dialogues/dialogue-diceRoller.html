@@ -165,6 +165,39 @@
           </div>
         </dd>
         {{/if}}
+        {{#if isPerception}}
+        <dt>Perception Merits:</dt>
+        <dd>
+          <div>
+            <p>
+              <label class="checkBox marginR">
+                <input data-dtype="Boolean" name="trainedObserver1" type="checkbox">
+                <span>Trained Observer &bull; (9-again)</span>
+              </label>
+            </p>
+            <p>
+              <label class="checkBox marginR">
+                <input data-dtype="Boolean" name="trainedObserver3" type="checkbox">
+                <span>Trained Observer &bull;&bull;&bull; (8-again, overrides &bull;)</span>
+              </label>
+            </p>
+            <p>
+              <label class="checkBox marginR">
+                <input data-dtype="Boolean" name="dangerSense" type="checkbox">
+                <span>Danger Sense (+2, reflexive ambush rolls only)</span>
+              </label>
+            </p>
+            {{#if isVampire}}
+            <p>
+              <label class="checkBox marginR" title="Exceptional success triggers the Obsession Condition tied to whatever stimulus prompted the roll.">
+                <input data-dtype="Boolean" name="acuteSenses" type="checkbox">
+                <span>Acute Senses (+{{bloodPotency}} Blood Potency)</span>
+              </label>
+            </p>
+            {{/if}}
+          </div>
+        </dd>
+        {{/if}}
       </dl>
     </div>
     <div class="vtr-dice-right-col">
