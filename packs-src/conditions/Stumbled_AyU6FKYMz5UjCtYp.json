@@ -1,0 +1,31 @@
+{
+  "_id": "AyU6FKYMz5UjCtYp",
+  "name": "Stumbled",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Stumbled.</strong> Your character has hit a complication while attempting a blood sorcery ritual. Each successive roll in the extended action is at a -3 die penalty.</p><p>This Condition does not grant a Beat when resolved.</p><p><strong>Possible Sources:</strong> Dramatic failure on a blood sorcery ritual.</p><p><strong>Resolution:</strong> The ritual ends.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!AyU6FKYMz5UjCtYp"
+}

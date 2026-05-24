@@ -1,0 +1,56 @@
+{
+  "_id": "z1ghCNd2Wq1Dnx7m",
+  "name": "Shield (large)",
+  "type": "melee",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Melee.svg",
+  "system": {
+    "damage": 2,
+    "initiativeMod": -4,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": true,
+    "damageType": "bashing",
+    "strengthReq": 3,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 3,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Shield (large). Damage 2B, initiative -4, Strength 3, Size 3, availability ••.</p><p><em>Special:</em> Concealed bonus to Defense.</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.strength",
+        "skills_physical.weaponry"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!z1ghCNd2Wq1Dnx7m"
+}

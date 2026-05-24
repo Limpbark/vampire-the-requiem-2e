@@ -1,0 +1,31 @@
+{
+  "_id": "ZP1eQGj8AitlA6qU",
+  "name": "Mesmerized",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Mesmerized.</strong> Your character's will is subordinate to that of a vampire. You're not obviously hypnotized — you're a bit quiet and reserved compared to normal, but nothing out of the ordinary. When the vampire who inflicted this Condition gives you a command, you cannot resist. If it's something that you wouldn't normally do, you might look like you've been hypnotized or that you're sleepwalking, but otherwise you look and act normally. If you resolve this Condition, gain a +3 die bonus to resist further attempts to Mesmerize you in the same scene; you also can't quite remember what happened while you were under the vampire's spell. This Condition fades naturally after a scene, which does not count as resolving the Condition.</p><p><strong>Possible Sources:</strong> The Dominate Discipline.</p><p><strong>Resolution:</strong> Take any amount of bashing or lethal damage. Experience a breaking point as part of a vampire's command.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!ZP1eQGj8AitlA6qU"
+}

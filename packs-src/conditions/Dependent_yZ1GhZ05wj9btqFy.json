@@ -1,0 +1,31 @@
+{
+  "_id": "yZ1GhZ05wj9btqFy",
+  "name": "Dependent",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Dependent (Persistent).</strong> Your character has become obsessed with a mortal. This obsession is for both attention and for blood. She suffers all the effects of a second-stage blood bond as if she were bound to the mortal.</p><p><strong>Possible Sources:</strong> Daeva clan bane.</p><p><strong>Resolution:</strong> Death of the mortal.</p><p><strong>Beat:</strong> Your character suffers loss because she avoided responsibility for her obsession.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!yZ1GhZ05wj9btqFy"
+}

@@ -1,0 +1,31 @@
+{
+  "_id": "GYcOOewgwWAUWT4R",
+  "name": "Jaded",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Jaded.</strong> Your character has no interest in the ways of the living. He eschews mortal society and only acts to better himself. Because of this, his Beast takes tighter hold on his actions. Any rolls to resist frenzy suffer his Humanity dots as a cap, and he cannot spend Willpower to hold back frenzy. He may still ride the wave.</p><p><strong>Possible Sources:</strong> Detachment failure.</p><p><strong>Resolution:</strong> Meaningful interaction with a Touchstone.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!GYcOOewgwWAUWT4R"
+}

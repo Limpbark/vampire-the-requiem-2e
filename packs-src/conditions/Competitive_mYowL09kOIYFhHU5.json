@@ -1,0 +1,31 @@
+{
+  "_id": "mYowL09kOIYFhHU5",
+  "name": "Competitive",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Competitive.</strong> Your character must assert dominance and superiority. Either she gives it her all, or she falters. Any time she's in direct competition with another character, she suffers a -2 die penalty on any rolls where she doesn't spend Willpower. This includes contested and extended rolls. As well, any rolls to tempt or coerce her into competition achieve exceptional success on three successes instead of five.</p><p>This Condition fades naturally after a number of nights equal to the Blood Potency of the vampire who caused it. In the case of the predatory aura, this is the vampire who won the conflict. In the case of testing for detachment, this is the vampire's own Blood Potency.</p><p>After resolving Competitive, your character cannot be subject to this Condition again for a full month.</p><p><strong>Possible Sources:</strong> A challenging predatory aura conflict, facing a breaking point.</p><p><strong>Resolution:</strong> Win or lose a competition where someone reaches a breaking point.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!mYowL09kOIYFhHU5"
+}

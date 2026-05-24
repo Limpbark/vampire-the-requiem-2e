@@ -1,0 +1,31 @@
+{
+  "_id": "xBgjHYANSNZQzl75",
+  "name": "Deprived",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Deprived.</strong> Your character suffers from an addiction. She is unable to get her fix, however, leaving her irritable, anxious, and unable to focus. Remove one from her Stamina, Resolve, and Composure dice pools. This does not influence derived traits; it only influences dice pools that use these Attributes.</p><p><strong>Possible Sources:</strong> Your character is Addicted but cannot get a fix.</p><p><strong>Resolution:</strong> Your character indulges her addiction.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!xBgjHYANSNZQzl75"
+}

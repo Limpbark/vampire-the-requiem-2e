@@ -1,0 +1,64 @@
+{
+  "_id": "awgyl2SzjNLzhEQC",
+  "name": "Pistol, Light",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 1,
+    "initiativeMod": 0,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 20,
+      "medium": 40,
+      "long": 80
+    },
+    "capacity": 17,
+    "magazine": null,
+    "cartridge": "Glock 17 (9mm)",
+    "strengthReq": 2,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 1,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Pistol, Light. Damage 1L, ranges 20/40/80, clip 17 (+1 chambered, 18 total), initiative +0, Strength 2, Size 1, availability •••.</p><p><em>Example:</em> Glock 17 (9mm)</p>",
+    "availability": 3,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!awgyl2SzjNLzhEQC"
+}

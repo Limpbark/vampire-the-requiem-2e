@@ -1,0 +1,31 @@
+{
+  "_id": "DN4bCPw0GIZt438Q",
+  "name": "Intoxicated",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Intoxicated.</strong> Your character is drunk, drugged, or otherwise dulled to the world around her. While she's probably not hallucinating, her inhibitions and reactions are both lower than they should be. Your character suffers a -2 die penalty to all Dexterity and Wits dice pools. Characters using Social maneuvering against her face two fewer Doors than usual.</p><p><strong>Possible Sources:</strong> Heavy drinking or drug use.</p><p><strong>Resolution:</strong> You sleep it off, or face a breaking point.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!DN4bCPw0GIZt438Q"
+}

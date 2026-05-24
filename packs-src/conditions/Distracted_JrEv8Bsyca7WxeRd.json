@@ -1,0 +1,31 @@
+{
+  "_id": "JrEv8Bsyca7WxeRd",
+  "name": "Distracted",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Distracted.</strong> Constant confusion and distractions buffet your character from all sides. She cannot take extended actions, and suffers a -2 die penalty to all rolls involving perception, concentration, and precision.</p><p>This Condition does not grant a Beat when resolved.</p><p><strong>Possible Sources:</strong> Being in a swarm.</p><p><strong>Resolution:</strong> Leaving the swarm.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!JrEv8Bsyca7WxeRd"
+}

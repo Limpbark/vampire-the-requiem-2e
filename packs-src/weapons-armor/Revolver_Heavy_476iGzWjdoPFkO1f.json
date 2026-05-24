@@ -1,0 +1,64 @@
+{
+  "_id": "476iGzWjdoPFkO1f",
+  "name": "Revolver, Heavy",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 2,
+    "initiativeMod": -2,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 35,
+      "medium": 70,
+      "long": 140
+    },
+    "capacity": 6,
+    "magazine": null,
+    "cartridge": "SW M29 (.44 Magnum)",
+    "strengthReq": 3,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 1,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Revolver, Heavy. Damage 2L, ranges 35/70/140, clip 6, initiative -2, Strength 3, Size 1, availability ••.</p><p><em>Example:</em> SW M29 (.44 Magnum)</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!476iGzWjdoPFkO1f"
+}

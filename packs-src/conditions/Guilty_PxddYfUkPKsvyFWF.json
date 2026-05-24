@@ -1,0 +1,31 @@
+{
+  "_id": "PxddYfUkPKsvyFWF",
+  "name": "Guilty",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Guilty.</strong> Your character is experiencing deep-seated feelings of guilt and remorse. This Condition is commonly applied after a successful detachment roll. While the character is under the effects of this Condition, he receives a -2 die penalty to any Resolve or Composure rolls to defend against Subterfuge, Empathy, or Intimidation rolls.</p><p><strong>Possible Sources:</strong> Encountering a breaking point, some Ghoul Merits.</p><p><strong>Resolution:</strong> The character confesses his crimes and makes restitution for whatever he did.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!PxddYfUkPKsvyFWF"
+}

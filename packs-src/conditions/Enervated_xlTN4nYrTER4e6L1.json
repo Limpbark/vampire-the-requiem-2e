@@ -1,0 +1,31 @@
+{
+  "_id": "xlTN4nYrTER4e6L1",
+  "name": "Enervated",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Enervated (Persistent).</strong> The character is in the second stage of soul loss. Her instinctive efforts to shore up her Willpower by giving into her urges have failed, her Integrity has gone and her Willpower is now fading. In addition to the effects of Soulless, she can no longer regain Willpower through her Virtue, only her Vice. Indulging herself brings diminishing returns — whenever she does so, her permanent Willpower drops by one dot before she regains Willpower points to the new maximum.</p><p><strong>Possible Sources:</strong> Soul loss.</p><p><strong>Resolution:</strong> The character regains her soul.</p><p><strong>Beat:</strong> Lose a dot of permanent Willpower.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!xlTN4nYrTER4e6L1"
+}

@@ -1,0 +1,31 @@
+{
+  "_id": "xYVcWYLLKH5AKjpE",
+  "name": "Amnesia",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Amnesia (Persistent).</strong> Your character is missing a portion of her memory. An entire period of her life is just gone. This causes massive difficulties with friends and loved ones.</p><p><strong>Possible Sources:</strong> Physical or psychological trauma, the Dominate Discipline.</p><p><strong>Resolution:</strong> You regain your memory and learn the truth. Depending on the circumstances, this may constitute a breaking point at a level determined by the Storyteller.</p><p><strong>Beat:</strong> Something problematic arises, such as a forgotten arrest warrant or old enemy.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!xYVcWYLLKH5AKjpE"
+}

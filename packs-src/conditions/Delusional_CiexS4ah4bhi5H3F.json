@@ -1,0 +1,31 @@
+{
+  "_id": "CiexS4ah4bhi5H3F",
+  "name": "Delusional",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Delusional (Persistent).</strong> You believe something that isn't actually true — maybe you think that someone is poisoning your food, that a doppelganger has replaced your daughter, or that something lives in the shadows of your apartment. You don't actually hallucinate images that reinforce your delusion; you may believe that you're covered in spiders, but just looking at yourself is enough to clarify matters. Germs, on the other hand.…</p><p>You can't truly repress your belief, but spending a point of Willpower lets you come up with an explanation (albeit one that sounds psychotic when you explain it to someone else) as to why your delusion does not apply to a specific situation.</p><p><strong>Possible Sources:</strong> The Nightmare Discipline.</p><p><strong>Resolution:</strong> You completely disprove your delusion, or destroy the vampire who is the source of your paranoia.</p><p><strong>Beat:</strong> You adhere to your paranoid belief despite evidence to the contrary.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!CiexS4ah4bhi5H3F"
+}

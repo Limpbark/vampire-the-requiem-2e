@@ -1,0 +1,55 @@
+{
+  "_id": "PGLqIQuLag5BMQPb",
+  "name": "Flak Jacket",
+  "type": "armor",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Armor.svg",
+  "system": {
+    "rating": 2,
+    "ballistic": 4,
+    "defenseMod": -1,
+    "speedMod": 0,
+    "strengthReq": 1,
+    "traits": [],
+    "coverage": {
+      "torso": true,
+      "arms": true,
+      "legs": false,
+      "head": false
+    },
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p><strong>Modern.</strong> Flak Jacket. Rating 2/4, Strength 1, Defense -1, Speed 0, availability ••.</p><p><em>Coverage:</em> torso, arms.</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!PGLqIQuLag5BMQPb"
+}

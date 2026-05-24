@@ -1,0 +1,31 @@
+{
+  "_id": "Rpgg0thOQ2MyXt55",
+  "name": "Sated",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Sated.</strong> Your character gave her Beast an outlet that stopped it from driving her to frenzy. Until she resolves this Condition, she has a +1 die modifier to rolls to resist Frenzy.</p><p><strong>Possible Sources:</strong> The Animalism Discipline.</p><p><strong>Resolution:</strong> Frenzy, or resist significant provocation to frenzy (a situation with a modifier of -3 or more to resist).</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!Rpgg0thOQ2MyXt55"
+}

@@ -1,0 +1,64 @@
+{
+  "_id": "BXzTjJnGflNbVg05",
+  "name": "Crossbow",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 2,
+    "initiativeMod": -5,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 40,
+      "medium": 80,
+      "long": 160
+    },
+    "capacity": 1,
+    "magazine": null,
+    "cartridge": "",
+    "strengthReq": 3,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 3,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Crossbow. Damage 2L, ranges 40/80/160, clip 1, initiative -5, Strength 3, Size 3, availability •••.</p>",
+    "availability": 3,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!BXzTjJnGflNbVg05"
+}

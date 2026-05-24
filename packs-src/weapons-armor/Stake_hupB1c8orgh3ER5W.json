@@ -1,0 +1,56 @@
+{
+  "_id": "hupB1c8orgh3ER5W",
+  "name": "Stake",
+  "type": "melee",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Melee.svg",
+  "system": {
+    "damage": 0,
+    "initiativeMod": -4,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": true,
+    "damageType": "lethal",
+    "strengthReq": 1,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 1,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Stake. Damage 0L, initiative -4, Strength 1, Size 1, availability n/a.</p><p><em>Special:</em> Can stake a Vampire on an exceptional success or a targeted heart attack.</p>",
+    "availability": 0,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.strength",
+        "skills_physical.weaponry"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!hupB1c8orgh3ER5W"
+}

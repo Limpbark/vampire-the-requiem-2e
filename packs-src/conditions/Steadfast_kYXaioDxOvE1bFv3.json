@@ -1,0 +1,31 @@
+{
+  "_id": "kYXaioDxOvE1bFv3",
+  "name": "Steadfast",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Steadfast.</strong> Your character is confident and resolved. When you've failed a roll, you may choose to resolve this Condition to instead treat the action as if you'd rolled a single success. If the roll is a chance die, you may choose to resolve this Condition and roll a single regular die instead.</p><p><strong>Possible Sources:</strong> Encountering a breaking point.</p><p><strong>Resolution:</strong> Your character's confidence carries him through and the worst is avoided; the Condition is resolved as described above.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!kYXaioDxOvE1bFv3"
+}

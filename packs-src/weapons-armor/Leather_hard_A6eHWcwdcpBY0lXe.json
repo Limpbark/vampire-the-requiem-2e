@@ -1,0 +1,55 @@
+{
+  "_id": "A6eHWcwdcpBY0lXe",
+  "name": "Leather (hard)",
+  "type": "armor",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Armor.svg",
+  "system": {
+    "rating": 2,
+    "ballistic": 0,
+    "defenseMod": -1,
+    "speedMod": 0,
+    "strengthReq": 2,
+    "traits": [],
+    "coverage": {
+      "torso": true,
+      "arms": true,
+      "legs": false,
+      "head": false
+    },
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p><strong>Archaic.</strong> Leather (hard). Rating 2/0, Strength 2, Defense -1, Speed 0, availability •.</p><p><em>Coverage:</em> torso, arms.</p>",
+    "availability": 1,
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!A6eHWcwdcpBY0lXe"
+}

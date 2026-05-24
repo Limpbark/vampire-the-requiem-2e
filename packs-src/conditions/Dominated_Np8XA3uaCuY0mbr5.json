@@ -1,0 +1,31 @@
+{
+  "_id": "Np8XA3uaCuY0mbr5",
+  "name": "Dominated",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Dominated.</strong> A vampire has given your character a specific command that she cannot go against. You don't have a choice whether or not to follow the command — your will is no longer your own. If your task has a natural end, such as \"Follow that man until he enters an apartment then call me with the address,\" you resolve the Condition once you complete it; otherwise it ends at sunrise. Once you resolve this Condition, you can't quite remember what happened while you were under the vampire's spell.</p><p><strong>Possible Sources:</strong> The Dominate Discipline.</p><p><strong>Resolution:</strong> Take more bashing or lethal damage than your Stamina. Experience a breaking point when following the command, and succeed at the related Resolve + Composure roll. Follow the vampire's command.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!Np8XA3uaCuY0mbr5"
+}

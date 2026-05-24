@@ -1,0 +1,31 @@
+{
+  "_id": "nUN6O6htG91FG4BX",
+  "name": "Drained",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Drained.</strong> Your character has been fed from extensively, and suffers from blood loss. He suffers a -2 die penalty to any physical actions, and rolls to stabilize and survive injuries. As well, after any scene where he exerts himself physically, he must make a Stamina roll or fall unconscious for an hour or more. The Drained penalty does not apply to the Stamina roll, but any wound penalties do apply. Taking damage, being fed from, or spending Willpower on a physical roll applies as physical exertion for this Condition.</p><p><strong>Possible Sources:</strong> A vampire's feeding.</p><p><strong>Resolution:</strong> All lethal damage healed through normal means.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!nUN6O6htG91FG4BX"
+}

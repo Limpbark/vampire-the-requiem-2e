@@ -1,0 +1,31 @@
+{
+  "_id": "wh3FHJu8O3ooBJBZ",
+  "name": "Lethargic",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Lethargic.</strong> Your character is drained and lethargic, feeling the weight of sleeplessness. With this Condition, your character cannot spend Willpower. As well, for every six hours he goes without sleeping, take a cumulative -1 die penalty to all actions. At every six-hour interval, make a Stamina + Resolve roll (with the penalty) to resist falling asleep until the sun next sets.</p><p><strong>Possible Sources:</strong> Fighting daysleep.</p><p><strong>Resolution:</strong> Sleeping a full day.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!wh3FHJu8O3ooBJBZ"
+}

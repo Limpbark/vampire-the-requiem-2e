@@ -1,0 +1,31 @@
+{
+  "_id": "gSmu3dFF8jdL8iJZ",
+  "name": "Thrall",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Thrall (Persistent).</strong> The character has fully succumbed to the effects of soullessness. She may not spend Willpower points for any reason, may not use her Defense in combat, may not spend Experiences, and suffers all the effects of the Broken Condition as well. The player should only continue playing a character with this Condition if there's a chance of regaining the soul.</p><p><strong>Possible Sources:</strong> Soul loss.</p><p><strong>Resolution:</strong> The character regains her soul.</p><p><strong>Beat:</strong> The character is victimized as a result of her Condition.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!gSmu3dFF8jdL8iJZ"
+}

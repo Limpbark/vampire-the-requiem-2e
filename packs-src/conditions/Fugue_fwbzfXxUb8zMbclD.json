@@ -1,0 +1,31 @@
+{
+  "_id": "fwbzfXxUb8zMbclD",
+  "name": "Fugue",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Fugue (Persistent).</strong> Something terrible happened. Rather than deal with it or let it break you, your mind shuts it out. You are prone to blackouts and lost time. Whenever circumstances become too similar to the situation that led to the character gaining this Condition, the player rolls Resolve + Composure. If you fail the roll, the Storyteller controls your character for the next scene; your character, left to his own devices, will seek to avoid the conflict and get away from the area.</p><p><strong>Possible Sources:</strong> Psychological trauma, encountering a breaking point, some Ghoul Merits.</p><p><strong>Resolution:</strong> Regain a dot of Integrity, lose another dot of Integrity, or achieve an exceptional success on a breaking point.</p><p><strong>Beat:</strong> You enter a fugue state as described above.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!fwbzfXxUb8zMbclD"
+}

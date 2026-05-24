@@ -1,0 +1,31 @@
+{
+  "_id": "sRjNKmCUQCdX0CWN",
+  "name": "Tempted",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Tempted.</strong> Your character came close to losing control. Her Beast came at her, and she refused the call. Now, the Beast remains close to the surface. She gets a -1 die penalty to any rolls to resist frenzy. Until she sheds this Condition, each time she resists frenzy, the penalty increases by one. For example, after three successful resistances, note this Condition as \"Tempted -3\" on your character sheet.</p><p><strong>Possible Sources:</strong> Successfully resisted frenzy.</p><p><strong>Resolution:</strong> Kill. Fall to frenzy. Have a meaningful connection with a Touchstone.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!sRjNKmCUQCdX0CWN"
+}

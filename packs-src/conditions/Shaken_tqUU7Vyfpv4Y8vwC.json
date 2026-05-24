@@ -1,0 +1,31 @@
+{
+  "_id": "tqUU7Vyfpv4Y8vwC",
+  "name": "Shaken",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Shaken.</strong> Something has severely frightened your character. Any time your character is taking an action where that fear might hinder her, you may opt to fail the roll and resolve this Condition.</p><p><strong>Possible Sources:</strong> Facing a breaking point, the Auspex Discipline.</p><p><strong>Resolution:</strong> The character gives into her fear and fails a roll as described above.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!tqUU7Vyfpv4Y8vwC"
+}

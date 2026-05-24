@@ -1,0 +1,64 @@
+{
+  "_id": "yOcL95D2za5lowI1",
+  "name": "Assault Rifle",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 3,
+    "initiativeMod": -3,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 150,
+      "medium": 300,
+      "long": 600
+    },
+    "capacity": 42,
+    "magazine": null,
+    "cartridge": "Steyr-AUG (5.56mm)",
+    "strengthReq": 3,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 3,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Assault Rifle. Damage 3L, ranges 150/300/600, clip 42 (+1 chambered, 43 total), initiative -3, Strength 3, Size 3, availability •••.</p><p>Capable of automatic fire.</p><p><em>Example:</em> Steyr-AUG (5.56mm)</p>",
+    "availability": 3,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!yOcL95D2za5lowI1"
+}

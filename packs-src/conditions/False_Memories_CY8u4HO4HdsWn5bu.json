@@ -1,0 +1,31 @@
+{
+  "_id": "CY8u4HO4HdsWn5bu",
+  "name": "False Memories",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>False Memories (Persistent).</strong> The way you remember things doesn't match up with how they happened. You might remember a son who didn't exist, your alcoholic father abusing you despite being raised an orphan, or never getting married. You believe your memories to be true no matter what; even conclusive proof has a hard time getting through to you. Being faced with proof that your memory is fake is a breaking point for you at a level set by the Storyteller.</p><p><strong>Possible Sources:</strong> The Dominate Discipline.</p><p><strong>Resolution:</strong> Face proof that your memory is false and succeed at the breaking point.</p><p><strong>Beat:</strong> Your character trusts someone or takes a risky action based on his faked memories alone.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!CY8u4HO4HdsWn5bu"
+}

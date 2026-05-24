@@ -1,0 +1,55 @@
+{
+  "_id": "eQQrfH13wHV9HXvO",
+  "name": "Chainmail",
+  "type": "armor",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Armor.svg",
+  "system": {
+    "rating": 3,
+    "ballistic": 1,
+    "defenseMod": -2,
+    "speedMod": -2,
+    "strengthReq": 3,
+    "traits": [],
+    "coverage": {
+      "torso": true,
+      "arms": true,
+      "legs": false,
+      "head": false
+    },
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p><strong>Archaic.</strong> Chainmail. Rating 3/1, Strength 3, Defense -2, Speed -2, availability ••.</p><p><em>Coverage:</em> torso, arms.</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!eQQrfH13wHV9HXvO"
+}

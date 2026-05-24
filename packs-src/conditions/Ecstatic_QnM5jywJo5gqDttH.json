@@ -1,0 +1,31 @@
+{
+  "_id": "QnM5jywJo5gqDttH",
+  "name": "Ecstatic",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Ecstatic.</strong> Your Beast has been temporarily sated through the use of blood sorcery. For as long as the Beast is quiet, the character may feed as though her Blood Potency were three dots less than her rating (minimum one), and has a +2 die bonus to avoid frenzy.</p><p><strong>Possible Sources:</strong> Exceptional success on a Crúac ritual.</p><p><strong>Resolution:</strong> Feeding, sleeping, or resisting a frenzy.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!QnM5jywJo5gqDttH"
+}

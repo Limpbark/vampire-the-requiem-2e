@@ -1,0 +1,31 @@
+{
+  "_id": "TXt0QuZPzNG48tAl",
+  "name": "Obsession",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Obsession (Persistent).</strong> Something's on your character's mind and she just can't shake it. She gains the 9-again quality on all rolls related to pursuing her obsession. On rolls that are unrelated to her obsession, she loses the 10-again quality. Obsession can be a temporary quality per Storyteller approval.</p><p><strong>Possible Sources:</strong> The Acute Senses Merit.</p><p><strong>Resolution:</strong> The character sheds or purges her fixation.</p><p><strong>Beat:</strong> Character fails to fulfill an obligation due to pursuing her obligation.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!TXt0QuZPzNG48tAl"
+}

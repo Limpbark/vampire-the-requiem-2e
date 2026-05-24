@@ -1,0 +1,56 @@
+{
+  "_id": "AZa2EXBtV79GI7p0",
+  "name": "Spear",
+  "type": "melee",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Melee.svg",
+  "system": {
+    "damage": 2,
+    "initiativeMod": -2,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": true,
+    "damageType": "lethal",
+    "strengthReq": 2,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 4,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Spear. Damage 2L, initiative -2, Strength 2, Size 4, availability •.</p><p><em>Special:</em> +1 Defense, two-handed.</p>",
+    "availability": 1,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.strength",
+        "skills_physical.weaponry"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!AZa2EXBtV79GI7p0"
+}

@@ -1,0 +1,64 @@
+{
+  "_id": "oCqOm400n1VaZIA8",
+  "name": "Shotgun",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 3,
+    "initiativeMod": -4,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 20,
+      "medium": 40,
+      "long": 80
+    },
+    "capacity": 5,
+    "magazine": null,
+    "cartridge": "Remington M870 (12-gauge)",
+    "strengthReq": 3,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 2,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Shotgun. Damage 3L, ranges 20/40/80, clip 5 (+1 chambered, 6 total), initiative -4, Strength 3, Size 2, availability ••.</p><p>9-again on short range.</p><p><em>Example:</em> Remington M870 (12-gauge)</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!oCqOm400n1VaZIA8"
+}

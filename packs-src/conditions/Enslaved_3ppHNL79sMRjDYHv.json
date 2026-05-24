@@ -1,0 +1,31 @@
+{
+  "_id": "3ppHNL79sMRjDYHv",
+  "name": "Enslaved",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Enslaved (Persistent).</strong> You're totally in thrall to the vampire who inflicted this Condition. You can no longer tell when her instructions end and commands issued by Dominate begin. She tells you to do something and you do it. She tells you what you remember, and you remember it. This Condition counts as the Mesmerized Condition for the purpose of the Dominate Discipline. She doesn't have to look at you to issue a command as long as you can hear her voice. You do not apply your Resolve as a penalty to the vampire's dice pool for Entombed Command and Possession.</p><p><strong>Possible Sources:</strong> The Dominate Discipline.</p><p><strong>Resolution:</strong> Kill the vampire who controls you. Undo her mental control by supernatural means.</p><p><strong>Beat:</strong> You're made to do something that you wouldn't normally do.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!3ppHNL79sMRjDYHv"
+}

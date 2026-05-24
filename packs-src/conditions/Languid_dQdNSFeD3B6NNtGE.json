@@ -1,0 +1,31 @@
+{
+  "_id": "dQdNSFeD3B6NNtGE",
+  "name": "Languid",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Languid.</strong> Your character feels the draw of torpor. His actions grow sluggish each night that passes, until eventually he falls to the sleep of ages. Every night that passes with this Condition, levy a cumulative -1 die penalty on all actions. As well, rising from daysleep requires a point of Vitae for each dot of Blood Potency.</p><p><strong>Possible Sources:</strong> Losing a Touchstone.</p><p><strong>Resolution:</strong> Falling to torpor.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!dQdNSFeD3B6NNtGE"
+}

@@ -1,0 +1,31 @@
+{
+  "_id": "KxLtPMGLhjAprDIO",
+  "name": "Scarred",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Scarred.</strong> Your character was subject to a violent bite from Kindred fangs. He's disturbed, angry, paranoid, and prone to lashing out. With this Condition, take a -2 die penalty to any rolls to resist fear, such as with the Nightmare Discipline or the Intimidation Skill. As well, any creature exhibiting a predatory aura attempting to frighten or intimidate your character receives a +2 die bonus.</p><p><strong>Possible Sources:</strong> A violent bite from a vampire.</p><p><strong>Resolution:</strong> Lash out physically, causing three or more levels of lethal damage to someone.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!KxLtPMGLhjAprDIO"
+}

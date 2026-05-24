@@ -1,0 +1,56 @@
+{
+  "_id": "daRWc5hKWenutbgI",
+  "name": "Chain",
+  "type": "melee",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Melee.svg",
+  "system": {
+    "damage": 1,
+    "initiativeMod": -3,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": true,
+    "damageType": "bashing",
+    "strengthReq": 2,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 2,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Chain. Damage 1B, initiative -3, Strength 2, Size 2, availability •.</p><p><em>Special:</em> May be used to grapple at range.</p>",
+    "availability": 1,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.strength",
+        "skills_physical.weaponry"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!daRWc5hKWenutbgI"
+}

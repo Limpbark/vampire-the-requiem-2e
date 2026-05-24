@@ -1,0 +1,31 @@
+{
+  "_id": "Ahb29iTC2yt564Cn",
+  "name": "Soulless",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Soulless (Persistent).</strong> The character is in the first stage of soul loss. Without a soul, she can't attempt abjuration, warding, or binding. She is also more susceptible to possession — any dice pools to resist being taken over by another entity are at a -2 die penalty. The effects on Integrity and Willpower, though, are more severe. For as long as she has this Condition, she does not regain Willpower through surrender or rest, and her use of Virtue and Vice is reversed — she may regain one Willpower point per scene by fulfilling her Virtue without having to risk herself, and regains full Willpower once per chapter by fulfilling her Vice in a way that poses a threat to herself. Regaining Willpower through Vice, though, is now a breaking point with a -5 die penalty unless the character has reached Integrity 1. For a vampire, it is a breaking point at Humanity 2.</p><p><strong>Possible Sources:</strong> Soul loss.</p><p><strong>Resolution:</strong> The character regains her soul.</p><p><strong>Beat:</strong> The character loses Integrity because she indulged her Vice.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!Ahb29iTC2yt564Cn"
+}

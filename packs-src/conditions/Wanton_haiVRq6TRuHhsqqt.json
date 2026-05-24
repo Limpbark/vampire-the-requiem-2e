@@ -1,0 +1,31 @@
+{
+  "_id": "haiVRq6TRuHhsqqt",
+  "name": "Wanton",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Wanton.</strong> Your character wants, for the sake of wanting. He's distracted with temptations of excess and indulgence. Any Composure or Resolve rolls to resist temptation suffer a -2 die penalty. As well, the character that brought forth this Condition achieves exceptional success on three successes instead of five when making any rolls to tempt your character. This could apply to Majesty rolls as well as mundane social rolls.</p><p>This Condition fades naturally after a number of nights equal to the Blood Potency of the vampire who caused it. In the case of the predatory aura, this is the vampire who won the conflict. In the case of testing for detachment, this is the vampire's own Blood Potency.</p><p>After resolving Wanton, your character cannot be subject to this Condition again for a full month.</p><p><strong>Possible Sources:</strong> A seductive predatory aura conflict, facing a breaking point.</p><p><strong>Resolution:</strong> Indulge in something that constitutes a breaking point.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!haiVRq6TRuHhsqqt"
+}

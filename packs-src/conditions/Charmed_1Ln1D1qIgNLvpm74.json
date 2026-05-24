@@ -1,0 +1,31 @@
+{
+  "_id": "1Ln1D1qIgNLvpm74",
+  "name": "Charmed",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Charmed (Persistent).</strong> You've been charmed by a vampire's supernatural force of personality. You don't want to believe that anything he says is a lie, and you can't read his true intentions. The vampire adds his Majesty dots to Manipulation rolls against you, and any Wits + Empathy or Subterfuge rolls you make to detect his lies or uncover his true motives suffer a penalty equal to his Majesty dots. Using supernatural means to detect his lies become a Clash of Wills.</p><p>You want to do things for the vampire, to make him happy. If he asks, you'll do favors for him like he was one of your best friends — giving him a place to crash, lending him your car keys, or revealing secrets that you really shouldn't. You don't feel tricked or ripped off unless you resolve the Condition. It expires normally (without resolving) after one hour per dot of the vampire's Blood Potency.</p><p><strong>Possible Sources:</strong> The Majesty Discipline.</p><p><strong>Resolution:</strong> The vampire attempts to seriously harm you or someone close to you, you make a significant financial or physical sacrifice for him.</p><p><strong>Beat:</strong> You divulge a secret or perform a favor for the vampire.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!1Ln1D1qIgNLvpm74"
+}

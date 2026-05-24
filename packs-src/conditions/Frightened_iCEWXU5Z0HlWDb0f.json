@@ -1,0 +1,31 @@
+{
+  "_id": "iCEWXU5Z0HlWDb0f",
+  "name": "Frightened",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Frightened.</strong> Something's scared you to the point where you lose rational thought. Maybe you've just looked down at a hundred-story drop, or seen a tarantula the size of your fist crawling up your leg. Whatever the case, you need to leave right now. Your only priority is getting the fuck away from the thing that's frightened you — the hell with your stuff, your friends, and your allies. If someone tries to stop you from escaping, you'll fight your way past them. You can't approach the source of your fear or act against it — and if the only way out involves going near the source of your fear, you'll collapse on the ground in terror.</p><p>Supernatural creatures prone to loss of control, including vampires, must roll to avoid frenzy. This Condition lasts until the end of the scene; suppressing its effects for a turn costs a point of Willpower.</p><p><strong>Possible Sources:</strong> The Nightmare Discipline, coming face to face with a phobia.</p><p><strong>Resolution:</strong> The character escapes from the source of his fear.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!iCEWXU5Z0HlWDb0f"
+}

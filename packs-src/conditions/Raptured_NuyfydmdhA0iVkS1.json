@@ -1,0 +1,31 @@
+{
+  "_id": "NuyfydmdhA0iVkS1",
+  "name": "Raptured",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Raptured.</strong> Your character is filled with the glory of God's admonishment, the grace of her damnation. She finds an unsettling harmony with her Beast, due to the fire of Longinus's words. She does not need to use Willpower to ride the wave, and can ride the wave on three successes instead of five.</p><p><strong>Possible Sources:</strong> The Anointed Merit.</p><p><strong>Resolution:</strong> Falling to frenzy or riding the wave.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!NuyfydmdhA0iVkS1"
+}

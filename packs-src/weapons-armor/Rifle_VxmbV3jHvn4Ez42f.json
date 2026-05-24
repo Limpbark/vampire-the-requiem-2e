@@ -1,0 +1,64 @@
+{
+  "_id": "VxmbV3jHvn4Ez42f",
+  "name": "Rifle",
+  "type": "firearm",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Firearm.svg",
+  "system": {
+    "damage": 4,
+    "initiativeMod": -5,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": false,
+    "damageType": "lethal",
+    "ranges": {
+      "short": 200,
+      "medium": 400,
+      "long": 800
+    },
+    "capacity": 5,
+    "magazine": null,
+    "cartridge": "Remington M-700 (.30-06)",
+    "strengthReq": 2,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 3,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Rifle. Damage 4L, ranges 200/400/800, clip 5 (+1 chambered, 6 total), initiative -5, Strength 2, Size 3, availability ••.</p><p><em>Example:</em> Remington M-700 (.30-06)</p>",
+    "availability": 2,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.dexterity",
+        "skills_physical.firearms"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!VxmbV3jHvn4Ez42f"
+}

@@ -1,0 +1,31 @@
+{
+  "_id": "ch9McB9o6FZCdzWr",
+  "name": "Subservient",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Subservient (Persistent).</strong> A vampire has pressed down on your will, and you find it hard to resist doing what she wants even when she doesn't use her supernatural powers of command. She can give you commands as though you were Mesmerized even when you do not have that Condition. You can spend a Willpower point to resist her commands, but she can just Mesmerize you and order you that way. She still needs to use Dominate to alter your memory.</p><p>This Condition fades naturally after a week unless the vampire applies it to you again during that time.</p><p><strong>Possible Sources:</strong> The Dominate Discipline.</p><p><strong>Resolution:</strong> Take more lethal damage than you have Stamina when following the vampire's command. Experience a breaking point when following the command and succeed at the roll.</p><p><strong>Beat:</strong> The vampire makes you do something that you wouldn't normally do.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!ch9McB9o6FZCdzWr"
+}

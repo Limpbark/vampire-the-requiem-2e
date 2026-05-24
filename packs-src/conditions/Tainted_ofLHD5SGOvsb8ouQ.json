@@ -1,0 +1,31 @@
+{
+  "_id": "ofLHD5SGOvsb8ouQ",
+  "name": "Tainted",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Tainted.</strong> Your character committed diablerie, and now retains traces of her victim's soul. Once per chapter, the victim can come back to haunt your character and try to force her destruction. This brief burst penalizes any one dice pool by the victim's Blood Potency dots, or adds to a dice pool opposing your character. This takes the form of subtle manifestations, or whispers that urge and distract. Your character may have multiple instances of this Condition, reflecting different victims.</p><p><strong>Possible Sources:</strong> Diablerie.</p><p><strong>Resolution:</strong> A number of months pass equal to the victim's Blood Potency score. Every level of aggravated damage your character takes reduces this time by one month.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!ofLHD5SGOvsb8ouQ"
+}

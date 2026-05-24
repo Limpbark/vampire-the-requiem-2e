@@ -1,0 +1,55 @@
+{
+  "_id": "Rt6krtCzawt6tZwr",
+  "name": "Full Riot Gear",
+  "type": "armor",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Armor.svg",
+  "system": {
+    "rating": 3,
+    "ballistic": 5,
+    "defenseMod": -2,
+    "speedMod": -1,
+    "strengthReq": 2,
+    "traits": [],
+    "coverage": {
+      "torso": true,
+      "arms": true,
+      "legs": true,
+      "head": false
+    },
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p><strong>Modern.</strong> Full Riot Gear. Rating 3/5, Strength 2, Defense -2, Speed -1, availability •••.</p><p><em>Coverage:</em> torso, arms, legs.</p>",
+    "availability": 3,
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!Rt6krtCzawt6tZwr"
+}

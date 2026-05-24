@@ -1,0 +1,56 @@
+{
+  "_id": "AGFDGiLw7wvjYiKJ",
+  "name": "Knife",
+  "type": "melee",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Melee.svg",
+  "system": {
+    "damage": 0,
+    "initiativeMod": -1,
+    "penetration": 0,
+    "noSuccessesToDamage": false,
+    "applyDefense": true,
+    "damageType": "lethal",
+    "strengthReq": 1,
+    "traits": [],
+    "diceBonus": 0,
+    "size": 1,
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p>Knife. Damage 0L, initiative -1, Strength 1, Size 1, availability •.</p>",
+    "availability": 1,
+    "dicePool": {
+      "value": 0,
+      "attributes": [
+        "attributes_physical.strength",
+        "skills_physical.weaponry"
+      ],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!AGFDGiLw7wvjYiKJ"
+}

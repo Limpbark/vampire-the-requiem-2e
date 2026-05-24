@@ -1,0 +1,55 @@
+{
+  "_id": "OqKCKjVBWMFYl9gd",
+  "name": "Reinforced Clothing",
+  "type": "armor",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Armor.svg",
+  "system": {
+    "rating": 1,
+    "ballistic": 0,
+    "defenseMod": 0,
+    "speedMod": 0,
+    "strengthReq": 1,
+    "traits": [],
+    "coverage": {
+      "torso": true,
+      "arms": true,
+      "legs": true,
+      "head": false
+    },
+    "equipped": false,
+    "isMagical": false,
+    "magicType": "",
+    "magicClass": "",
+    "unlockAttribute": "",
+    "quantity": 1,
+    "durability": 1,
+    "structure": {
+      "value": 1,
+      "max": 1
+    },
+    "mana": {
+      "value": 0,
+      "max": 0
+    },
+    "description": "<p><strong>Modern.</strong> Reinforced Clothing. Rating 1/0, Strength 1, Defense 0, Speed 0, availability •.</p><p><em>Coverage:</em> torso, arms, legs.</p>",
+    "availability": 1,
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!OqKCKjVBWMFYl9gd"
+}

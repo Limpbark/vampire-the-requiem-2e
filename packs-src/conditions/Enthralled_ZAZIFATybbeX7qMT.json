@@ -1,0 +1,31 @@
+{
+  "_id": "ZAZIFATybbeX7qMT",
+  "name": "Enthralled",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Enthralled (Persistent).</strong> You're fanatically loyal to a vampire, willing to go to any length for him. You'll happily take actions that threaten your own life — ramming a speeding truck head-on, jumping in front of a gun-wielding psycho, or handing over your spouse and children for the vampire to play with. The compulsion lasts for one night for each dot of the vampire's Blood Potency.</p><p>You need to spend a point of Willpower just to take an action that goes against your master's commands. Doing so is an immediate breaking point at Humanity 1. If you fail, you chicken out at the last minute; only if you succeed can you do something that the vampire doesn't want you to do.</p><p><strong>Possible Sources:</strong> The Majesty Discipline.</p><p><strong>Resolution:</strong> You take serious harm (more lethal damage than your Stamina) when protecting the vampire, or you succeed at a breaking point roll related to the Condition.</p><p><strong>Beat:</strong> You put yourself in harm's way to protect the vampire.</p>",
+    "availability": 1,
+    "isPersistent": true,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!ZAZIFATybbeX7qMT"
+}

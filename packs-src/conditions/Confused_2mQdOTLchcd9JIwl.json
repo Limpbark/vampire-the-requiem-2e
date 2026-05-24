@@ -1,0 +1,31 @@
+{
+  "_id": "2mQdOTLchcd9JIwl",
+  "name": "Confused",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Confused.</strong> Your character cannot think straight, either because of some mental power or good old-fashioned cranial trauma. You take a -2 die penalty on all Intelligence and Wits rolls.</p><p><strong>Possible Sources:</strong> A blow to the head, dramatic failure when using some Auspex powers.</p><p><strong>Resolution:</strong> Take half an hour to focus and clear your mind. Take any amount of lethal damage.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!2mQdOTLchcd9JIwl"
+}

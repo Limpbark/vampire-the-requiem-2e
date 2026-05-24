@@ -1,0 +1,31 @@
+{
+  "_id": "AloHsbPVOlwMPShs",
+  "name": "Inspired",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Inspired.</strong> Your character is deeply inspired. When your character takes an action pertaining to that inspiration, you may resolve this Condition. An exceptional success on that roll requires only three successes instead of five and you gain a point of Willpower.</p><p><strong>Possible Sources:</strong> Exceptional success with Crafts or Expression, the Inspiring Merit, the Auspex Discipline.</p><p><strong>Resolution:</strong> You spend inspiration to spur yourself to greater success, resolving the Condition as described above.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!AloHsbPVOlwMPShs"
+}

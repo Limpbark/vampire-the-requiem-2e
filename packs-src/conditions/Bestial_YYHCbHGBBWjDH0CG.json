@@ -1,0 +1,31 @@
+{
+  "_id": "YYHCbHGBBWjDH0CG",
+  "name": "Bestial",
+  "type": "condition",
+  "img": "systems/vampire-the-requiem-2e/icons/placeholders/Condition.svg",
+  "system": {
+    "description": "<p><strong>Bestial.</strong> Your character acts on primal, physical impulses. Frightening things make him run. He meets aggressive threats with violence and anger. Take a -2 die penalty to all rolls to resist frenzy or physical impulse. As well, take a -2 die penalty to Defense due to impulsive action. Any rolls to compel your character to impulsive, aggressive action or escape achieve exceptional success on three successes instead of five. This could apply to Disciplines such as Nightmare, or Dominate under the right circumstances.</p><p>This Condition fades naturally after a number of nights equal to the Blood Potency of the vampire who caused it. In the case of the predatory aura, this is the vampire who won the conflict. In the case of testing for detachment, this is the vampire's own Blood Potency.</p><p>After resolving Bestial, your character cannot be subject to this Condition again for a full month.</p><p><strong>Possible Sources:</strong> A monstrous predatory aura conflict, facing a breaking point.</p><p><strong>Resolution:</strong> Cause damage in someone's last three Health boxes.</p><p><strong>Beat:</strong> n/a</p>",
+    "availability": 1,
+    "isPersistent": false,
+    "isClarity": false,
+    "statusVisibility": "Owner",
+    "dicePool": {
+      "value": 0,
+      "attributes": [],
+      "macro": "",
+      "comment": "",
+      "ignoreUnskilled": false
+    },
+    "effects": [],
+    "effectsActive": false,
+    "specialEffects": []
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!items!YYHCbHGBBWjDH0CG"
+}
