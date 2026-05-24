@@ -95,6 +95,14 @@
               </label>
             </p>
             {{/if}}
+            {{#if isVampire}}{{#unless isPerception}}
+            <p>
+              <label class="checkBox marginR" title="Vampires may add their Blood Potency to certain rolls — typically to resist another Discipline or in a Clash of Wills.">
+                <input data-dtype="Boolean" name="addBloodPotency" type="checkbox">
+                <span>Add Blood Potency (+{{bloodPotency}}, resist Disciplines / Clash of Wills)</span>
+              </label>
+            </p>
+            {{/unless}}{{/if}}
           </div>
         </dd>
         {{#if spendAmmo}}

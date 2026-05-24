@@ -288,6 +288,7 @@ export class DiceRollerDialogue extends Application {
       const base = this.dicePool;
       const vitae = this.actorOverride?.system?.vitae?.value ?? 0;
       const isPerception = this.rollContext === "perception";
+      const isVampire = this.actorOverride?.system?.characterVariant === "vampire";
       const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
       const updateVisual = () => {
         const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
@@ -298,12 +299,15 @@ export class DiceRollerDialogue extends Application {
         // Perception Merits that grant dice (Danger Sense +2, Acute Senses
         // +Blood Potency). Trained Observer only shifts the explode
         // threshold so it doesn't enter the visual count.
-        let percBonus = 0;
+        let extraBonus = 0;
         if (isPerception) {
-          if (html.find('input[name="dangerSense"]').is(":checked")) percBonus += 2;
-          if (html.find('input[name="acuteSenses"]').is(":checked")) percBonus += bp;
+          if (html.find('input[name="dangerSense"]').is(":checked")) extraBonus += 2;
+          if (html.find('input[name="acuteSenses"]').is(":checked")) extraBonus += bp;
+        } else if (isVampire && html.find('input[name="addBloodPotency"]').is(":checked")) {
+          // General Vampire toggle on non-Perception rolls: +Blood Potency.
+          extraBonus += bp;
         }
-        const prePool = Math.max(0, base + bonus + specialties + percBonus);
+        const prePool = Math.max(0, base + bonus + specialties + extraBonus);
         const totalPool = Math.max(0, prePool + wpBonus);
         // Hunger dice apply to the pre-Willpower pool only; Willpower dice
         // always count as normal (white).
@@ -321,7 +325,7 @@ export class DiceRollerDialogue extends Application {
       html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
       html.find('input[name^="specialty_"]').on("change", updateVisual);
       html.find('input[name="willpower"]').on("change", updateVisual);
-      html.find('input[name="dangerSense"], input[name="acuteSenses"]').on("change", updateVisual);
+      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="addBloodPotency"]').on("change", updateVisual);
 
       // Trained Observer toggles sync the explodeThreshold radio at the
       // top of the dialog: 0 of 2 -> 10-again (default); 1 -> 9-again;
@@ -366,6 +370,16 @@ export class DiceRollerDialogue extends Application {
         modifiers.dicePool_userMod += bp;
         percFlavor += ` [Acute Senses +${bp}]`;
       }
+    }
+    // Add Blood Potency toggle: a general Vampire option for non-Perception
+    // rolls (resisting Disciplines, Clash of Wills, etc.). Distinct from
+    // Acute Senses, which is the Perception-only Merit with its own drawback.
+    if (this.actorOverride?.system?.characterVariant === "vampire"
+        && this.rollContext !== "perception"
+        && html.find('input[name="addBloodPotency"]').is(":checked")) {
+      const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
+      modifiers.dicePool_userMod += bp;
+      percFlavor += ` [Blood Potency +${bp}]`;
     }
 
     const realPool = this.dicePool + modifiers.dicePool_userMod;
