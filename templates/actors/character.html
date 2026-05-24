@@ -439,6 +439,7 @@
                     {{#if system.effects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle" title="Effects active" data-item-id="{{item._id}}"></i>{{/if}}
                   </td>
                   <td class="cell edit-delete {{#if @last}} lastRow {{/if}}">
+                    <span class="button stoneButton condition-resolve" data-item-id="{{item.id}}" title="Resolve Condition (+1 Beat)"><i class="fas fa-check-circle"></i></span>
                     <span class="button stoneButton item-edit" data-item-id="{{item.id}}" title="{{ localize 'MTA.EditItem' }}"><i class="fas fa-edit"></i></span>
                     <span class="button stoneButton item-delete" data-item-id="{{item.id}}" title="{{ localize 'MTA.DeleteItem' }}"><i class="fas fa-times-circle"></i></span>
                   </td>

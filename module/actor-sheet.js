@@ -1732,6 +1732,24 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       if (tip) ui.notifications.info(tip);
     });
 
+    // Resolve Condition button (in the Conditions table). Deletes the
+    // Condition item and grants the character a Beat tagged with the
+    // resolved Condition's name.
+    html.find('.condition-resolve').click(async ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const itemId = ev.currentTarget.dataset.itemId;
+      const item = this.actor.items.get(itemId);
+      if (!item) return;
+      const name = item.name;
+      await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
+      await this.actor.addProgress(`Resolved Condition: ${name}`, 1, 0);
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+        content: `<p><em><strong>${this.actor.name}</strong> resolves the <strong>${name}</strong> Condition &mdash; +1 Beat.</em></p>`
+      });
+    });
+
     // Blush of Life corner icon on the Vampire portrait. Left-click spends 1
     // Vitae and toggles the sheet portrait to the alternate; right-click opens
     // a FilePicker to set/change that alternate. Going through FilePicker

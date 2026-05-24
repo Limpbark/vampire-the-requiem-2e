@@ -221,10 +221,10 @@ export class ItemMtA extends Item {
     const template = `systems/vampire-the-requiem-2e/templates/chat/item-card.html`;
     const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
-    // Basic chat message data
+    // Basic chat message data — type defaults to "base" in v14; the old
+    // CONST.CHAT_MESSAGE_STYLES.OTHER (numeric 0) is no longer valid.
     const chatData = {
       user: game.user.id,
-      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: html,
       speaker: ChatMessage.getSpeaker({ actor: this.actor, token: this.actor.token }),
       flavor: ""

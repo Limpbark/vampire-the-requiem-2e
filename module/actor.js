@@ -1635,7 +1635,7 @@ export class ActorMtA extends Actor {
    * @param {Function} opts.onRoll   Async callback(html) for the Roll button.
    */
   _renderRiteDialog({ title, variant, body, onRoll }) {
-    const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.png`;
+    const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.webp`;
     new foundry.appv1.api.Dialog({
       title,
       content: `<div class="kUltraBlock vtr-rite-block">${body}</div>`,

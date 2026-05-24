@@ -2,7 +2,7 @@
   "id": "vampire-the-requiem-2e",
   "title": "Vampire the Requiem 2E",
   "description": "A Foundry VTT game system for Vampire: The Requiem 2nd Edition, focused on Vampire, Ghoul, and Mortal characters. An offshoot of the Chronicles of Darkness 2E system by SoulCake, updated for Foundry VTT v14.",
-  "version": "1.0.58",
+  "version": "1.0.59",
   "socket": true,
   "authors": [
     {

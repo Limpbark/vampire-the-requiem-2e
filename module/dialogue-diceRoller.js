@@ -168,7 +168,7 @@ export class DiceRollerDialogue extends Application {
       bgName = `dice_bg_neutral_${pick}`;
       data.attribute = "neutral";
     }
-    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/${bgName}.png`;
+    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/${bgName}.webp`;
 
     // Initial dice visual counts. The live updater in activateListeners
     // recomputes these whenever the pool / bonuses / Willpower change.

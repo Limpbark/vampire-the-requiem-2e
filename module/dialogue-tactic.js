@@ -46,7 +46,6 @@ export class TacticDialogue extends Application {
     else {
       return ChatMessage.create({
         user: game.user.id,
-        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content: "",
         speaker: ChatMessage.getSpeaker({ actor: this.actor, token: this.actor.token }),
         flavor: dicePool.description
