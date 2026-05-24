@@ -779,46 +779,66 @@ game-pause .vtr-pause-icon img {
    Parchment-style background (ui/chat_card_01.webp) stretched to the card's
    intrinsic height so the texture grows with long descriptions. Title in
    P22 Cezanne for flair; body text darkened for legibility on the parchment.
+
+   !important is used liberally on body text because pasted rulebook
+   descriptions frequently carry inline styles (color: white, background, etc.)
+   that would otherwise win the cascade and leave the text invisible on the
+   light parchment.
 --------------------------------------------------------------------------- */
 .worldbuilding.chat-card {
   background: url("../ui/chat_card_01.webp") center / 100% 100% no-repeat,
               #e8d8b6;
-  padding: 14px 18px;
+  padding: 22px 22px 24px !important;
   border-radius: 4px;
   color: #1a1a1a;
-  min-height: 120px;
+  min-height: 140px;
   box-sizing: border-box;
+  overflow: visible;
+}
+.worldbuilding.chat-card .card-header {
+  display: block;
 }
 .worldbuilding.chat-card .item-name {
   font-family: "Cezanne VTR", cursive, serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: normal;
-  line-height: 1.1;
+  line-height: 1.15;
   color: #2b1a0c;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.55);
-  margin: 0 0 6px;
+  margin: 0 0 10px;
+  padding: 0;
   border-bottom: none;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
-.worldbuilding.chat-card .card-header,
 .worldbuilding.chat-card .card-description,
+.worldbuilding.chat-card .card-description *,
 .worldbuilding.chat-card .card-content,
+.worldbuilding.chat-card .card-content *,
 .worldbuilding.chat-card .card-summary,
+.worldbuilding.chat-card .card-summary *,
 .worldbuilding.chat-card .card-summaryAddendum,
-.worldbuilding.chat-card .card-footer {
-  color: #1a1a1a;
-  background: transparent;
+.worldbuilding.chat-card .card-summaryAddendum *,
+.worldbuilding.chat-card .card-footer,
+.worldbuilding.chat-card .card-footer * {
+  color: #1a1a1a !important;
+  background-color: transparent !important;
 }
 .worldbuilding.chat-card .card-description {
+  font-size: 13px;
+  line-height: 1.4;
   margin-top: 4px;
-  line-height: 1.35;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.worldbuilding.chat-card .card-description hr {
+  border: none;
+  border-top: 1px solid rgba(74, 51, 24, 0.4);
+  margin: 6px 0;
 }
 .worldbuilding.chat-card .item-img {
   border: 1px solid #4a3318;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.15);
-}
-/* Foundry's outer chat-message frame can clash with the parchment; soften
-   its background so the parchment reads cleanly. */
-.message .message-content .worldbuilding.chat-card {
-  margin: 0;
 }
