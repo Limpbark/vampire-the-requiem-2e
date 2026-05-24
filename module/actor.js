@@ -1940,6 +1940,7 @@ export class ActorMtA extends Actor {
       content: `<div class="vtr-roll"><div class="hunger-messy ${cls}">`
         + `<span class="hunger-messy-title">${title}</span>`
         + `<span class="hunger-messy-text">${body}${humanityNote}</span>`
+        + `<span class="hunger-messy-text"><em>+1 Beat granted for facing a breaking point.</em></span>`
         + buttons
         + `</div></div>`
     });
