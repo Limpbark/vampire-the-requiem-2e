@@ -304,115 +304,21 @@
             this column. The codex panel below shows reference text for the
             currently-selected trait, populated by module/actor-sheet.js. --}}
       <div class="codex-panel"></div>
-      <div class="items-block">
-        <div class="items-table">
-          {{!-- Merits --}}
-          <table class="item-table">
-            <thead>
-              <tr class="item-row header">
-                <th class="cell header first"> 
-                  <span class="collapsible button fas fa-minus-square"> </span>
-                  <span class="sortable button" data-sorttype="merit" data-sortproperty="name" data-type="merit">{{ localize "MTA.Merits" }}<i class="fas fa-sort"></i> </span>
-                </th>
-                {{#each inventory.merit.dataset}}
-                  <th class="cell header {{#if this.property}} sortable button{{/if}}" 
-                      data-sorttype="merit" 
-                      data-sortproperty="{{this.property}}">
-                    {{localize this.label}}
-                    {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
-                  </th>
-                {{/each}}
-                <th class="cell header"> </th>
-                <th class="cell header button item-create" data-type="merit">{{ localize "MTA.ButtonAdd" }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each inventory.merit.items as |item iid|}}
-                <tr class="item-row item" data-item-id="{{item.id}}">
-                  <td class="cell item-name first {{#if @last}} lastRow {{/if}}" data-item-id="{{item.id}}">
-                    <div class="item-name-wrapper">
-                      <div class="item-image {{#if system.effectsActive}} effectActive {{/if}}" style="background-image: url({{item.img}})"></div>
-                      <span> {{item.name}} </span>
-                    </div>
-                  </td>
-                  <td class="cell {{#if @last}} lastRow {{/if}}"> {{system.rating}}</td>
-                  <td class="cell {{#if @last}} lastRow {{/if}}">
-                    {{#if system.effects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle" title="Effects active" data-item-id="{{item._id}}"></i>{{else}}
-                    {{#if system.specialEffects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle"
-                      title="Effects active" data-item-id="{{item._id}}"></i>{{/if}}
-                    {{/if}}
-                  </td>
-                  <td class="cell edit-delete {{#if @last}} lastRow {{/if}}">
-                    <span class="button stoneButton item-edit" data-item-id="{{item.id}}" title="{{ localize 'MTA.EditItem' }}"><i class="fas fa-edit"></i></span>
-                    <span class="button stoneButton item-delete" data-item-id="{{item.id}}" title="{{ localize 'MTA.DeleteItem' }}"><i class="fas fa-times-circle"></i></span>
-                  </td>
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {{#if showDreadPowers}}
-      <div class="items-block">
-        <div class="items-table">
-          {{!-- Dread Powers --}}
-          <table class="item-table">
-            <thead>
-              <tr class="item-row header">
-                <th class="cell header first"> 
-                  <span class="collapsible button fas fa-minus-square"> </span>
-                  <span class="sortable button" data-sorttype="dreadPower" data-sortproperty="name" data-type="dreadPower">{{ localize "MTA.DreadPowers" }}<i class="fas fa-sort"></i> </span>
-                </th>
-                {{#each inventory.dreadPower.dataset}}
-                  <th class="cell header {{#if this.property}} sortable button{{/if}}" 
-                      data-sorttype="dreadPower" 
-                      data-sortproperty="{{this.property}}">
-                    {{localize this.label}}
-                    {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
-                  </th>
-                {{/each}}
-                <th class="cell header"> </th>
-                <th class="cell header button item-create" data-type="dreadPower">{{ localize "MTA.ButtonAdd" }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each inventory.dreadPower.items as |item iid|}}
-                <tr class="item-row item" data-item-id="{{item.id}}">
-                  <td class="cell item-name first {{#if @last}} lastRow {{/if}}" data-item-id="{{item.id}}">
-                    <div class="item-name-wrapper">
-                      <div class="item-image {{#if system.effectsActive}} effectActive {{/if}}" style="background-image: url({{item.img}})"></div>
-                      <span> {{item.name}} </span>
-                    </div>
-                  </td>
-                  <td class="cell {{#if @last}} lastRow {{/if}}"> {{system.rating}}</td>
-                  <td class="cell {{#if @last}} lastRow {{/if}}"> 
-                    {{#if system.effects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle" title="Effects active" data-item-id="{{item._id}}"></i>{{/if}}
-                    <i class="favicon {{#if system.isFavorite}} fas {{else}} far {{/if}} fa-star" title="Favorite" data-item-id="{{item.id}}"></i>
-                  </td>
-                  <td class="cell edit-delete {{#if @last}} lastRow {{/if}}">
-                    <span class="button stoneButton item-edit" data-item-id="{{item.id}}" title="{{ localize 'MTA.EditItem' }}"><i class="fas fa-edit"></i></span>
-                    <span class="button stoneButton item-delete" data-item-id="{{item.id}}" title="{{ localize 'MTA.DeleteItem' }}"><i class="fas fa-times-circle"></i></span>
-                  </td>
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {{/if}}
+      {{!-- Conditions: at the top of the item lists so transient statuses are
+            seen first. --}}
       <div class="items-block">
         <div class="items-table">
           {{!-- Conditions --}}
           <table class="item-table">
             <thead>
               <tr class="item-row header">
-                <th class="cell header first"> 
+                <th class="cell header first">
                   <span class="collapsible button fas fa-minus-square"> </span>
                   <span class="sortable button" data-sorttype="condition" data-sortproperty="name" data-type="condition">{{ localize "MTA.Conditions" }}<i class="fas fa-sort"></i> </span>
                 </th>
                 {{#each inventory.condition.dataset}}
-                  <th class="cell header {{#if this.property}} sortable button{{/if}}" 
-                    data-sorttype="condition" 
+                  <th class="cell header {{#if this.property}} sortable button{{/if}}"
+                    data-sorttype="condition"
                     data-sortproperty="{{this.property}}">
                   {{localize this.label}}
                   {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
@@ -451,17 +357,65 @@
       </div>
       <div class="items-block">
         <div class="items-table">
+          {{!-- Merits --}}
+          <table class="item-table">
+            <thead>
+              <tr class="item-row header">
+                <th class="cell header first">
+                  <span class="collapsible button fas fa-minus-square"> </span>
+                  <span class="sortable button" data-sorttype="merit" data-sortproperty="name" data-type="merit">{{ localize "MTA.Merits" }}<i class="fas fa-sort"></i> </span>
+                </th>
+                {{#each inventory.merit.dataset}}
+                  <th class="cell header {{#if this.property}} sortable button{{/if}}"
+                      data-sorttype="merit"
+                      data-sortproperty="{{this.property}}">
+                    {{localize this.label}}
+                    {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
+                  </th>
+                {{/each}}
+                <th class="cell header"> </th>
+                <th class="cell header button item-create" data-type="merit">{{ localize "MTA.ButtonAdd" }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each inventory.merit.items as |item iid|}}
+                <tr class="item-row item" data-item-id="{{item.id}}">
+                  <td class="cell item-name first {{#if @last}} lastRow {{/if}}" data-item-id="{{item.id}}">
+                    <div class="item-name-wrapper">
+                      <div class="item-image {{#if system.effectsActive}} effectActive {{/if}}" style="background-image: url({{item.img}})"></div>
+                      <span> {{item.name}} </span>
+                    </div>
+                  </td>
+                  <td class="cell {{#if @last}} lastRow {{/if}}"> {{system.rating}}</td>
+                  <td class="cell {{#if @last}} lastRow {{/if}}">
+                    {{#if system.effects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle" title="Effects active" data-item-id="{{item._id}}"></i>{{else}}
+                    {{#if system.specialEffects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle"
+                      title="Effects active" data-item-id="{{item._id}}"></i>{{/if}}
+                    {{/if}}
+                  </td>
+                  <td class="cell edit-delete {{#if @last}} lastRow {{/if}}">
+                    <span class="button stoneButton item-edit" data-item-id="{{item.id}}" title="{{ localize 'MTA.EditItem' }}"><i class="fas fa-edit"></i></span>
+                    <span class="button stoneButton item-delete" data-item-id="{{item.id}}" title="{{ localize 'MTA.DeleteItem' }}"><i class="fas fa-times-circle"></i></span>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="items-block">
+        <div class="items-table">
           {{!-- Tilts --}}
           <table class="item-table">
             <thead>
               <tr class="item-row header">
-                <th class="cell header first"> 
+                <th class="cell header first">
                   <span class="collapsible button fas fa-minus-square"> </span>
                   <span class="sortable button" data-sorttype="tilt" data-sortproperty="name" data-type="tilt">{{ localize "MTA.Tilts" }}<i class="fas fa-sort"></i> </span>
                 </th>
                 {{#each inventory.tilt.dataset}}
-                  <th class="cell header {{#if this.property}} sortable button{{/if}}" 
-                    data-sorttype="tilt" 
+                  <th class="cell header {{#if this.property}} sortable button{{/if}}"
+                    data-sorttype="tilt"
                     data-sortproperty="{{this.property}}">
                   {{localize this.label}}
                   {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
@@ -494,30 +448,32 @@
           </table>
         </div>
       </div>
+      {{!-- Dread Powers: last item-block before Derived Traits. --}}
+      {{#if showDreadPowers}}
       <div class="items-block">
         <div class="items-table">
-          {{!-- Spell Effects --}}
+          {{!-- Dread Powers --}}
           <table class="item-table">
             <thead>
               <tr class="item-row header">
-                <th class="cell header first"> 
+                <th class="cell header first">
                   <span class="collapsible button fas fa-minus-square"> </span>
-                  <span class="sortable button" data-sorttype="spellEffect" data-sortproperty="name" data-type="spellEffect">{{ localize "MTA.SpellEffects" }}<i class="fas fa-sort"></i> </span>
+                  <span class="sortable button" data-sorttype="dreadPower" data-sortproperty="name" data-type="dreadPower">{{ localize "MTA.DreadPowers" }}<i class="fas fa-sort"></i> </span>
                 </th>
-                {{#each inventory.spellEffect.dataset}}
-                  <th class="cell header {{#if this.property}} sortable button{{/if}}" 
-                    data-sorttype="spellEffect" 
-                    data-sortproperty="{{this.property}}">
-                  {{localize this.label}}
-                  {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
+                {{#each inventory.dreadPower.dataset}}
+                  <th class="cell header {{#if this.property}} sortable button{{/if}}"
+                      data-sorttype="dreadPower"
+                      data-sortproperty="{{this.property}}">
+                    {{localize this.label}}
+                    {{#if this.property}}<i class="fas fa-sort"></i>{{/if}}
                   </th>
                 {{/each}}
                 <th class="cell header"> </th>
-                <th class="cell header button item-create" data-type="spellEffect">{{ localize "MTA.ButtonAdd" }}</th>
+                <th class="cell header button item-create" data-type="dreadPower">{{ localize "MTA.ButtonAdd" }}</th>
               </tr>
             </thead>
             <tbody>
-              {{#each inventory.spellEffect.items as |item iid|}}
+              {{#each inventory.dreadPower.items as |item iid|}}
                 <tr class="item-row item" data-item-id="{{item.id}}">
                   <td class="cell item-name first {{#if @last}} lastRow {{/if}}" data-item-id="{{item.id}}">
                     <div class="item-name-wrapper">
@@ -525,8 +481,10 @@
                       <span> {{item.name}} </span>
                     </div>
                   </td>
+                  <td class="cell {{#if @last}} lastRow {{/if}}"> {{system.rating}}</td>
                   <td class="cell {{#if @last}} lastRow {{/if}}">
                     {{#if system.effects }}<i class="activeIcon {{#if system.effectsActive}} fas {{else}} far {{/if}} fa-dot-circle" title="Effects active" data-item-id="{{item._id}}"></i>{{/if}}
+                    <i class="favicon {{#if system.isFavorite}} fas {{else}} far {{/if}} fa-star" title="Favorite" data-item-id="{{item.id}}"></i>
                   </td>
                   <td class="cell edit-delete {{#if @last}} lastRow {{/if}}">
                     <span class="button stoneButton item-edit" data-item-id="{{item.id}}" title="{{ localize 'MTA.EditItem' }}"><i class="fas fa-edit"></i></span>
@@ -538,6 +496,7 @@
           </table>
         </div>
       </div>
+      {{/if}}
 
       {{!-- Derived Traits, tucked at the bottom and collapsed by default. --}}
       <details class="derived-traits">

@@ -109,11 +109,11 @@
    than being a small icon. Sized larger than .vitae-pool intentionally. */
 .characterSheet .vitae-splatter {
   position: absolute;
-  right: -14px;
+  right: -20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 140px;
-  height: 140px;
+  width: 180px;
+  height: 180px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
