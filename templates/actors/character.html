@@ -657,6 +657,9 @@
               submission). A dedicated change handler in actor-sheet.js
               writes the value back via actor.update(). --}}
         {{#if (eq system.characterType "vampire")}}
+        {{#if vitaeSplatterBucket}}
+        <div class="vitae-splatter" data-bucket="{{vitaeSplatterBucket}}"></div>
+        {{/if}}
         <div class="vitae-pool tooltip" title="Vitae">
           <span class="tooltip-text">{{ localize "MTA.Vitae" }}</span>
           <div class="niceNumber">

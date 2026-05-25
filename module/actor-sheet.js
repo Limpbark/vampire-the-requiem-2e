@@ -330,6 +330,24 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     sheetData.portraitImg = (sheetData.blushEnabled && sheetData.blushActive && sheetData.blushOfLifeImg)
       ? sheetData.blushOfLifeImg
       : actor.img;
+
+    // Vitae blood-splatter background bucket (Vampires only). Maps the current
+    // Vitae/max ratio to one of five splatter graphics in ui/, so the macro-row
+    // pool reflects how depleted the character is. Null when not a Vampire or
+    // when max is 0 (e.g., during sheet setup) so the splatter is hidden.
+    sheetData.vitaeSplatterBucket = null;
+    if (systemData.characterType === "vampire") {
+      const v = Number(systemData.vitae?.value ?? 0);
+      const m = Number(systemData.vitae?.max ?? 0);
+      if (m > 0) {
+        const ratio = v / m;
+        sheetData.vitaeSplatterBucket =
+          ratio >= 0.8 ? 100 :
+          ratio >= 0.6 ? 80 :
+          ratio >= 0.4 ? 60 :
+          ratio >= 0.2 ? 40 : 20;
+      }
+    }
     const PHASE_LABELS = CONFIG.MTA.phaseOfNightLabels;
     const rawPhase = Number(systemData.phaseOfNight ?? 0) || 0;
     const phaseIdx = Math.max(0, Math.min(9, Math.floor(rawPhase)));

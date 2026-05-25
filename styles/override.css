@@ -82,9 +82,11 @@
   min-width: 50px;
 }
 
-/* Prominent Vitae blood-pool counter on the macro row (Vampires & Ghouls).
-   Click the number to edit; hover reveals +/- buttons. Background uses
-   vtm-blood-stats.png (drop the PNG into icons/gui/ to enable the flair). */
+/* Prominent Vitae blood-pool counter on the macro row (Vampires only).
+   Click the number to edit; hover reveals +/- buttons. The blood-splatter
+   background is provided by a sibling .vitae-splatter element keyed to a
+   Vitae/max bucket (see actor-sheet.js getData → vitaeSplatterBucket), so
+   the splatter shrinks as the character depletes. */
 .characterSheet .characterMacroPanel > div { position: relative; }
 .characterSheet .vitae-pool {
   position: absolute;
@@ -93,16 +95,43 @@
   transform: translateY(-50%);
   width: 72px;
   height: 72px;
-  background-image: url("../icons/gui/vtm-blood-stats.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   user-select: none;
+}
+
+/* Vitae blood-splatter: sits behind the macro-row icons and the Vitae number,
+   so the depleting splatter feels like it's bleeding across the ribbon rather
+   than being a small icon. Sized larger than .vitae-pool intentionally. */
+.characterSheet .vitae-splatter {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 140px;
+  height: 140px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 0;
+}
+.characterSheet .vitae-splatter[data-bucket="100"] { background-image: url("../ui/vitae_100pct.webp"); }
+.characterSheet .vitae-splatter[data-bucket="80"]  { background-image: url("../ui/vitae_80pct.webp"); }
+.characterSheet .vitae-splatter[data-bucket="60"]  { background-image: url("../ui/vitae_60pct.webp"); }
+.characterSheet .vitae-splatter[data-bucket="40"]  { background-image: url("../ui/vitae_40pct.webp"); }
+.characterSheet .vitae-splatter[data-bucket="20"]  { background-image: url("../ui/vitae_20pct.webp"); }
+
+/* Ensure the other macro-row icons paint above the splatter rather than
+   under it (they're statically positioned by default so they'd otherwise
+   share the same stacking level as the splatter). */
+.characterSheet .characterMacroPanel > div > .charMacroButton {
+  position: relative;
+  z-index: 1;
 }
 .characterSheet .vitae-pool .niceNumber {
   background: transparent;
