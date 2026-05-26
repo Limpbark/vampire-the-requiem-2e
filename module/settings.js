@@ -122,7 +122,7 @@ export const registerSystemSettings = function () {
 
   game.settings.register("vampire-the-requiem-2e", "homebrewWillpower", {
     name: "Homebrew rule: alternative Willpower gain",
-    hint: "Replaces the Anchor-based Willpower recovery with: Daysleep restores 1 Willpower (alongside the usual 1 Vitae spent); an unaided exceptional success grants 1 Willpower (exceptional successes helped by the Willpower toggle do not count); and the shipped 'Story Achievement' macro refreshes all Willpower for a major milestone.",
+    hint: "Replaces the Anchor-based Willpower recovery with: Daysleep restores 1 Willpower (alongside the usual 1 Vitae spent); an unaided exceptional success posts a chat note granting the Inspired Condition (Willpower is claimed later by resolving the Condition; exceptional successes helped by the Willpower toggle do not count); and the shipped 'Story Achievement' macro refreshes all Willpower for a major milestone.",
     scope: "world",
     config: true,
     default: false,

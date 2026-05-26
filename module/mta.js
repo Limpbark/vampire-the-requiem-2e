@@ -388,6 +388,54 @@ Hooks.on("renderChatMessageHTML", (message, html, data) => {
 
 Hooks.on("renderChatMessageHTML", (app, html, data) => ItemMtA.chatListeners(html));
 
+// Apply-Inspired-Condition button: the homebrewWillpower rule posts a chat
+// card on an unaided exceptional success offering to apply the Inspired
+// Condition. Pull it from the conditions compendium and embed it on the actor.
+Hooks.on("renderChatMessageHTML", (app, html, data) => {
+  const btn = html.querySelector?.(".vtr-apply-inspired");
+  if (!btn || btn.dataset.bound === "1") return;
+  btn.dataset.bound = "1";
+  btn.addEventListener("click", async (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    const uuid = btn.dataset.actorUuid;
+    const actor = uuid ? await fromUuid(uuid) : null;
+    if (!actor) {
+      ui.notifications?.warn("Could not find the actor for this chat card.");
+      return;
+    }
+    if (!actor.isOwner) {
+      ui.notifications?.warn(`You do not own ${actor.name}.`);
+      return;
+    }
+    // Don't double-apply if Inspired is already on the sheet.
+    const existing = actor.items.find(i => i.type === "condition" && i.name === "Inspired");
+    if (existing) {
+      ui.notifications?.info(`${actor.name} already has the Inspired Condition.`);
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-check"></i> Already applied`;
+      return;
+    }
+    const pack = game.packs.get("vampire-the-requiem-2e.conditions");
+    if (!pack) {
+      ui.notifications?.error("Conditions compendium not found.");
+      return;
+    }
+    const idx = await pack.getIndex({ fields: ["name", "type"] });
+    const entry = idx.find(e => e.name === "Inspired" && e.type === "condition");
+    if (!entry) {
+      ui.notifications?.error("Inspired entry not found in the Conditions compendium.");
+      return;
+    }
+    const source = await pack.getDocument(entry._id);
+    if (!source) return;
+    await actor.createEmbeddedDocuments("Item", [source.toObject()]);
+    ui.notifications?.info(`Applied Inspired Condition to ${actor.name}.`);
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-check"></i> Inspired Condition applied`;
+  });
+});
+
 
 /** Add the dice roller button **/
 Hooks.on("renderChatInput", (chatApp, elements) => {

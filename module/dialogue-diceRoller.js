@@ -455,32 +455,37 @@ export class DiceRollerDialogue extends Application {
   }
 
   /**
-   * Homebrew alternative Willpower: an unaided exceptional success grants the
-   * roller 1 Willpower. Messy successes and rolls helped by the Willpower
+   * Homebrew alternative Willpower: an unaided exceptional success announces
+   * that the character gains the Inspired Condition (the Willpower is no
+   * longer granted automatically — the player must resolve the Condition
+   * later to claim it). Messy successes and rolls helped by the Willpower
    * toggle do not qualify (so players can't spend Willpower to farm it).
    * No-op unless the "homebrewWillpower" setting is enabled.
    * @param {Actor}   actor         The rolling actor (actorOverride).
    * @param {Roll}    roll          The resolved roll.
    * @param {boolean} willpowerUsed Whether the Willpower toggle fed this roll.
    */
-  static _maybeGrantExceptionalWillpower(actor, roll, willpowerUsed) {
+  static _maybeAnnounceInspiredCondition(actor, roll, willpowerUsed) {
     if (!actor || willpowerUsed) return;
     if (!game.settings.get("vampire-the-requiem-2e", "homebrewWillpower")) return;
     if (!roll?.exceptionalSuccess || roll?.messySuccess) return;
-    if (!actor.system?.willpower) return;
-    // Defer the update so it lands cleanly after the roll's chat/render
-    // pipeline (and any actor-sheet re-render) has settled, rather than
-    // racing with it — an inline update here was being overwritten.
+    // Defer the chat post so it lands cleanly after the roll's own chat card
+    // (and any actor-sheet re-render) has settled, matching the prior cadence.
     setTimeout(async () => {
-      const wp = actor.system?.willpower;
-      if (!wp) return;
-      const cur = Number(wp.value ?? 0);
-      const max = Number(wp.max ?? cur);
-      if (cur >= max) return;
-      await actor.update({ "system.willpower.value": Math.min(max, cur + 1) });
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<p><em><strong>${actor.name}</strong> gains 1 Willpower from an exceptional success.</em></p>`
+        content:
+          `<div class="vtr-chat-card vtr-inspired-card">` +
+          `<h3 style="margin-bottom:0.3em;"><strong>${actor.name}</strong> gains the <em>Inspired</em> Condition.</h3>` +
+          `<p>Your character is deeply inspired. When your character takes an action pertaining to that inspiration, you may resolve this Condition. An exceptional success on that roll requires only three successes instead of five and you gain a point of Willpower.</p>` +
+          `<p><strong>Resolution:</strong> You spend inspiration to spur yourself to greater success, resolving the Condition as described above.</p>` +
+          `<p><strong>Beat:</strong> n/a</p>` +
+          `<p style="text-align:center; margin-top:0.6em;">` +
+            `<button type="button" class="vtr-apply-inspired" data-actor-uuid="${actor.uuid}">` +
+              `<i class="fas fa-lightbulb"></i> Apply Inspired Condition` +
+            `</button>` +
+          `</p>` +
+          `</div>`
       });
     }, 120);
   }
@@ -742,7 +747,7 @@ export class DiceRollerDialogue extends Application {
     }
 
     // Homebrew alternative Willpower: an unaided exceptional success grants 1 WP.
-    DiceRollerDialogue._maybeGrantExceptionalWillpower(actorOverride, rollReturn.roll, willpowerUsed);
+    DiceRollerDialogue._maybeAnnounceInspiredCondition(actorOverride, rollReturn.roll, willpowerUsed);
 
     // Create the chat message
     return msg;

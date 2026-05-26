@@ -894,3 +894,31 @@ game-pause .vtr-pause-icon img {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.15);
 }
+
+/* ---------------------------------------------------------------------------
+   Inspired-Condition chat card button: posted by the homebrewWillpower rule
+   when an unaided exceptional success fires. One-click apply pulls the
+   Inspired Condition from the conditions compendium onto the actor. */
+.vtr-inspired-card .vtr-apply-inspired {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid #4a3318;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f7e9c5 0%, #d8c08a 100%);
+  color: #3a230d;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.vtr-inspired-card .vtr-apply-inspired:hover {
+  background: linear-gradient(180deg, #fff2cc 0%, #e2cd9d 100%);
+}
+.vtr-inspired-card .vtr-apply-inspired:disabled {
+  cursor: default;
+  opacity: 0.6;
+  background: #d8c08a;
+  box-shadow: none;
+}
+.vtr-inspired-card .vtr-apply-inspired i {
+  margin-right: 4px;
+}
