@@ -59,6 +59,21 @@ export const registerSystemSettings = function () {
     type: Boolean
   });
 
+  game.settings.register("vampire-the-requiem-2e", "chatRollPortrait", {
+    name: "Show portrait on dice roller chat cards",
+    hint: "Display the rolling character's portrait or token image at the top of dice roller and attack chat cards.",
+    scope: "client",
+    config: true,
+    default: "none",
+    type: String,
+    choices: {
+      "none": "Off",
+      "portrait": "Character portrait",
+      "token": "Token image"
+    },
+    onChange: () => ui.chat.render()
+  });
+
 
   /** Homebrew rules */
 

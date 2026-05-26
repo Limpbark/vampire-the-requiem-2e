@@ -388,6 +388,47 @@ Hooks.on("renderChatMessageHTML", (message, html, data) => {
 
 Hooks.on("renderChatMessageHTML", (app, html, data) => ItemMtA.chatListeners(html));
 
+// Dice roller chat card: optionally prepend the speaker's portrait or token
+// image. Controlled by the "chatRollPortrait" client setting (Off/Portrait/Token).
+// Only fires on our roll outputs (.vtr-roll from rollToChat, .attack-card from
+// rollWithDamage) — not on every chat message.
+Hooks.on("renderChatMessageHTML", (message, html, data) => {
+  const mode = game.settings.get("vampire-the-requiem-2e", "chatRollPortrait");
+  if (mode === "none") return;
+  if (!html?.querySelector) return;
+  if (html.querySelector(".vtr-chat-portrait")) return;
+
+  const card = html.querySelector(".vtr-roll, .worldbuilding.chat-card.attack-card");
+  if (!card) return;
+
+  const speaker = message?.speaker;
+  if (!speaker?.actor) return;
+  const actor = game.actors.get(speaker.actor);
+  if (!actor) return;
+
+  let src;
+  if (mode === "token") {
+    const scene = speaker.scene ? game.scenes.get(speaker.scene) : null;
+    const tokenDoc = scene?.tokens?.get(speaker.token);
+    src = tokenDoc?.texture?.src
+      ?? canvas.tokens?.get(speaker.token)?.document?.texture?.src
+      ?? actor.prototypeToken?.texture?.src
+      ?? actor.img;
+  } else {
+    src = actor.img;
+  }
+  if (!src) return;
+
+  const img = document.createElement("img");
+  img.className = "vtr-chat-portrait";
+  img.src = src;
+  img.alt = actor.name;
+  img.title = actor.name;
+
+  const host = html.querySelector(".message-content") ?? card.parentElement ?? card;
+  host.insertBefore(img, host.firstChild);
+});
+
 // Apply-Inspired-Condition button: the homebrewWillpower rule posts a chat
 // card on an unaided exceptional success offering to apply the Inspired
 // Condition. Pull it from the conditions compendium and embed it on the actor.

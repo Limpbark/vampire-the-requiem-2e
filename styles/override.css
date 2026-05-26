@@ -895,6 +895,21 @@ game-pause .vtr-pause-icon img {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Speaker portrait / token thumbnail injected at the top of dice roller
+   chat cards by the "chatRollPortrait" setting (see mta.js renderChatMessageHTML
+   hook). Sits above the parchment card so it reads as a chat avatar. */
+.vtr-chat-portrait {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid #4a3318;
+  border-radius: 4px;
+  margin: 4px auto 6px;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
 /* ---------------------------------------------------------------------------
    Inspired-Condition chat card button: posted by the homebrewWillpower rule
    when an unaided exceptional success fires. One-click apply pulls the
