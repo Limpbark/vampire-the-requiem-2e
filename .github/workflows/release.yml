@@ -29,10 +29,10 @@ jobs:
             -x ".git/*" ".github/*" "packs-src/*" "node_modules/*" "screenshots/*" "*.zip"
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          files: |
-            system.json
-            system.zip
-          fail_on_unmatched_files: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Automated release for ${GITHUB_REF_NAME}." \
+            system.json system.zip
