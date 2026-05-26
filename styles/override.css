@@ -911,9 +911,33 @@ game-pause .vtr-pause-icon img {
 }
 
 /* ---------------------------------------------------------------------------
-   Inspired-Condition chat card button: posted by the homebrewWillpower rule
-   when an unaided exceptional success fires. One-click apply pulls the
-   Inspired Condition from the conditions compendium onto the actor. */
+   Inspired-Condition chat card: posted by the homebrewWillpower rule when an
+   unaided exceptional success fires. Foundry's default chat h3 is huge and
+   often picks up a low-contrast text-shadow/clip in dark mode — override it
+   to a compact, high-contrast headline that doesn't overshadow the dice
+   result above it. */
+.vtr-inspired-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 0.5em;
+  padding: 0;
+  border: none;
+  color: #e8b770;
+  text-shadow: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.vtr-inspired-card h3 strong,
+.vtr-inspired-card h3 em {
+  color: inherit;
+  text-shadow: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.vtr-inspired-card h3 em { font-style: italic; }
+.vtr-inspired-card h3 strong { font-weight: 700; }
+
 .vtr-inspired-card .vtr-apply-inspired {
   display: inline-block;
   padding: 4px 12px;
