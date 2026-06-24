@@ -911,26 +911,39 @@ game-pause .vtr-pause-icon img {
 }
 
 /* ---------------------------------------------------------------------------
-   Trait-textured chat-card body. The renderChatMessageHTML hook in
+   Trait-textured chat-card. The renderChatMessageHTML hook in
    module/mta.js stamps the per-roll dice_bg_<trait>.webp URL onto
    --vtr-card-bg whenever a chat message carries a diceBgUrl flag (set by
    DiceRollerDialogue.rollToChat / rollWithDamage). We paint the texture
-   beneath the body of the result card so the chat card echoes the dice
-   roller window that produced it. Dimensions are unchanged:
-   background-size: cover scales the texture to fit whatever Foundry sized
-   the card to, no padding or width is overridden. A flat dark overlay
-   sits in front of the texture so the dice icons and "X hits - Success."
-   line stay readable across all colored textures. */
-.chat-log .message .message-content.vtr-textured-bg,
-#chat-log .message .message-content.vtr-textured-bg,
-#chat .message .message-content.vtr-textured-bg {
+   on the outer .message element rather than .message-content because
+   Foundry's default `.chat-log .message { background: var(--background-
+   message) }` paints the diesel blue there, and the dice card's children
+   bleed outside .message-content via `margin: -5px` (default.css:2867),
+   so a texture on the inner element gets covered by the parent's blue in
+   the bleed area. Painting on .message covers everything; .message-header
+   has its own gradient on top and stays distinct.
+
+   Dimensions are unchanged: background-size: cover scales the texture
+   to whatever Foundry sized the card to, with no padding or width
+   override. A flat dark overlay sits over the texture so dice icons and
+   the "X hits - Success." line stay readable across colored textures.
+   !important is used because Foundry's per-message background rules
+   (.chat-log .message, .chat-log .message.whisper, etc.) compete on
+   specificity and we need this to win for any message that carries the
+   flag. */
+.chat-log .message.vtr-textured-bg,
+#chat-log .message.vtr-textured-bg,
+#chat .message.vtr-textured-bg,
+.chat-log .message.whisper.vtr-textured-bg,
+#chat-log .message.whisper.vtr-textured-bg,
+#chat .message.whisper.vtr-textured-bg {
   background-image:
     linear-gradient(rgba(8, 16, 22, 0.55), rgba(8, 16, 22, 0.55)),
-    var(--vtr-card-bg, none);
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-  background-color: transparent;
+    var(--vtr-card-bg, none) !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-color: transparent !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -992,33 +1005,4 @@ game-pause .vtr-pause-icon img {
    Foundry's default `.message-sender` and `.flavor-text` rules carry the
    global UI font and inherited bold/italic — strip those and apply the
    system's flair fonts directly. */
-.chat-log .message .message-sender,
-#chat-log .message .message-sender,
-#chat .message .message-sender {
-  font-family: "Trajan VTR", "Trajan Pro", "Times New Roman", serif;
-  font-size: 20px;
-  font-weight: normal;
-  letter-spacing: 1px;
-  line-height: 1.15;
-  text-shadow: none;
-}
-.chat-log .message .flavor-text,
-#chat-log .message .flavor-text,
-#chat .message .flavor-text {
-  font-family: "Cezanne VTR", cursive;
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;
-  color: #c87848;
-  line-height: 1.15;
-  text-shadow: none;
-  background: transparent;
-  border: none;
-  padding: 2px 6px 6px;
-  margin: 0;
-}
-.chat-log .message .flavor-text * {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: normal;
-}
+.chat-log .mess

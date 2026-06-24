@@ -430,22 +430,29 @@ Hooks.on("renderChatMessageHTML", (message, html, data) => {
 });
 
 // Roll chat-card background: paint the per-trait dice_bg_<x>.webp behind
-// the card body (avatar + dice icons + result line) so the result card
-// echoes the texture of the dice roller window that produced it. The URL
-// is stamped onto the ChatMessage as a flag by rollToChat / rollWithDamage
-// in module/dialogue-diceRoller.js. Dimensions of the card are not changed
-// — only the background paints differently. The CSS rule in
-// styles/override.css (.message-content.vtr-textured-bg) handles sizing
-// (background-size: cover) and contrast (a dark overlay so the dice icons
-// and result text stay readable across all colored textures).
+// the card so the result card echoes the texture of the dice roller window
+// that produced it. The URL is stamped onto the ChatMessage as a flag by
+// rollToChat / rollWithDamage in module/dialogue-diceRoller.js.
+//
+// We stamp the class on the outer .message element rather than the inner
+// .message-content because Foundry paints the visible diesel-blue body
+// background on .message itself (default.css: `.chat-log .message {
+// background: var(--background-message) }`). The dice card's children also
+// use `margin: -5px` to bleed outside .message-content, so a texture on
+// the inner element gets occluded by the parent's color in the bleed area.
+// Painting on .message covers everything; the .message-header still paints
+// its own darker gradient on top, so the header band stays distinct.
+//
+// Dimensions of the card are not changed — only the background paints
+// differently. The CSS rule in styles/override.css (.message.vtr-textured-bg)
+// handles sizing (background-size: cover) and contrast (a dark overlay so
+// the dice icons and result text stay readable across colored textures).
 Hooks.on("renderChatMessageHTML", (message, html, data) => {
-  if (!html?.querySelector) return;
+  if (!html?.classList) return;
   const bgUrl = message?.flags?.["vampire-the-requiem-2e"]?.diceBgUrl;
   if (!bgUrl) return;
-  const body = html.querySelector(".message-content");
-  if (!body) return;
-  body.classList.add("vtr-textured-bg");
-  body.style.setProperty("--vtr-card-bg", `url("${bgUrl}")`);
+  html.classList.add("vtr-textured-bg");
+  html.style.setProperty("--vtr-card-bg", `url("${bgUrl}")`);
 });
 
 // Apply-Inspired-Condition button: the homebrewWillpower rule posts a chat
@@ -808,26 +815,4 @@ Hooks.once("ready", () => {
 
 // Register a crimson "Hunger" colourset so Hunger dice (homebrew) are visually
 // distinct in the Dice So Nice 3D animation, matching the chat card. The roll
-// builder tags the Hunger term with `options.appearance = { colorset: "vtr-hunger" }`.
-Hooks.once("diceSoNiceReady", (dice3d) => {
-  dice3d.addColorset({
-    name: "vtr-hunger",
-    description: "Hunger (Vampire the Requiem 2E)",
-    category: "Vampire the Requiem 2E",
-    foreground: "#ffffff",
-    background: "#c8102e",
-    edge: "#7a0a18",
-    outline: "#3a0008",
-    texture: "none",
-    material: "plastic",
-    font: "auto",
-    fontScale: {},
-    visibility: "visible"
-  }, "default");
-});
-
-
-
-
-
-
+// builder tags the Hunger term with `options.appe
