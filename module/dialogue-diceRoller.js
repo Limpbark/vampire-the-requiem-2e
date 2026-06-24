@@ -136,53 +136,17 @@ export class DiceRollerDialogue extends Application {
     // Dice-roller window background: prefer the Attribute texture; if the
     // pool has no Attribute, fall back to the Skill texture; if neither is
     // present (item-only / damage / generic rolls) pick a random neutral.
-    const KNOWN_ATTRS = [
-      "strength", "dexterity", "stamina",
-      "presence", "manipulation", "composure",
-      "intelligence", "wits", "resolve"
-    ];
-    // Skills that have a dice_bg_<skill>.png in ui/ — all 24 CofD skills.
-    const KNOWN_SKILLS = [
-      "athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry",
-      "animal_ken", "empathy", "expression", "intimidation", "persuasion",
-      "socialize", "streetwise", "subterfuge",
-      "academics", "computer", "crafts", "investigation", "medicine",
-      "occult", "politics", "science"
-    ];
-    // Skill keys are camelCase in the data model (e.g. "animalKen"); the
-    // texture filenames are snake_case (dice_bg_animal_ken.png).
-    const toSlug = (s) => String(s ?? "")
-      .replace(/([a-z])([A-Z])/g, "$1_$2")
-      .toLowerCase();
-    const NEUTRAL_COUNT = 4; // ui/dice_bg_neutral_1.png … _4.png
-
-    // Resolve which trait drives the background. If we know the trait that
-    // was selected last (lastTrait, e.g. "skills_mental.occult"), it wins —
-    // so picking an Attribute and then a Skill shows the Skill. Otherwise
-    // fall back to: Attribute, then Skill, then a random neutral.
-    let attrCandidate = this.attribute;
-    let skillCandidate = this.skill;
-    if (this.lastTrait && String(this.lastTrait).includes(".")) {
-      const [group, key] = String(this.lastTrait).split(".");
-      if (group.startsWith("attributes_")) { attrCandidate = key; skillCandidate = null; }
-      else if (group.startsWith("skills_")) { skillCandidate = key; attrCandidate = null; }
-    }
-
-    const attrSlug = toSlug(attrCandidate);
-    const skillSlug = toSlug(skillCandidate);
-    let bgName;
-    if (attrSlug && KNOWN_ATTRS.includes(attrSlug)) {
-      bgName = `dice_bg_${attrSlug}`;
-      data.attribute = attrSlug;
-    } else if (skillSlug && KNOWN_SKILLS.includes(skillSlug)) {
-      bgName = `dice_bg_${skillSlug}`;
-      data.attribute = skillSlug;
-    } else {
-      const pick = 1 + Math.floor(Math.random() * NEUTRAL_COUNT);
-      bgName = `dice_bg_neutral_${pick}`;
-      data.attribute = "neutral";
-    }
-    data.diceBgUrl = `systems/vampire-the-requiem-2e/ui/${bgName}.webp`;
+    // The same picker is reused for the result chat card so both surfaces
+    // share a texture — see _resolveDiceBg and the renderChatMessageHTML
+    // hook in module/mta.js.
+    const bg = DiceRollerDialogue._resolveDiceBg({
+      attribute: this.attribute,
+      skill: this.skill,
+      lastTrait: this.lastTrait,
+    });
+    data.diceBgUrl = bg.bgUrl;
+    data.diceBgName = bg.bgName;
+    data.attribute = bg.attribute;
 
     // Initial dice visual counts. The live updater in activateListeners
     // recomputes these whenever the pool / bonuses / Willpower change.
@@ -426,8 +390,17 @@ export class DiceRollerDialogue extends Application {
     const explodeThreshold = modifiers.explode_threshold;
     const targetNumber = Math.clamp(modifiers.dicePool_difficulty, 1, 10);
     const rollReturn = {};
-    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice });
-    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice, willpowerUsed: willpowerBonus > 0 });
+    // Texture for the result chat card: pick the same trait-matched
+    // dice_bg_<x>.webp the roller dialog already shows. The chat-card
+    // render hook in module/mta.js reads this URL off the message flag
+    // and paints it as the body background.
+    const diceBgUrl = DiceRollerDialogue._resolveDiceBg({
+      attribute: this.attribute,
+      skill: this.skill,
+      lastTrait: this.lastTrait,
+    }).bgUrl;
+    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice, diceBgUrl });
+    else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice, willpowerUsed: willpowerBonus > 0, diceBgUrl });
 
     if (modifiers.extended) {
       let successes = rollReturn.roll.total;
@@ -440,6 +413,76 @@ export class DiceRollerDialogue extends Application {
     if (this.macro && this.actor) {
       this.macro.execute({ actor: this.actor, token: this.actor.token ?? this.actor.getActiveTokens[0], item: this.itemRef });
     }
+  }
+
+  /**
+   * Attributes that have a matching ui/dice_bg_<attribute>.webp.
+   * Order is the standard CofD attribute layout.
+   */
+  static _DICE_BG_KNOWN_ATTRS = [
+    "strength", "dexterity", "stamina",
+    "presence", "manipulation", "composure",
+    "intelligence", "wits", "resolve",
+  ];
+  /** Skills that have a matching ui/dice_bg_<skill>.webp — all 24 CofD skills. */
+  static _DICE_BG_KNOWN_SKILLS = [
+    "athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry",
+    "animal_ken", "empathy", "expression", "intimidation", "persuasion",
+    "socialize", "streetwise", "subterfuge",
+    "academics", "computer", "crafts", "investigation", "medicine",
+    "occult", "politics", "science",
+  ];
+  /** ui/dice_bg_neutral_1.webp … _4.webp — picked at random as a fall-back. */
+  static _DICE_BG_NEUTRAL_COUNT = 4;
+
+  /**
+   * Skill keys are camelCase in the data model (e.g. "animalKen"); the
+   * texture filenames are snake_case (dice_bg_animal_ken.webp).
+   */
+  static _diceBgSlug(s) {
+    return String(s ?? "").replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
+  }
+
+  /**
+   * Resolve which dice_bg_*.webp texture matches a roll. Picks
+   * Attribute > Skill > random neutral, with lastTrait breaking ties (so
+   * selecting an Attribute and then a Skill shows the Skill texture).
+   * Used both by the dice roller dialog and by the chat-card render hook
+   * so the result card mirrors the texture that was on the roller window.
+   * @param {object} [opts]
+   * @param {string} [opts.attribute]  Attribute key, e.g. "wits".
+   * @param {string} [opts.skill]      Skill key, e.g. "occult" or "animalKen".
+   * @param {string} [opts.lastTrait]  "<group>.<key>" of the last clicked
+   *                                   trait, e.g. "skills_mental.occult".
+   * @returns {{ bgName: string, bgUrl: string, attribute: string }}
+   */
+  static _resolveDiceBg({ attribute, skill, lastTrait } = {}) {
+    let attrCandidate = attribute;
+    let skillCandidate = skill;
+    if (lastTrait && String(lastTrait).includes(".")) {
+      const [group, key] = String(lastTrait).split(".");
+      if (group.startsWith("attributes_")) { attrCandidate = key; skillCandidate = null; }
+      else if (group.startsWith("skills_"))    { skillCandidate = key; attrCandidate = null; }
+    }
+    const attrSlug = DiceRollerDialogue._diceBgSlug(attrCandidate);
+    const skillSlug = DiceRollerDialogue._diceBgSlug(skillCandidate);
+    let bgName, kind;
+    if (attrSlug && DiceRollerDialogue._DICE_BG_KNOWN_ATTRS.includes(attrSlug)) {
+      bgName = `dice_bg_${attrSlug}`;
+      kind = attrSlug;
+    } else if (skillSlug && DiceRollerDialogue._DICE_BG_KNOWN_SKILLS.includes(skillSlug)) {
+      bgName = `dice_bg_${skillSlug}`;
+      kind = skillSlug;
+    } else {
+      const pick = 1 + Math.floor(Math.random() * DiceRollerDialogue._DICE_BG_NEUTRAL_COUNT);
+      bgName = `dice_bg_neutral_${pick}`;
+      kind = "neutral";
+    }
+    return {
+      bgName,
+      bgUrl: `systems/vampire-the-requiem-2e/ui/${bgName}.webp`,
+      attribute: kind,
+    };
   }
 
   /**
@@ -684,7 +727,8 @@ export class DiceRollerDialogue extends Application {
     macro,
     actor,
     hungerDice,
-    willpowerUsed = false
+    willpowerUsed = false,
+    diceBgUrl,
   }) {
 
     // Quick rolls don't pass a Hunger count; derive it from the actor's Vitae.
@@ -721,6 +765,13 @@ export class DiceRollerDialogue extends Application {
     const template = `systems/vampire-the-requiem-2e/templates/chat/roll-template.html`;
     const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
+    // Texture for the result chat card. If the caller (a dice-roller
+    // dialog) already picked a trait-matched dice_bg_<x>.webp, use it;
+    // otherwise pick a neutral fall-back so quick rolls still get a
+    // textured background. The render hook in module/mta.js reads
+    // flags["vampire-the-requiem-2e"].diceBgUrl and stamps it.
+    const cardBgUrl = diceBgUrl ?? DiceRollerDialogue._resolveDiceBg().bgUrl;
+
     // Basic chat message data
     let chatData = {
       user: game.user.id,
@@ -731,12 +782,13 @@ export class DiceRollerDialogue extends Application {
       sound: CONFIG.sounds.dice,
       roll: rollReturn.roll,
       rolls: [rollReturn.roll],
-      rollMode: rollMode
+      rollMode: rollMode,
+      flags: { "vampire-the-requiem-2e": { diceBgUrl: cardBgUrl } },
     };
 
     // Toggle default roll mode
     /* if ( ["gmroll", "blindroll"].includes(rollMode) ) chatData["whisper"] = ChatMessage.getWhisperRecipients("GM");*/
-    //if ( rollMode === "blindroll" ) chatData["blind"] = true; 
+    //if ( rollMode === "blindroll" ) chatData["blind"] = true;
     chatData = ChatMessage.applyRollMode(chatData, rollMode);
 
     const msg = await ChatMessage.create(chatData);
@@ -822,7 +874,8 @@ export class DiceRollerDialogue extends Application {
     macro,
     actor,
     damageType = "lethal",
-    hungerDice
+    hungerDice,
+    diceBgUrl,
   }) {
     if (applyDefense) dicePool -= defense;
 
@@ -940,6 +993,9 @@ export class DiceRollerDialogue extends Application {
     const template = `systems/vampire-the-requiem-2e/templates/chat/item-card.html`;
     const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
+    // Same trait-textured background plumbing as rollToChat above.
+    const cardBgUrl = diceBgUrl ?? DiceRollerDialogue._resolveDiceBg().bgUrl;
+
     // Basic chat message data
     let chatData = {
       user: game.user.id,
@@ -951,6 +1007,7 @@ export class DiceRollerDialogue extends Application {
       roll: rollReturn.roll,
       rolls: [rollReturn.roll],
       rollMode: rollMode,
+      flags: { "vampire-the-requiem-2e": { diceBgUrl: cardBgUrl } },
       /*       system: {
               targetId: templateData.data.damageTokenId,
               isAttack: true,

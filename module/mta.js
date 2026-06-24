@@ -429,6 +429,25 @@ Hooks.on("renderChatMessageHTML", (message, html, data) => {
   host.insertBefore(img, host.firstChild);
 });
 
+// Roll chat-card background: paint the per-trait dice_bg_<x>.webp behind
+// the card body (avatar + dice icons + result line) so the result card
+// echoes the texture of the dice roller window that produced it. The URL
+// is stamped onto the ChatMessage as a flag by rollToChat / rollWithDamage
+// in module/dialogue-diceRoller.js. Dimensions of the card are not changed
+// — only the background paints differently. The CSS rule in
+// styles/override.css (.message-content.vtr-textured-bg) handles sizing
+// (background-size: cover) and contrast (a dark overlay so the dice icons
+// and result text stay readable across all colored textures).
+Hooks.on("renderChatMessageHTML", (message, html, data) => {
+  if (!html?.querySelector) return;
+  const bgUrl = message?.flags?.["vampire-the-requiem-2e"]?.diceBgUrl;
+  if (!bgUrl) return;
+  const body = html.querySelector(".message-content");
+  if (!body) return;
+  body.classList.add("vtr-textured-bg");
+  body.style.setProperty("--vtr-card-bg", `url("${bgUrl}")`);
+});
+
 // Apply-Inspired-Condition button: the homebrewWillpower rule posts a chat
 // card on an unaided exceptional success offering to apply the Inspired
 // Condition. Pull it from the conditions compendium and embed it on the actor.
