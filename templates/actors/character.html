@@ -11,7 +11,7 @@
         <img class="profile-img" src="{{portraitImg}}" data-edit="img" title="{{actor.name}}">
         {{#if blushEnabled}}
         <span class="blush-icon{{#if blushActive}} blush-icon-active{{/if}}"
-              title="Blush of Life &mdash; left-click to spend 1 Vitae, right-click to pick the alternate portrait">
+              title="Blush of Life{{#if blushActive}} (active) &mdash; left-click to let it fade{{else}} &mdash; left-click to spend 1 Vitae; lasts the scene{{/if}}{{#if blushPortraitSwap}}; right-click to pick the alternate portrait{{/if}}">
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-blush-of-life.svg" alt="Blush of Life">
         </span>
         {{/if}}
@@ -573,15 +573,31 @@
         {{/if}}
         {{#if (eq system.characterVariant "vampire")}}
         <div class="button charMacroButton daysleepButton tooltip">
-          <span class="tooltip-text">Daysleep: rise and expend 1 Vitae{{#if homebrewWillpower}}, recover 1 Willpower{{/if}}</span>
+          <span class="tooltip-text">Daysleep: mend, sleep and rise for 1 Vitae{{#if homebrewWillpower}}, recover 1 Willpower{{/if}}; or resist the sleep</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-daysleep.svg" alt="Daysleep.">
+        </div>
+        <div class="button charMacroButton mendButton tooltip">
+          <span class="tooltip-text">Mend wounds with Vitae</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-mend.svg" alt="Mend.">
+        </div>
+        <div class="button charMacroButton feedButton tooltip">
+          <span class="tooltip-text">Feeding: feed, hunt, starting Vitae, taste blood</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-feed.svg" alt="Feed.">
+        </div>
+        <div class="button charMacroButton physicalButton tooltip">
+          <span class="tooltip-text">Celerity, Resilience and Vigor: active effects (1 Vitae each)</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-physical.svg" alt="Physical Disciplines.">
+        </div>
+        <div class="button charMacroButton banesButton tooltip">
+          <span class="tooltip-text">Sunlight and fire</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-banes.svg" alt="Banes.">
         </div>
         <div class="button charMacroButton frenzyButton tooltip">
           <span class="tooltip-text">Resist Frenzy (Resolve + Composure)</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-breaking-point.svg" alt="Resist frenzy.">
         </div>
         <div class="button charMacroButton lashingOutButton tooltip">
-          <span class="tooltip-text">Lash Out with the Predatory Aura</span>
+          <span class="tooltip-text">Lash Out with the Predatory Aura (target the victim's token first)</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-lashing-out.svg" alt="Lash out.">
         </div>
         <div class="button charMacroButton detachmentButton tooltip">

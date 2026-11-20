@@ -888,20 +888,144 @@ MTA.yantras = [
 /*          Vampire the Requiem                 */
 /* -------------------------------------------- */
 
+/**
+ * Effects of Blood Potency, indexed by dots 0-10 (VtR 2E p. 90, p. 102).
+ * - max_vitae is undefined at 0 dots, where the pool equals Stamina.
+ * - feedsFrom is the least potent blood that still nourishes; drinking
+ *   anything beneath it costs 1 Willpower per Vitae (p. 89).
+ * - sunlightStep indexes MTA.sunlightFrequencies.
+ */
 MTA.bloodPotency_levels = [
-  { vitae_per_turn: 1, max_vitae: undefined },
-  { vitae_per_turn: 1, max_vitae: 10 },
-  { vitae_per_turn: 2, max_vitae: 11 },
-  { vitae_per_turn: 3, max_vitae: 12 },
-  { vitae_per_turn: 4, max_vitae: 13 },
-  { vitae_per_turn: 5, max_vitae: 15 },
-  { vitae_per_turn: 6, max_vitae: 20 },
-  { vitae_per_turn: 7, max_vitae: 25 },
-  { vitae_per_turn: 8, max_vitae: 30 },
-  { vitae_per_turn: 10, max_vitae: 50 },
-  { vitae_per_turn: 15, max_vitae: 75 }
+  { vitae_per_turn: 1, max_vitae: undefined, feedsFrom: "animals", sunlightStep: 0 },
+  { vitae_per_turn: 1, max_vitae: 10, feedsFrom: "animals", sunlightStep: 1 },
+  { vitae_per_turn: 2, max_vitae: 11, feedsFrom: "animals", sunlightStep: 1 },
+  { vitae_per_turn: 3, max_vitae: 12, feedsFrom: "humans", sunlightStep: 2 },
+  { vitae_per_turn: 4, max_vitae: 13, feedsFrom: "humans", sunlightStep: 3 },
+  { vitae_per_turn: 5, max_vitae: 15, feedsFrom: "humans", sunlightStep: 3 },
+  { vitae_per_turn: 6, max_vitae: 20, feedsFrom: "kindred", sunlightStep: 4 },
+  { vitae_per_turn: 7, max_vitae: 25, feedsFrom: "kindred", sunlightStep: 4 },
+  { vitae_per_turn: 8, max_vitae: 30, feedsFrom: "kindred", sunlightStep: 5 },
+  { vitae_per_turn: 10, max_vitae: 50, feedsFrom: "kindred", sunlightStep: 5 },
+  { vitae_per_turn: 15, max_vitae: 75, feedsFrom: "kindred", sunlightStep: 6 }
 ];
-MTA.actionTypes = ["Instant", "Reflexive", "Contested vs", "Contested (refl. resist.) vs", "Extended"];
+
+/** Blood sources from least to most potent; the index is the source's rank. */
+MTA.feedingSources = ["animals", "humans", "kindred"];
+
+/**
+ * How often sunlight deals its damage (VtR 2E p. 102). `times` multiplies the
+ * damage dealt each interval. Exposing only the eyes moves one step up this
+ * list, towards "none".
+ */
+MTA.sunlightFrequencies = [
+  { interval: "none", times: 0, label: "no damage" },
+  { interval: "tenMinutes", times: 1, label: "every ten minutes" },
+  { interval: "minute", times: 1, label: "every minute" },
+  { interval: "turn", times: 1, label: "every turn" },
+  { interval: "turn", times: 2, label: "twice every turn" },
+  { interval: "turn", times: 3, label: "three times every turn" },
+  { interval: "turn", times: 5, label: "five times every turn" }
+];
+
+/**
+ * Effects of Humanity, indexed by the character's CURRENT dots 0-10.
+ * - mortals: dice modifier on rolls to relate to humans (p. 106); "chance"
+ *   reduces the roll to a chance die.
+ * - sunlight: damage per interval (p. 102).
+ * - torpor: base duration, multiplied by Blood Potency (p. 105). The printed
+ *   table lists Humanity 9 in two rows; the first (one night) is used here.
+ */
+MTA.humanity_levels = [
+  { mortals: "chance", sunlight: { amount: 5, type: "aggravated" }, torpor: "100 years" },
+  { mortals: "chance", sunlight: { amount: 4, type: "aggravated" }, torpor: "50 years" },
+  { mortals: -5, sunlight: { amount: 3, type: "aggravated" }, torpor: "ten years" },
+  { mortals: -3, sunlight: { amount: 2, type: "aggravated" }, torpor: "five years" },
+  { mortals: -2, sunlight: { amount: 1, type: "aggravated" }, torpor: "one year" },
+  { mortals: -1, sunlight: { amount: 3, type: "lethal" }, torpor: "one month" },
+  { mortals: -1, sunlight: { amount: 2, type: "lethal" }, torpor: "one week" },
+  { mortals: 0, sunlight: { amount: 1, type: "lethal" }, torpor: "one week" },
+  { mortals: 0, sunlight: { amount: 1, type: "lethal" }, torpor: "two nights" },
+  { mortals: 2, sunlight: { amount: 1, type: "lethal" }, torpor: "one night" },
+  { mortals: 2, sunlight: { amount: 1, type: "lethal" }, torpor: "one night" }
+];
+
+/** Fire (VtR 2E p. 103): aggravated damage per turn is size + heat. */
+MTA.fireSizes = {
+  torch: { label: "Torch", damage: 1 },
+  bonfire: { label: "Bonfire", damage: 2 },
+  inferno: { label: "Inferno", damage: 3 }
+};
+MTA.fireHeats = {
+  candle: { label: "Candle (first-degree burns)", damage: 0 },
+  torch: { label: "Torch (second-degree burns)", damage: 1 },
+  bunsen: { label: "Bunsen burner (third-degree burns)", damage: 2 },
+  chemical: { label: "Chemical fire or molten metal", damage: 3 }
+};
+
+/**
+ * Suggested hunting modifiers (VtR 2E p. 96). `each` entries are counted, the
+ * rest are yes/no. Feeding Grounds and "a very specific vessel" are numeric
+ * inputs of their own in the hunting dialog.
+ */
+MTA.huntingModifiers = [
+  { key: "multiple", label: "Extra vessels hunted at once", value: -2, each: true },
+  { key: "hours", label: "Extra hours of hunting tonight", value: 2, each: true },
+  { key: "halfHour", label: "Only half an hour to hunt", value: -3 },
+  { key: "dressedWrong", label: "Dressed wrong for the hunt", value: -2 },
+  { key: "repeatPrey", label: "Repeat prey", value: 1 },
+  { key: "animalUrban", label: "Animal blood, in the city", value: 1 },
+  { key: "animalRural", label: "Animal blood, in the country", value: 3 },
+  { key: "rack", label: "Hunting in the Rack", value: 2 },
+  { key: "poaching", label: "Poaching on another's ground", value: -2 },
+  { key: "curfew", label: "During a curfew", value: -3 },
+  { key: "crimeSpree", label: "During a crime spree", value: -3 }
+];
+
+/** Suggested modifiers for A Taste of Blood (VtR 2E p. 91). */
+MTA.tasteOfBloodModifiers = [
+  { key: "auspex", label: "Auspex active", value: 2 },
+  { key: "bloodTied", label: "Blood-tied to the donor", value: 2 },
+  { key: "hungry", label: "Currently hungry", value: 2 },
+  { key: "hourOld", label: "Hour-old blood", value: -1 },
+  { key: "dayOld", label: "Day-old blood", value: -3 },
+  { key: "weekOld", label: "A week old or more", value: -5 }
+];
+
+/**
+ * Vampire Touchstones (VtR 2E p. 87). `system.touchstones_vampire` holds ten
+ * slots keyed "1".."10" that run DOWN the Humanity track: slot 1 sits beside
+ * Humanity dot 10, slot 5 beside dot 6 (a starting character's Touchstone),
+ * slot 10 beside dot 1. Everything that reads those slots goes through these
+ * two functions, so the sheet labels, the Humanity-box icons and the
+ * Detachment roll cannot drift apart.
+ */
+MTA.touchstoneSlotToDot = (slot) => 11 - Number(slot);
+
+/**
+ * @param {object} slots     system.touchstones_vampire
+ * @param {number} humanity  The character's current Humanity dots.
+ * @returns {{slot:number, dot:number, name:string, attached:boolean}[]}
+ *   Filled slots only, highest Humanity dot first. A Touchstone is attached
+ *   while the character still has the dot it is written beside.
+ */
+MTA.vampireTouchstones = (slots, humanity) => Object.entries(slots ?? {})
+  .map(([slot, name]) => ({
+    slot: Number(slot),
+    dot: MTA.touchstoneSlotToDot(slot),
+    name: String(name ?? "").trim()
+  }))
+  .filter(t => t.name.length > 0 && t.dot >= 1 && t.dot <= 10)
+  .map(t => ({ ...t, attached: t.dot <= Number(humanity) }))
+  .sort((a, b) => b.dot - a.dot);
+
+/**
+ * Detachment dice by breaking-point level (VtR 2E p. 107). The index is the
+ * Humanity level the breaking point is listed under, NOT the character's
+ * current Humanity. Index 0 is unused.
+ */
+MTA.breakingPointDice = [null, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5];
+
+MTA.actionTypes =["Instant", "Reflexive", "Contested vs", "Contested (refl. resist.) vs", "Extended"];
 
 MTA.actionTypesSelection = {
   reflexive: "MTA.ActionType.Reflexive",

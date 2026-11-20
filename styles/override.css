@@ -445,6 +445,11 @@ game-pause .vtr-pause-icon img {
   height: 100%;
   display: block;
 }
+/* A Touchstone beside a Humanity dot the character no longer has. */
+.characterSheet .touchstone-corner.touchstone-detached {
+  opacity: 0.4;
+  filter: grayscale(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+}
 .characterSheet .touchstone-tl { top: 3px;    left: 3px; }
 .characterSheet .touchstone-tr { top: 3px;    right: 3px; }
 .characterSheet .touchstone-bl { bottom: 3px; left: 3px; }
@@ -564,6 +569,49 @@ game-pause .vtr-pause-icon img {
 }
 .vtr-rite-dialog .vtr-rite-block dl dd input,
 .vtr-rite-dialog .vtr-rite-block dl dd select {
+  width: 100%;
+}
+/* Yes/no modifiers (Masquerade, Requiem, Feral Curse): one checkbox per row. */
+.vtr-rite-dialog .vtr-rite-checks {
+  margin-top: 8px;
+}
+.vtr-rite-dialog .vtr-rite-checks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0;
+  color: #f4ead8;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+  cursor: pointer;
+}
+.vtr-rite-dialog .vtr-rite-checks input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}
+/* An effect that cannot be chosen: already used this turn, or used up. */
+.vtr-rite-dialog .vtr-rite-checks label.vtr-rite-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+/* Small print under a dialog's fields. */
+.vtr-rite-dialog .vtr-rite-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #e6dcc8;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+/* Two short number fields side by side (Health dots / Stamina). */
+.vtr-rite-dialog .vtr-rite-block dl dd input + input {
+  margin-top: 4px;
+}
+/* A dialog that is a menu of actions: one full-width button per row. */
+.vtr-rite-dialog.vtr-rite-stacked .dialog-buttons {
+  flex-direction: column;
+}
+.vtr-rite-dialog.vtr-rite-stacked .dialog-buttons button {
+  flex: 0 0 auto;
   width: 100%;
 }
 /* Button row: themed buttons sit directly on the texture, no backing strip. */
@@ -741,10 +789,10 @@ game-pause .vtr-pause-icon img {
 
 /* ---------------------------------------------------------------------------
    Blush of Life corner icon on the Vampire portrait.
-   Only rendered when the homebrew Blush setting (and Phases of Night) are on
-   — see actor-sheet.js getData. Left-click activates / first-time picks the
-   alternate portrait; right-click always picks. .blush-icon-active adds a
-   warm red glow so the swapped state is unmistakable.
+   Rendered for every Vampire — see actor-sheet.js getData. Left-click turns
+   the Blush on (1 Vitae) or off; right-click picks the alternate portrait
+   when the portrait-swap setting is on. .blush-icon-active adds a warm red
+   glow so the active state is unmistakable.
 
    Selectors are chained through .sheet-header .portrait so they outrank the
    default `.mta-sheet .sheet-header .portrait img` rule, which would

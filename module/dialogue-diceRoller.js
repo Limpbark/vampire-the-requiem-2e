@@ -1,4 +1,5 @@
 import { applyMessageVisibility } from "./chat.js";
+import { kindredIntake, describeDamage, mortalsModifier } from "./kindred.js";
 
 export class DiceRollerDialogue extends foundry.appv1.api.Application {
   constructor({ dicePool = 0,
@@ -38,6 +39,7 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
     lastTrait = null,
     rollContext = "",
     isPhysicalRoll = false,
+    isSocialRoll = false,
   }, ...args) {
     super(...args);
     this.targetNumber = +targetNumber;
@@ -78,6 +80,7 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
     this.lastTrait = lastTrait;
     this.rollContext = rollContext;
     this.isPhysicalRoll = isPhysicalRoll;
+    this.isSocialRoll = isSocialRoll;
   }
 
   /* -------------------------------------------- */
@@ -134,6 +137,29 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
     data.bloodPotency = hungerActor?.system?.vampire_traits?.bloodPotency?.final ?? 0;
     data.isPhysicalRoll = !!this.isPhysicalRoll;
     data.currentVitae = hungerActor?.system?.vitae?.value ?? 0;
+
+    // Humanity's modifier on rolls to relate to mortals (VtR 2E p. 106). The
+    // toggle is offered on a Vampire's Social rolls when Humanity gives one,
+    // but never on Intimidation, which is exempt.
+    this._mortals = null;
+    if (data.isVampire && this.isSocialRoll && this.skill !== "intimidation" && hungerActor.getHumanity) {
+      const humanity = hungerActor.getHumanity();
+      const m = mortalsModifier(humanity);
+      if (m.chance || m.modifier) {
+        this._mortals = {
+          ...m,
+          humanity,
+          label: m.chance ? "chance die" : `${m.modifier > 0 ? "+" : "−"}${Math.abs(m.modifier)}`
+        };
+      }
+    }
+    data.mortals = this._mortals;
+
+    // Vigor's active effect (p. 142): its dots as a weapon bonus on Athletics,
+    // Brawl and Weaponry attacks this turn, so not on firearms or explosives.
+    const vigor = hungerActor?.system?.physicalDisciplines?.vigor ?? 0;
+    data.vigor = (this.damageRoll && !this.spendAmmo && this.itemRef?.type !== "explosive") ? vigor : 0;
+    data.vigorArmed = !!hungerActor?._usedThisTurn?.("vigorStrike");
 
     // Dice-roller window background: prefer the Attribute texture; if the
     // pool has no Attribute, fall back to the Skill texture; if neither is
@@ -262,6 +288,7 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
       const isVampire = this.actorOverride?.system?.characterVariant === "vampire";
       const isPhysicalRoll = !!this.isPhysicalRoll;
       const bp = this.actorOverride?.system?.vampire_traits?.bloodPotency?.final ?? 0;
+      const mortals = this._mortals;
       const updateVisual = () => {
         const raw = String(html.find('[name="dicePoolBonus"]').val() ?? "0").replace(/[^-\d]/g, "");
         const bonus = (raw === "" || raw === "-") ? 0 : parseInt(raw, 10);
@@ -284,12 +311,16 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
             && html.find('input[name="burnVitaePhysical"]').is(":checked")) {
           extraBonus += 2;
         }
+        // Relating to mortals: Humanity's modifier, or a lone chance die.
+        const toMortals = mortals && html.find('input[name="relatingToMortals"]').is(":checked");
+        if (toMortals && !mortals.chance) extraBonus += mortals.modifier;
         const prePool = Math.max(0, base + bonus + specialties + extraBonus);
         const totalPool = Math.max(0, prePool + wpBonus);
         // Hunger dice apply to the pre-Willpower pool only; Willpower dice
         // always count as normal (white).
-        const hunger = isHungerVamp ? Math.max(0, prePool - vitae) : 0;
-        const normal = Math.max(0, totalPool - hunger);
+        const forcedChance = toMortals && mortals.chance;
+        const hunger = (isHungerVamp && !forcedChance) ? Math.max(0, prePool - vitae) : 0;
+        const normal = forcedChance ? 1 : Math.max(0, totalPool - hunger);
         const pieces = [];
         for (let i = 0; i < normal; i++) {
           pieces.push('<img class="dpv-die" src="systems/vampire-the-requiem-2e/icons/gui/d10_white.png" alt="">');
@@ -302,7 +333,7 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
       html.find('[name="dicePoolBonus"]').on("change input", updateVisual);
       html.find('input[name^="specialty_"]').on("change", updateVisual);
       html.find('input[name="willpower"]').on("change", updateVisual);
-      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="addBloodPotency"], input[name="burnVitaePhysical"]').on("change", updateVisual);
+      html.find('input[name="dangerSense"], input[name="acuteSenses"], input[name="addBloodPotency"], input[name="burnVitaePhysical"], input[name="relatingToMortals"]').on("change", updateVisual);
 
       // Trained Observer toggles sync the explodeThreshold radio at the
       // top of the dialog: 0 of 2 -> 10-again (default); 1 -> 9-again;
@@ -366,21 +397,49 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
     if (this.isPhysicalRoll
         && this.actorOverride?.system?.characterVariant === "vampire"
         && html.find('input[name="burnVitaePhysical"]').is(":checked")) {
-      const cur = Number(this.actorOverride?.system?.vitae?.value ?? 0);
-      if (cur >= 1) {
+      // spendVitae warns by itself when the pool is empty, and counts the
+      // point towards the Vitae-per-turn limit while in combat.
+      if (await this.actorOverride.spendVitae(1, { reason: "burn for a physical bonus" })) {
         modifiers.dicePool_userMod += 2;
         percFlavor += " [Burned 1 Vitae +2 Physical]";
-        await this.actorOverride.update({ "system.vitae.value": cur - 1 });
+      }
+    }
+
+    // Relating to mortals: Humanity's modifier, or a chance die at Humanity 1.
+    let forcedChance = false;
+    if (this._mortals && html.find('input[name="relatingToMortals"]').is(":checked")) {
+      if (this._mortals.chance) {
+        forcedChance = true;
+        percFlavor += ` [Relating to mortals at Humanity ${this._mortals.humanity}: chance die]`;
       } else {
-        ui.notifications.warn(`${this.actorOverride.name}: not enough Vitae to burn — no bonus applied.`);
+        modifiers.dicePool_userMod += this._mortals.modifier;
+        percFlavor += ` [Relating to mortals at Humanity ${this._mortals.humanity}]`;
+      }
+    }
+
+    // Vigor's weapon bonus: 1 Vitae covers every attack made this turn, so a
+    // second attack in the same combat round is not charged again.
+    let weaponDamage = this.weaponDamage;
+    const vigor = this.actorOverride?.system?.physicalDisciplines?.vigor ?? 0;
+    if (this.damageRoll && vigor > 0 && html.find('input[name="vigorStrike"]').is(":checked")) {
+      let active = this.actorOverride._usedThisTurn("vigorStrike");
+      if (!active) {
+        const update = {};
+        this.actorOverride._markUsedThisTurn(["vigorStrike"], update);
+        active = await this.actorOverride.spendVitae(1, { reason: "call on Vigor", update });
+      }
+      if (active) {
+        weaponDamage += vigor;
+        percFlavor += ` [Vigor +${vigor} weapon bonus]`;
       }
     }
 
     const realPool = this.dicePool + modifiers.dicePool_userMod;
     const defenseAdj = (this.damageRoll && modifiers.applyDefense) ? this.defense : 0;
     const willpowerBonus = modifiers.willpower ? 3 : 0;
-    const hungerDice = DiceRollerDialogue._hungerDiceCount(this.actorOverride, realPool - defenseAdj);
-    const dicePool = realPool + willpowerBonus;
+    const hungerDice = forcedChance ? 0 : DiceRollerDialogue._hungerDiceCount(this.actorOverride, realPool - defenseAdj);
+    // A pool below 1 is rolled as a chance die.
+    const dicePool = forcedChance ? 0 : realPool + willpowerBonus;
     const roteAction = modifiers.rote_action;
     let flavor = (this.flavor || "Skill Check")
       + (modifiers.dicePool_userMod > 0 ? " + " + modifiers.dicePool_userMod : modifiers.dicePool_userMod < 0 ? " - " + -modifiers.dicePool_userMod : "");
@@ -401,7 +460,7 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
       skill: this.skill,
       lastTrait: this.lastTrait,
     }).bgUrl;
-    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: this.weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice, diceBgUrl });
+    if (this.damageRoll) await DiceRollerDialogue.rollWithDamage({ dicePool: dicePool, targetNumber: targetNumber, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, weaponDamage: weaponDamage, armorPiercing: this.armorPiercing, itemImg: this.itemImg, itemName: this.itemName, itemRef: this.itemRef, itemDescr: this.itemDescr, spendAmmo: this.spendAmmo, ammoPerShot: modifiers.ammoPerShot, advancedAction: modifiers.advancedAction, comment: this.comment, target: this.target, ignoreArmor: modifiers.ignoreArmor, ignoreBallistic: modifiers.ignoreBallistic, noSuccessesToDamage: modifiers.noSuccessesToDamage, applyDefense: modifiers.applyDefense, defense: this.defense, ballistic: this.ballistic, armor: this.armor, exceptionalTarget: this.exceptionalTarget, damageType: modifiers.damageType, hungerDice: hungerDice, diceBgUrl });
     else await DiceRollerDialogue.rollToChat({ dicePool: dicePool, targetNumber: targetNumber, extended: modifiers.extended, extended_accumulatedSuccesses: this.accumulatedSuccesses, extended_rolls: this.extendedRolls, extended_rollsMax: this.dicePool, rollReturn: rollReturn, tenAgain: explodeThreshold === 10, nineAgain: explodeThreshold === 9, eightAgain: explodeThreshold === 8, roteAction: roteAction, flavor: flavor, blindGMRoll: this.blindGMRoll, actorOverride: this.actorOverride, advancedAction: modifiers.advancedAction, comment: this.comment, exceptionalTarget: this.exceptionalTarget, hungerDice: hungerDice, willpowerUsed: willpowerBonus > 0, diceBgUrl });
 
     if (modifiers.extended) {
@@ -937,6 +996,25 @@ export class DiceRollerDialogue extends foundry.appv1.api.Application {
     //game.i18n.localize('MTA.DamageInflicted') 
 
     if (armorPiercing && rollReturn.roll.total) templateData.data.summary += " (" + armorPiercing + " AP)";
+
+    // The card states damage as the weapon deals it to a mortal; the target
+    // converts it when it is applied (ActorMtA#receiveAttack). Against a
+    // Kindred target, say now what that will come to, before any Vitae is
+    // spent on Resilience's active effect.
+    const fullToKindred = !!itemRef?.system?.fullDamageToKindred;
+    templateData.data.fullToKindred = fullToKindred;
+    const targetSystem = target?.actor?.system;
+    if (rollReturn.roll.total > 0 && targetSystem?.characterVariant === "vampire") {
+      const asKindred = kindredIntake({
+        bashing: bashingDamageInflicted,
+        lethal: damageType === "aggravated" ? 0 : damageInflicted,
+        aggravated: damageType === "aggravated" ? damageInflicted : 0
+      }, {
+        source: fullToKindred ? "supernatural" : "mundane",
+        resilience: targetSystem.physicalDisciplines?.resilience ?? 0
+      });
+      templateData.data.summary += `<br><em>To a Kindred: ${describeDamage(asKindred)}</em>`;
+    }
     if (spendAmmo) templateData.data.summaryAddendum = ammoPerShot + " " + game.i18n.localize('MTA.AmmoSpent');
     if (rollReturn.roll.total) {
       templateData.data.showDamageButton = true;

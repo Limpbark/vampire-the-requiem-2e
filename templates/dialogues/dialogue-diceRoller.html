@@ -114,6 +114,14 @@
               </label>
             </p>
             {{/if}}{{/if}}
+            {{#if mortals}}
+            <p>
+              <label class="checkBox marginR" title="Humanity colours every roll to relate to mortals. It does not apply to frightening them with Intimidation, or to deceiving them in order to feed.">
+                <input data-dtype="Boolean" name="relatingToMortals" type="checkbox">
+                <span>Relating to mortals (Humanity {{mortals.humanity}}: {{mortals.label}})</span>
+              </label>
+            </p>
+            {{/if}}
           </div>
         </dd>
         {{#if spendAmmo}}
@@ -156,6 +164,14 @@
                 <span>{{ localize "MTA.NoSuccessesToDamage" }}</span>
               </label>
             </p>
+            {{#if vigor}}
+            <p>
+              <label class="checkBox marginR" title="Vigor's active effect: its dots are added as a weapon bonus to every Athletics, Brawl and Weaponry attack made this turn. The Vitae is deducted when you press Roll.">
+                <input data-dtype="Boolean" name="vigorStrike" type="checkbox" {{checked vigorArmed}}>
+                <span>Vigor: +{{vigor}} weapon bonus this turn ({{#if vigorArmed}}already paid{{else}}1 Vitae{{/if}})</span>
+              </label>
+            </p>
+            {{/if}}
             <p>
               <label>{{localize "MTA.DamageType"}}</label> 
               <select name="damageType">

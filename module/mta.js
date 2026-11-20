@@ -557,6 +557,22 @@ const createTokenBar = () => {
   }
 }
 
+// A Vampire's or Ghoul's maximum Health follows Stamina (which includes
+// Resilience) and Size by itself, so a new Discipline dot or an effect on an
+// item does not wait for the calculate button. It runs only for the user who
+// made the change, and stops as soon as the stored maximum matches.
+function _vtrSyncMaxHealth(actor, userId) {
+  if (userId !== game.user.id) return;
+  if (actor?.type !== "character" || actor.system?.characterType !== "vampire") return;
+  const derived = actor.system?.derivedTraits?.health?.final;
+  if (!Number.isFinite(derived) || derived === actor.system?.health?.max) return;
+  actor.calculateAndSetMaxHealth();
+}
+Hooks.on("updateActor", (actor, changed, options, userId) => _vtrSyncMaxHealth(actor, userId));
+Hooks.on("createItem", (item, options, userId) => _vtrSyncMaxHealth(item.parent, userId));
+Hooks.on("updateItem", (item, changed, options, userId) => _vtrSyncMaxHealth(item.parent, userId));
+Hooks.on("deleteItem", (item, options, userId) => _vtrSyncMaxHealth(item.parent, userId));
+
 Hooks.on("controlToken", foundry.utils.debounce(createTokenBar, 200));
 
 Hooks.on("updateActor", foundry.utils.debounce(createTokenBar, 200));
@@ -695,11 +711,12 @@ Hooks.once("ready", function () {
   });
 
   // Outcome-card buttons that apply a named Condition to an actor (Frenzy,
-  // Lashing Out, Detachment cards all emit these). data-vtr-apply-to="selected"
-  // targets the controlled token's actor (used when the recipient is not the
-  // card's actor, e.g. the loser of a Predatory Aura clash); otherwise the
-  // Condition goes on the card's own actor.
-  document.body.addEventListener("click", (event) => {
+  // Lashing Out, Detachment cards all emit these). The recipient is, in order:
+  // the controlled token's actor when data-vtr-apply-to="selected"; the actor
+  // named by data-actor-uuid (which also reaches unlinked token actors, e.g.
+  // an NPC on the losing side of a Predatory Aura clash); or the world actor
+  // named by data-actor-id.
+  document.body.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-vtr-apply-condition]");
     if (!btn) return;
     let actor;
@@ -710,11 +727,48 @@ Hooks.once("ready", function () {
         return;
       }
       actor = tokens[0].actor;
+    } else if (btn.dataset.actorUuid) {
+      actor = await fromUuid(btn.dataset.actorUuid);
     } else {
       actor = game.actors.get(btn.dataset.actorId);
     }
     if (!actor) { ui.notifications.warn("Apply Condition: actor not found."); return; }
+    if (!actor.isOwner) {
+      ui.notifications.warn(`You do not own ${actor.name}. Ask their player or the Storyteller to apply the Condition.`);
+      return;
+    }
     actor.applyConditionByName(btn.dataset.vtrApplyCondition);
+  });
+
+  // "Apply to <vessel>" on a Feeding card: what being fed upon costs the
+  // vessel, for when the feeder's player may not change that character.
+  document.body.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-vtr-vessel]");
+    if (!btn) return;
+    const doc = await fromUuid(btn.dataset.vtrVessel);
+    const vessel = doc?.documentName === "Actor" ? doc : doc?.actor;
+    if (!vessel) { ui.notifications.warn("Feeding: the vessel is no longer in the scene."); return; }
+    if (!vessel.isOwner) {
+      ui.notifications.warn(`Only ${vessel.name}'s player or the Storyteller can apply this.`);
+      return;
+    }
+    btn.disabled = true;
+    await vessel.sufferFeeding({ lethal: Number(btn.dataset.lethal) || 0, vitae: Number(btn.dataset.vitae) || 0 });
+  });
+
+  // Fight / Flight buttons on a Lashing Out card. The clash, including the
+  // character it is addressed to, was stored in the card's message flags by
+  // ActorMtA#rollLashingOut; resolveAuraDefender works out who answers.
+  document.body.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-vtr-aura-response]");
+    if (!btn) return;
+    const messageId = btn.closest("[data-message-id]")?.dataset.messageId;
+    const clash = game.messages.get(messageId)?.flags?.["vampire-the-requiem-2e"]?.lashOut;
+    if (!clash) { ui.notifications.warn("Predatory Aura: could not read the clash from this card."); return; }
+
+    const { defender, problem } = await ActorMtA.resolveAuraDefender(clash);
+    if (problem) { ui.notifications.warn(problem); return; }
+    defender.respondToLashingOut(clash, btn.dataset.vtrAuraResponse === "flight" ? "flight" : "fight");
   });
 });
 

@@ -76,7 +76,7 @@
 
   <div class="card-buttons">
     {{#if data.showDamageButton}}
-      <button data-action="applyDamage" data-damage="{{data.damageInflicted}}" data-damageisaggravated={{data.damageIsAggravated}} data-bashingdamageinflicted="{{data.bashingDamageInflicted}}" data-tokenId="{{data.damageTokenId}}" data-actorId="{{data.damageTargetId}}" class="button stoneButton">Apply damage</button>
+      <button data-action="applyDamage" data-damage="{{data.damageInflicted}}" data-damageisaggravated={{data.damageIsAggravated}} data-bashingdamageinflicted="{{data.bashingDamageInflicted}}" data-fulltokindred="{{#if data.fullToKindred}}true{{else}}false{{/if}}" data-tokenId="{{data.damageTokenId}}" data-actorId="{{data.damageTargetId}}" class="button stoneButton">Apply damage</button>
     {{/if}}
   </div>
 

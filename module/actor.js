@@ -7,6 +7,9 @@ import {
 import {
   UtteranceDialogue
 } from "./dialogue-utterance.js";
+import {
+  KindredActorMixin
+} from "./actor-kindred.js";
 
 /**
  * Short, original explanations of the Conditions the Frenzy / Lashing Out /
@@ -24,9 +27,21 @@ const CONDITION_BLURBS = {
 };
 
 /**
+ * The three aspects of the Beast used by the Predatory Aura (VtR 2E p. 92):
+ * the Power Attribute each one rolls and the Condition it imposes.
+ */
+const BEAST_ASPECTS = {
+  monstrous:   { label: "Monstrous",   attr: "Strength",     path: ["attributes_physical", "strength"],   condition: "Bestial" },
+  seductive:   { label: "Seductive",   attr: "Presence",     path: ["attributes_social", "presence"],     condition: "Wanton" },
+  competitive: { label: "Competitive", attr: "Intelligence", path: ["attributes_mental", "intelligence"], condition: "Competitive" }
+};
+
+const SYSTEM_ID = "vampire-the-requiem-2e";
+
+/**
  * Override and extend the basic :class:`Actor` implementation
  */
-export class ActorMtA extends Actor {
+export class ActorMtA extends KindredActorMixin(Actor) {
 
   /* -------------------------------------------- */
   /*	Data Preparation														*/
@@ -224,6 +239,30 @@ export class ActorMtA extends Actor {
       trait.isModified = true;
     });
 
+    // Physical Disciplines (VtR 2E p. 130-142), for Vampires and Ghouls. Their
+    // dots are always on and may pass the Blood Potency cap, so they are added
+    // after item effects have been clamped to it. Vigor raises Strength and
+    // Resilience raises Stamina, which then carry into Speed and Health below;
+    // Celerity is added to Defense there too.
+    systemData.physicalDisciplines = { celerity: 0, resilience: 0, vigor: 0 };
+    if (this.type === "character" && systemData.characterType === "vampire") {
+      const dots = (key) => {
+        const trait = systemData.disciplines_common?.[key];
+        return Math.max(0, Math.round(Number(trait?.final ?? trait?.value) || 0));
+      };
+      const raise = (trait, by) => {
+        if (!trait || !by) return;
+        trait.final += by;
+        trait.isModified = true;
+      };
+      const pd = systemData.physicalDisciplines;
+      pd.celerity = dots("celerity");
+      pd.resilience = dots("resilience");
+      pd.vigor = dots("vigor");
+      raise(systemData.attributes_physical.strength, pd.vigor);
+      raise(systemData.attributes_physical.stamina, pd.resilience);
+    }
+
     // Some defaults for all characters
     der.size.value = 5;
 
@@ -255,7 +294,8 @@ export class ActorMtA extends Actor {
         let higherOfWitsDexDefense = this.hasSpecialEffect("defenseHigherOfWitsAndDex")
           || (this.hasSpecialEffect("defenseHigherOfWitsAndDexWerewolf") && this.areAnyItemsActive("Urhan", "Urshul"));
         der.speed.value = 5 + strength + dexterity;
-        der.defense.value = (higherOfWitsDexDefense ? Math.max(wits, dexterity) : Math.min(wits, dexterity)) + this._getDefenseSkill();
+        der.defense.value = (higherOfWitsDexDefense ? Math.max(wits, dexterity) : Math.min(wits, dexterity)) + this._getDefenseSkill()
+          + systemData.physicalDisciplines.celerity;
         der.initiativeMod.value = composure + dexterity;
         der.health.value = stamina;
       }
@@ -532,14 +572,6 @@ export class ActorMtA extends Actor {
 
 
 
-  /** @override */
-  static async create(data, options = {}) {
-    const actor = await super.create(data, options);
-    if (actor.type === "character") await actor.createWerewolfForms();
-
-    return actor;
-  }
-
   /**
    * Rolls a set of dice and calculates a result based on the provided traits and bonuses.
    *
@@ -553,13 +585,13 @@ export class ActorMtA extends Actor {
    */
   roll({ traits = [], diceBonus = 0, rollName = "Skill check", rollType = "dialogue", damageRoll = false, lastTrait = null }) {
 
-    const { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll } = this.assembleDicePool({ traits, diceBonus });
+    const { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll, isSocialRoll } = this.assembleDicePool({ traits, diceBonus });
 
     switch (rollType) {
       case 'dialogue':
         let title = "";
         title = rollName + ": " + flavor;
-        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill, lastTrait, isPhysicalRoll });
+        let diceRoller = new DiceRollerDialogue({ dicePool, flavor: title, title, actorOverride: this, specialties, attribute, skill, lastTrait, isPhysicalRoll, isSocialRoll });
         diceRoller.render(true);
         break;
       case 'quick':
@@ -753,7 +785,7 @@ export class ActorMtA extends Actor {
       flavor += " (Wound penalties: -" + woundPenalty + ")";
     }
 
-    return { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll };
+    return { dicePool, flavor, specialties, attribute, skill, isPhysicalRoll, isSocialRoll };
   }
 
   async werewolfTransform(form) {
@@ -1083,7 +1115,16 @@ export class ActorMtA extends Actor {
     }
   }
 
-  damage(damageAmount, damagetype, resistant = false) {
+  /**
+   * Mark damage on the Health track, or heal it with a negative amount.
+   * @param {number} damageAmount
+   * @param {"bashing"|"lethal"|"aggravated"} damagetype
+   * @param {boolean} [resistant=false]  Mark the boxes as resistant damage.
+   * @param {object} [o]
+   * @param {boolean} [o.quiet=false]  Skip the card that says what a newly
+   *   full track means for a Vampire; the caller will post it once itself.
+   */
+  damage(damageAmount, damagetype, resistant = false, { quiet = false } = {}) {
     if (damageAmount === 0) return;
     console.log("Damaging " + this.name + " by " + damageAmount + " " + damagetype + " damage");
     if (damagetype === "bashing") damagetype = "value"
@@ -1112,7 +1153,8 @@ export class ActorMtA extends Actor {
           carryOver_aggravated = - Math.min(0, this.system.health.lethal - carryOver_lethal);
 
           if (carryOver_aggravated > 0) updateData[`system.health.aggravated`] = Math.max(0, this.system.health.aggravated - carryOver_aggravated);
-          if (carryOver_lethal > 0) updateData[`system.health.lethal`] = Math.max(0, this.system.health.lethal - damageAmount);
+          // Only the bashing that no longer fits upgrades existing wounds to lethal.
+          if (carryOver_lethal > 0) updateData[`system.health.lethal`] = Math.max(0, this.system.health.lethal - carryOver_lethal);
           updateData[`system.health.value`] = Math.max(0, this.system.health.value - damageAmount);
         }
 
@@ -1159,7 +1201,12 @@ export class ActorMtA extends Actor {
         }
       }
 
-      return this.update(updateData);
+      if (quiet || damageAmount < 0) return this.update(updateData);
+      const stateBefore = this._kindredTrackState();
+      return this.update(updateData).then(async (result) => {
+        await this._announceTrackOutcome(stateBefore);
+        return result;
+      });
     }
   }
 
@@ -1519,57 +1566,6 @@ export class ActorMtA extends Actor {
   }
 
   /**
-   * Daysleep: when a vampire rises for the night they expend a point of Vitae.
-   * Posts a chat message, and if the character has injuries, a follow-up
-   * reminder about automatic healing during daysleep (the vampire spends
-   * Vitae unconsciously, 1 per 2 bashing or 1 lethal, 5 per aggravated;
-   * spend 1 Willpower per wound to preserve a wound through the sleep).
-   */
-  async daysleep() {
-    const sys = this.system;
-    const currentVitae = sys.vitae?.value ?? 0;
-    const newVitae = Math.max(0, currentVitae - 1);
-    // Daysleep also resets the Phases of Night marker back to Early Dawn,
-    // regardless of whether the homebrew setting is currently enabled — the
-    // stored phase index always lives on the actor.
-    const update = {
-      "system.vitae.value": newVitae,
-      "system.phaseOfNight": 0,
-      // Blush of Life (homebrew) reverts on daysleep — the night is over and
-      // the trick wears off.
-      "flags.vampire-the-requiem-2e.blushActive": false
-    };
-
-    // Homebrew alternative Willpower: rising for the night also restores
-    // 1 Willpower (capped at the pool maximum).
-    let gainedWillpower = false;
-    if (game.settings.get("vampire-the-requiem-2e", "homebrewWillpower") && sys.willpower) {
-      const curWP = Number(sys.willpower.value ?? 0);
-      const maxWP = Number(sys.willpower.max ?? curWP);
-      if (curWP < maxWP) {
-        update["system.willpower.value"] = curWP + 1;
-        gainedWillpower = true;
-      }
-    }
-    await this.update(update);
-
-    const speaker = ChatMessage.getSpeaker({ actor: this });
-    await ChatMessage.create({
-      speaker,
-      content: `<p><strong>${this.name}</strong> wakes and expends a point of Vitae`
-        + `${gainedWillpower ? " and recovers 1 Willpower" : ""}.</p>`
-    });
-
-    const damaged = sys.health && (sys.health.value ?? sys.health.max) < (sys.health.max ?? 0);
-    if (damaged) {
-      await ChatMessage.create({
-        speaker,
-        content: `<p><em><strong>${this.name}</strong> has injuries &mdash; during daysleep the Beast heals them automatically (1 Vitae per 2 bashing or 1 lethal; 5 Vitae per aggravated). Spend 1 Willpower per wound to preserve it through the rest.</em></p>`
-      });
-    }
-  }
-
-  /**
    * Homebrew Phases of Night: advance (or rewind) the actor's position on the
    * ten-segment night ribbon. Wraps around at both ends so the right arrow at
    * Late Dawn returns to Early Dawn and the left arrow at Early Dawn jumps to
@@ -1590,24 +1586,33 @@ export class ActorMtA extends Actor {
   }
 
   /**
-   * Look up a Condition item by name in the world's item directory and add a
-   * copy to this actor. The user keeps their Conditions in the world (no
-   * shipped compendium), so this resolves against `game.items`. If no match
-   * is found, posts a chat note for manual application instead.
+   * Look up a Condition item by name and add a copy to this actor. A world
+   * item wins, so a Storyteller's customised Condition is used when there is
+   * one; otherwise the copy comes from the shipped Conditions compendium. If
+   * neither has it, posts a chat note for manual application instead.
    * @param {string} name  The Condition's name (case-insensitive).
    */
   async applyConditionByName(name) {
     if (!name) return;
-    const cond = game.items.find(i => i.type === "condition"
-      && i.name?.toLowerCase() === String(name).toLowerCase());
+    const wanted = String(name).toLowerCase();
+    const isMatch = (i) => i.type === "condition" && i.name?.toLowerCase() === wanted;
+    let cond = game.items.find(isMatch);
+    if (!cond) {
+      const pack = game.packs.get(`${SYSTEM_ID}.conditions`);
+      if (pack) {
+        const index = await pack.getIndex({ fields: ["name", "type"] });
+        const entry = index.find(isMatch);
+        if (entry) cond = await pack.getDocument(entry._id);
+      }
+    }
     if (cond) {
       await this.createEmbeddedDocuments("Item", [cond.toObject()]);
       ui.notifications.info(`${cond.name} Condition added to ${this.name}.`);
       return;
     }
-    // No matching Condition item in this world: post a short explanation of
-    // the Condition instead. Don't mention missing assets — that's noise
-    // during play.
+    // No matching Condition item anywhere: post a short explanation of the
+    // Condition instead. Don't mention missing assets — that's noise during
+    // play.
     const blurb = CONDITION_BLURBS[String(name).toLowerCase()];
     const tone = blurb?.tone === "good" ? "messy-success" : "messy-failure";
     await ChatMessage.create({
@@ -1630,26 +1635,36 @@ export class ActorMtA extends Actor {
    * appv1 Dialog options does not reliably reach the window element.
    * @param {object}   opts
    * @param {string}   opts.title    Window title.
-   * @param {string}   opts.variant  Matches ui/dice_bg_<variant>.png — one of
-   *                                 "frenzy" | "lashing_out" | "detachment".
+   * @param {string}   opts.variant  Matches ui/dice_bg_<variant>.webp: "frenzy",
+   *                                 "lashing_out", "detachment", or any
+   *                                 Attribute or Skill texture ("stamina").
    * @param {string}   opts.body     Inner HTML, wrapped in a kUltraBlock.
-   * @param {Function} opts.onRoll   Async callback(html) for the Roll button.
+   * @param {Function} [opts.onRoll] Async callback(html) for a Roll button.
+   * @param {object}   [opts.buttons] Action buttons to show instead of Roll,
+   *                                 as { key: { icon, label, callback } }. The
+   *                                 first is the default. Cancel is always added.
+   * @param {number}   [opts.width=440]
+   * @param {boolean}  [opts.stacked=false]  Lay the buttons out one per row,
+   *                                 for a dialog that is a menu of actions.
    */
-  _renderRiteDialog({ title, variant, body, onRoll }) {
+  _renderRiteDialog({ title, variant, body, onRoll, buttons, width = 440, stacked = false }) {
     const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.webp`;
+    const actions = buttons ?? { roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll } };
+    const classes = ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`];
+    if (stacked) classes.push("vtr-rite-stacked");
     new foundry.appv1.api.Dialog({
       title,
       content: `<div class="kUltraBlock vtr-rite-block">${body}</div>`,
       buttons: {
-        roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll },
+        ...actions,
         cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
       },
-      default: "roll",
+      default: Object.keys(actions)[0],
       render: (html) => {
         const el = html instanceof HTMLElement ? html : html?.[0];
         const root = el?.closest(".window-app, .application, .app");
         if (!root) return;
-        root.classList.add("mta-sheet", "theme-dark", "vtr-rite-dialog", `vtr-rite-${variant}`);
+        root.classList.add("theme-dark", ...classes);
         const wc = root.querySelector(".window-content");
         if (wc) {
           // Set every background longhand inline so the whole texture fills
@@ -1662,34 +1677,73 @@ export class ActorMtA extends Actor {
         }
       }
     }, {
-      classes: ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`],
-      width: 440
+      classes,
+      width
     }).render(true);
+  }
+
+  /**
+   * The morality rating Kindred rules read: Humanity for a Vampire, Integrity
+   * for everyone else (Ghouls and Mortals keep Integrity).
+   * @returns {number}
+   */
+  getHumanity() {
+    const sys = this.system;
+    if (sys?.characterVariant === "vampire") {
+      const humanity = sys.vampire_traits?.humanity;
+      return Number(humanity?.final ?? humanity?.value ?? 0) || 0;
+    }
+    return Number(sys?.integrity ?? 0) || 0;
+  }
+
+  /**
+   * This Vampire's Touchstones with the Humanity dot each is written beside
+   * and whether it is still attached. See MTA.vampireTouchstones.
+   * @returns {{slot:number, dot:number, name:string, attached:boolean}[]}
+   */
+  getVampireTouchstones() {
+    return CONFIG.MTA.vampireTouchstones(this.system?.touchstones_vampire, this.getHumanity());
+  }
+
+  /**
+   * Clan banes lie dormant until Humanity first reaches 6, and never leave
+   * afterwards, even if the seventh dot is regained (VtR 2E p. 103). The
+   * "woken" state therefore has to be remembered separately from Humanity.
+   * @returns {boolean}
+   */
+  isClanBaneAwake() {
+    return this.getHumanity() <= 6 || !!this.getFlag(SYSTEM_ID, "clanBaneAwake");
   }
 
   /**
    * Frenzy resistance (VtR 2E p. 104). Opens a dialog for the provocation
    * modifier and any Willpower spent fighting the Beast, rolls Resolve +
-   * Composure, and posts an outcome card. The Gangrel bane caps the pool at
-   * Humanity dots. Entering frenzy grants a Beat.
+   * Composure, and posts an outcome card. Once a Gangrel's clan bane has
+   * woken, it caps the pool at Humanity dots. Entering frenzy grants a Beat.
    */
   async rollFrenzy() {
     const sys = this.system;
     const resolve = sys.attributes_mental?.resolve?.final ?? 0;
     const composure = sys.attributes_social?.composure?.final ?? 0;
     const basePool = resolve + composure;
-    const humanity = Number(sys.integrity ?? 10);
+    const humanity = this.getHumanity();
     const isGangrel = String(sys.clan ?? "").toLowerCase() === "gangrel";
+    const baneAwake = this.isClanBaneAwake();
 
     const body = `
-      <p class="vtr-rite-summary">Resolve + Composure = <strong>${basePool}</strong>${isGangrel
-        ? ` <em>(Gangrel bane: pool capped at Humanity ${humanity})</em>` : ""}</p>
+      <p class="vtr-rite-summary">Resolve + Composure = <strong>${basePool}</strong></p>
       <dl>
         <dt>Provocation modifier:</dt>
         <dd><input type="number" name="modifier" value="0" autofocus></dd>
         <dt>Willpower spent fighting (turns) &mdash; +1 die each:</dt>
         <dd><input type="number" name="willpower" value="0" min="0"></dd>
-      </dl>`;
+      </dl>${isGangrel ? `
+      <div class="vtr-rite-checks">
+        <label title="Clan banes wake when Humanity first reaches 6 and never leave.">
+          <input type="checkbox" name="feralCurse" ${baneAwake ? "checked" : ""}>
+          Feral Curse &mdash; cap the pool at Humanity ${humanity}
+        </label>
+      </div>` : ""}`;
 
     this._renderRiteDialog({
       title: "Resist Frenzy",
@@ -1698,14 +1752,19 @@ export class ActorMtA extends Actor {
       onRoll: async (html) => {
         const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
         const willpower = Math.max(0, Math.round(Number(html.find('[name="willpower"]').val()) || 0));
+        const capped = isGangrel && html.find('[name="feralCurse"]').is(":checked");
         let pool = basePool + modifier + willpower;
-        if (isGangrel) pool = Math.min(pool, humanity);
+        if (capped) pool = Math.min(pool, humanity);
         pool = Math.max(0, pool);
+        // Remember a woken bane so it survives regaining the seventh dot.
+        if (humanity <= 6 && !this.getFlag(SYSTEM_ID, "clanBaneAwake")) {
+          await this.setFlag(SYSTEM_ID, "clanBaneAwake", true);
+        }
 
         const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
           dicePool: pool,
-          flavor: "Frenzy Resistance",
+          flavor: capped ? `Frenzy Resistance (Feral Curse: capped at Humanity ${humanity})` : "Frenzy Resistance",
           title: "Frenzy Resistance",
           actorOverride: this,
           hungerDice: 0,
@@ -1759,30 +1818,116 @@ export class ActorMtA extends Actor {
   }
 
   /**
-   * Lashing Out with the Predatory Aura (VtR 2E p. 91-92). Opens a dialog to
-   * choose the aspect of the Beast, rolls Blood Potency + the matching Power
-   * Attribute, and posts a card describing the contested response and the
-   * Condition the loser gains.
+   * Spend one Willpower point, or warn and return false when none is left.
+   * @param {string} purpose  Finishes the sentence "has no Willpower left to ...".
+   * @returns {Promise<boolean>} Whether the point was spent.
+   */
+  async _spendWillpowerPoint(purpose) {
+    const current = Number(this.system?.willpower?.value ?? 0);
+    if (current < 1) {
+      ui.notifications.warn(`${this.name} has no Willpower left to ${purpose}.`);
+      return false;
+    }
+    await this.update({ "system.willpower.value": current - 1 });
+    return true;
+  }
+
+  /**
+   * Dialog rows for the Predatory Aura choices that either side of a clash may
+   * claim (VtR 2E p. 92): the aspect of the Beast and, for Kindred, Feeding
+   * Grounds dots on home territory and hunger. Hunger is preselected from
+   * current Vitae using the frenzy table's thresholds (p. 104).
+   * @returns {string} HTML <dt>/<dd> pairs.
+   */
+  _auraDialogRows() {
+    const isKindred = this.system?.characterVariant === "vampire";
+    const aspectRow = `
+        <dt>Aspect of the Beast:</dt>
+        <dd><select name="aspect">${Object.entries(BEAST_ASPECTS).map(([key, a]) =>
+          `<option value="${key}">${a.label} &mdash; ${a.attr}${isKindred ? ` (inflicts ${a.condition})` : ""}</option>`
+        ).join("")}</select></dd>`;
+    if (!isKindred) return aspectRow;
+
+    const vitae = Number(this.system?.vitae?.value ?? 0);
+    const hunger = vitae <= 2 ? 2 : vitae <= 4 ? 1 : 0;
+    const grounds = Number(this.items.find(i => i.type === "merit"
+      && /feeding grounds?/i.test(i.name ?? ""))?.system?.rating ?? 0) || 0;
+    const picked = (n) => (hunger === n ? " selected" : "");
+    return `${aspectRow}
+        <dt>On your own territory &mdash; Feeding Grounds dots${grounds ? ` (you have ${grounds})` : ""}:</dt>
+        <dd><input type="number" name="territory" value="0" min="0" max="5"></dd>
+        <dt>Hunger:</dt>
+        <dd><select name="hunger">
+          <option value="0"${picked(0)}>Fed</option>
+          <option value="1"${picked(1)}>Hungry &mdash; 4 or fewer Vitae (+1)</option>
+          <option value="2"${picked(2)}>Starving &mdash; 2 or fewer Vitae (+2)</option>
+        </select></dd>`;
+  }
+
+  /**
+   * Read the fields rendered by _auraDialogRows(), plus the optional "earlier"
+   * and "modifier" inputs, back out of a Predatory Aura dialog.
+   * @returns {{aspectKey:string, aspect:object, bonus:number}} `bonus` is the
+   *   net dice modifier from territory, hunger, earlier uses and the free field.
+   */
+  _readAuraDialog(html) {
+    const num = (name) => Math.round(Number(html.find(`[name="${name}"]`).val()) || 0);
+    const chosen = html.find('[name="aspect"]').val();
+    const aspectKey = BEAST_ASPECTS[chosen] ? chosen : "monstrous";
+    return {
+      aspectKey,
+      aspect: BEAST_ASPECTS[aspectKey],
+      bonus: Math.max(0, num("territory")) + Math.clamp(num("hunger"), 0, 2)
+        - Math.max(0, num("earlier")) + num("modifier")
+    };
+  }
+
+  /**
+   * Lashing Out with the Predatory Aura (VtR 2E p. 91-92). Opens a dialog for
+   * the aspect of the Beast and the aura modifiers, spends the Willpower point
+   * it costs against Kindred, rolls Blood Potency + the matching Power
+   * Attribute, and posts a card with Fight and Flight buttons.
+   *
+   * The victim is the token the user has targeted when the ability is used,
+   * the same convention weapon rolls follow (see ItemMtA#roll). The card is
+   * addressed to that character, so whoever controls them only has to click
+   * Fight or Flight; that side is respondToLashingOut(). With nothing
+   * targeted the lash-out still works, for play without tokens, but the card
+   * then has to ask which token answers.
    */
   async rollLashingOut() {
-    const sys = this.system;
-    const bp = sys.vampire_traits?.bloodPotency?.final ?? 0;
-    const ASPECTS = {
-      monstrous:   { label: "Monstrous",   attr: "Strength",     path: ["attributes_physical", "strength"],     condition: "Bestial" },
-      seductive:   { label: "Seductive",   attr: "Presence",     path: ["attributes_social", "presence"],       condition: "Wanton" },
-      competitive: { label: "Competitive", attr: "Intelligence", path: ["attributes_mental", "intelligence"],   condition: "Competitive" }
-    };
+    const bp = Number(this.system?.vampire_traits?.bloodPotency?.final ?? 0);
+
+    const targeted = [...(game.user?.targets ?? [])];
+    if (targeted.length > 1) {
+      ui.notifications.warn("A predatory aura is aimed at one victim. Target a single token first.");
+      return;
+    }
+    const victimToken = targeted[0] ?? null;
+    const victim = victimToken?.actor ?? null;
+    if (victim && victim.uuid === this.uuid) {
+      ui.notifications.warn(`${this.name} cannot lash out at themself. Target the victim's token first.`);
+      return;
+    }
+    // A token's own UUID resolves to the right actor for linked and unlinked
+    // tokens alike, so prefer it over the actor's.
+    const defenderUuid = victim ? (victimToken.document?.uuid ?? victim.uuid) : null;
+    const defenderName = victim?.name ?? null;
+    const victimIsMortal = !!victim && victim.system?.characterVariant !== "vampire";
 
     const body = `
-      <p class="vtr-rite-summary">Blood Potency = <strong>${bp}</strong></p>
+      <p class="vtr-rite-summary">Blood Potency = <strong>${bp}</strong><br>
+        ${victim ? `Target: <strong>${defenderName}</strong>`
+          : "<em>No token targeted &mdash; the card will ask which token answers</em>"}</p>
       <dl>
-        <dt>Aspect of the Beast:</dt>
-        <dd><select name="aspect">
-          <option value="monstrous">Monstrous &mdash; Strength (inflicts Bestial)</option>
-          <option value="seductive">Seductive &mdash; Presence (inflicts Wanton)</option>
-          <option value="competitive">Competitive &mdash; Intelligence (inflicts Competitive)</option>
-        </select></dd>
-        <dt>Situational modifier (territory, hunger, &hellip;):</dt>
+        <dt>Target is:</dt>
+        <dd><select name="targetKind">
+          <option value="kindred">Kindred &mdash; costs 1 Willpower</option>
+          <option value="mortal"${victimIsMortal ? " selected" : ""}>Mortal &mdash; free</option>
+        </select></dd>${this._auraDialogRows()}
+        <dt>Earlier aura uses on this victim this scene (&minus;1 each):</dt>
+        <dd><input type="number" name="earlier" value="0" min="0"></dd>
+        <dt>Other modifier:</dt>
         <dd><input type="number" name="modifier" value="0"></dd>
       </dl>`;
 
@@ -1791,36 +1936,57 @@ export class ActorMtA extends Actor {
       variant: "lashing_out",
       body,
       onRoll: async (html) => {
-        const aspect = ASPECTS[html.find('[name="aspect"]').val()] ?? ASPECTS.monstrous;
-        const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
+        const { aspectKey, aspect, bonus } = this._readAuraDialog(html);
+        const againstKindred = html.find('[name="targetKind"]').val() !== "mortal";
+        if (againstKindred && !(await this._spendWillpowerPoint("lash out at another vampire"))) return;
+
         const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
-        const pool = Math.max(0, bp + attrVal + modifier);
+        const pool = Math.max(0, bp + attrVal + bonus);
 
         const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
           dicePool: pool,
-          flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`,
+          flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`
+            + (againstKindred ? ", 1 Willpower spent" : ""),
           title: "Lashing Out",
           actorOverride: this,
           hungerDice: 0,
           rollReturn
         });
-        // Only show the contested-response / Condition card when the lash-out
-        // actually landed. A failed roll never reaches the opposed step.
-        const hits = Math.max(0, rollReturn.roll?.total ?? 0);
-        if (hits < 1) return;
+
+        // The clash is contested, so the answer card is posted whatever the
+        // roll came to: a defender who fights only needs to beat this total,
+        // and one who flees concedes the Condition regardless. The details
+        // the answering side needs, including who that is, travel in the
+        // message flags.
+        const successes = Math.max(0, rollReturn.roll?.total ?? 0);
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: this }),
+          flags: {
+            [SYSTEM_ID]: {
+              lashOut: {
+                aggressorUuid: this.uuid,
+                aggressorName: this.name,
+                defenderUuid,
+                defenderName,
+                aspect: aspectKey,
+                successes,
+                bloodPotency: bp
+              }
+            }
+          },
           content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
             + `<span class="hunger-messy-title">Predatory Aura &mdash; ${aspect.label} Beast</span>`
-            + `<span class="hunger-messy-text">Your target responds with <em>fight</em> `
-            + `(a Power Attribute + Blood Potency &mdash; it costs them 1 Willpower if their Blood `
-            + `Potency is lower than yours) or <em>flight</em>. If you score more successes, they gain `
-            + `the <strong>${aspect.condition}</strong> Condition and you take +2 to pursue your `
-            + `aspect for the scene.</span>`
-            + `<button type="button" class="vtr-frenzy-button" data-vtr-apply-condition="${aspect.condition}" `
-            + `data-vtr-apply-to="selected" data-actor-id="${this.id}">`
-            + `Apply ${aspect.condition} to selected token</button>`
+            + `<span class="hunger-messy-text"><strong>${this.name}</strong> lashes out`
+            + `${victim ? ` at <strong>${defenderName}</strong>` : ""}: `
+            + `<strong>${successes}</strong> success${successes === 1 ? "" : "es"} to beat. `
+            + `${victim ? defenderName : "The target"} answers with <em>fight</em> (a Power Attribute + `
+            + `Blood Potency; 1 Willpower if their Blood Potency is the lower) or <em>flight</em> `
+            + `(free, but they take the <strong>${aspect.condition}</strong> Condition).</span>`
+            + (victim ? "" : `<span class="hunger-messy-text"><em>No token was targeted. `
+              + `Select the answering token, then choose.</em></span>`)
+            + `<button type="button" class="vtr-frenzy-button" data-vtr-aura-response="fight">Fight</button>`
+            + `<button type="button" class="vtr-frenzy-button" data-vtr-aura-response="flight">Flight</button>`
             + `</div></div>`
         });
       }
@@ -1828,56 +1994,231 @@ export class ActorMtA extends Actor {
   }
 
   /**
-   * Detachment roll for Vampires (VtR 2E p. 107-108). The dice pool is the
-   * breaking point's severity plus a Touchstone modifier (−2 none / +2 one /
-   * +3 multiple). Failure (or dramatic failure) costs a Humanity dot. Facing
-   * any breaking point grants a Beat. Conditions are offered as card buttons.
+   * Work out who answers a Lashing Out card. A card addressed to a target
+   * (the aggressor had a token targeted) resolves that character, whatever
+   * the clicking user has selected. An unaddressed card falls back to the
+   * user's single controlled token, or failing that their assigned character.
+   * Only someone who owns the answering character may answer for them: their
+   * player, or the Storyteller for an NPC.
+   * @param {object} clash  The `lashOut` flag stored on the aggressor's card.
+   * @returns {Promise<{defender?: ActorMtA, problem?: string}>}
+   */
+  static async resolveAuraDefender(clash) {
+    let defender;
+    if (clash?.defenderUuid) {
+      const doc = await fromUuid(clash.defenderUuid);
+      defender = doc?.documentName === "Actor" ? doc : (doc?.actor ?? null);
+      if (!defender) return { problem: `${clash.defenderName ?? "The target"} is no longer in the scene.` };
+    } else {
+      const tokens = canvas.tokens?.controlled ?? [];
+      defender = tokens.length === 1 ? tokens[0].actor
+        : tokens.length === 0 ? game.user?.character : null;
+      if (!defender) return { problem: "This card names no target. Select the one token that answers the predatory aura." };
+      if (defender.uuid === clash?.aggressorUuid) {
+        return { problem: `${defender.name} lashed out. Select the token that answers instead.` };
+      }
+    }
+    if (!defender.isOwner) {
+      return { problem: `Only ${defender.name}'s player or the Storyteller can answer for them.` };
+    }
+    // Fighting rolls a Power Attribute, which only these two actor types have.
+    if (!["character", "simple_antagonist"].includes(defender.type)) {
+      return { problem: `${defender.name} has no Power Attributes to answer a predatory aura with.` };
+    }
+    return { defender };
+  }
+
+  /**
+   * Answer another vampire's Predatory Aura (VtR 2E p. 92). Called on the
+   * answering actor by the Fight / Flight buttons of a Lashing Out card.
+   *
+   * Flight costs nothing and concedes the aggressor's Condition. Fight is a
+   * counter-roll of Blood Potency + a Power Attribute (any aspect, not
+   * necessarily the aggressor's) and costs 1 Willpower when this character's
+   * Blood Potency is the lower of the two. More successes wins: the winner
+   * imposes their own aspect's Condition and takes +2 dice for the scene. A
+   * tie imposes both Conditions and gives no bonus. Mortals may fight, with no
+   * Blood Potency, but never impose a Condition.
+   * @param {object} clash  The `lashOut` flag stored on the aggressor's card.
+   * @param {"fight"|"flight"} response
+   */
+  async respondToLashingOut(clash, response) {
+    const theirs = BEAST_ASPECTS[clash?.aspect] ?? BEAST_ASPECTS.monstrous;
+    const aggressorName = clash?.aggressorName ?? "The aggressor";
+    const theirHits = Number(clash?.successes ?? 0) || 0;
+    const isKindred = this.system?.characterVariant === "vampire";
+
+    const applyBtn = (condition, uuid, who) => `<button type="button" class="vtr-frenzy-button" `
+      + `data-vtr-apply-condition="${condition}" data-actor-uuid="${uuid}">Apply ${condition} to ${who}</button>`;
+    const postCard = (cls, title, text, buttons = "") => ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      content: `<div class="vtr-roll"><div class="hunger-messy ${cls}">`
+        + `<span class="hunger-messy-title">${title}</span>`
+        + `<span class="hunger-messy-text">${text}</span>`
+        + buttons
+        + `</div></div>`
+    });
+    const takeTheirs = applyBtn(theirs.condition, this.uuid, this.name);
+
+    if (response === "flight") {
+      await postCard("messy-failure", "Predatory Aura &mdash; Flight",
+        `<strong>${this.name}</strong> backs down from ${aggressorName}'s ${theirs.label} Beast. `
+        + `Withdrawing costs nothing, but ${this.name} gains the <strong>${theirs.condition}</strong> `
+        + `Condition, and ${aggressorName} may pursue.`,
+        takeTheirs);
+      return;
+    }
+
+    const bp = isKindred ? Number(this.system?.vampire_traits?.bloodPotency?.final ?? 0) : 0;
+    const costsWillpower = bp < (Number(clash?.bloodPotency ?? 0) || 0);
+
+    const body = `
+      <p class="vtr-rite-summary">Answering ${aggressorName}'s ${theirs.label} Beast
+        (${theirHits} success${theirHits === 1 ? "" : "es"})<br>
+        Blood Potency = <strong>${bp}</strong>${costsWillpower
+          ? " &middot; <em>costs 1 Willpower (lower Blood Potency)</em>" : ""}</p>
+      <dl>${this._auraDialogRows()}
+        <dt>Other modifier:</dt>
+        <dd><input type="number" name="modifier" value="0"></dd>
+      </dl>`;
+
+    this._renderRiteDialog({
+      title: "Fight the Predatory Aura",
+      variant: "lashing_out",
+      body,
+      onRoll: async (html) => {
+        const { aspect: mine, bonus } = this._readAuraDialog(html);
+        if (costsWillpower && !(await this._spendWillpowerPoint("fight the predatory aura"))) return;
+
+        const attrVal = this.system?.[mine.path[0]]?.[mine.path[1]]?.final ?? 0;
+        const pool = Math.max(0, bp + attrVal + bonus);
+
+        const rollReturn = {};
+        await DiceRollerDialogue.rollToChat({
+          dicePool: pool,
+          flavor: `Predatory Aura &mdash; Fight: ${mine.label} (${isKindred ? "Blood Potency + " : ""}${mine.attr})`
+            + (costsWillpower ? ", 1 Willpower spent" : ""),
+          title: "Fighting the Predatory Aura",
+          actorOverride: this,
+          hungerDice: 0,
+          rollReturn
+        });
+
+        const myHits = Math.max(0, rollReturn.roll?.total ?? 0);
+        const score = `${aggressorName} ${theirHits} &ndash; ${myHits} ${this.name}.`;
+        const takeMine = applyBtn(mine.condition, clash.aggressorUuid, aggressorName);
+
+        if (theirHits > myHits) {
+          await postCard("messy-failure", "Predatory Aura &mdash; the aggressor prevails",
+            `${score} <strong>${this.name}</strong> gains the <strong>${theirs.condition}</strong> Condition. `
+            + `${aggressorName} takes +2 dice on rolls that pursue the ${theirs.label} Beast's aims `
+            + `for the rest of the scene.`,
+            takeTheirs);
+        } else if (myHits > theirHits && isKindred) {
+          await postCard("messy-success", "Predatory Aura &mdash; turned back",
+            `${score} <strong>${this.name}</strong> turns the confrontation around: ${aggressorName} `
+            + `gains the <strong>${mine.condition}</strong> Condition, and ${this.name} takes +2 dice `
+            + `on rolls that pursue the ${mine.label} Beast's aims for the rest of the scene.`,
+            takeMine);
+        } else if (myHits > theirHits) {
+          await postCard("messy-success", "Predatory Aura &mdash; resisted",
+            `${score} <strong>${this.name}</strong> stands firm. A mortal cannot impose a Condition, `
+            + `but takes +2 dice to attack, flee or otherwise neutralise the threat for the rest of the scene.`);
+        } else if (isKindred) {
+          await postCard("messy-failure", "Predatory Aura &mdash; tie",
+            `${score} Both Beasts land: ${this.name} gains <strong>${theirs.condition}</strong> and `
+            + `${aggressorName} gains <strong>${mine.condition}</strong>. Neither side takes the +2 dice.`,
+            takeTheirs + takeMine);
+        } else {
+          await postCard("messy-failure", "Predatory Aura &mdash; tie",
+            `${score} <strong>${this.name}</strong> gains the <strong>${theirs.condition}</strong> Condition; `
+            + `a mortal imposes none in return. Neither side takes the +2 dice.`,
+            takeTheirs);
+        }
+      }
+    });
+  }
+
+  /**
+   * Detachment roll for Vampires (VtR 2E p. 107-108). The dice pool comes from
+   * the level of the breaking point (only levels at or below current Humanity
+   * can be breaking points), plus the Touchstone modifier, minus 1 per bane,
+   * with the Masquerade (-1) and Requiem (+1) modifiers. Willpower cannot be
+   * spent on it. Failure costs a Humanity dot; facing any breaking point
+   * grants a Beat. Conditions are offered as card buttons.
    */
   async rollDetachment() {
-    const sys = this.system;
-    const humanity = Number(sys.integrity ?? 7);
+    const humanity = this.getHumanity();
+    if (humanity < 1) {
+      ui.notifications.warn(`${this.name} has no Humanity left to risk.`);
+      return;
+    }
 
-    // Touchstone modifier: count filled touchstones_vampire slots. The label
-    // names the Touchstones so the dialog shows who they are.
-    const tsNames = Object.values(sys.touchstones_vampire ?? {})
-      .map(t => String(t ?? "").trim())
-      .filter(t => t.length > 0);
-    const filled = tsNames.length;
-    const tsMod = filled === 0 ? -2 : filled === 1 ? 2 : 3;
-    const tsLabel = filled === 0
-      ? "no Touchstones (&minus;2)"
-      : `${tsNames.join(", ")} (${tsMod >= 0 ? "+" : ""}${tsMod})`;
+    // Touchstone modifier (p. 87, p. 108): +2 for one attached Touchstone, +3
+    // for several, -2 for a character with no Touchstones at all. Touchstones
+    // that have all come detached give neither the bonus nor the penalty.
+    const touchstones = this.getVampireTouchstones();
+    const attached = touchstones.filter(t => t.attached);
+    const tsMod = attached.length > 1 ? 3
+      : attached.length === 1 ? 2
+      : touchstones.length === 0 ? -2 : 0;
+    const signed = (n) => `${n >= 0 ? "+" : ""}${n}`;
+    const tsLabel = attached.length > 0
+      ? `${attached.map(t => t.name).join(", ")} (${signed(tsMod)})`
+      : touchstones.length === 0 ? `none (${signed(tsMod)})` : "none attached (+0)";
+
+    const dice = CONFIG.MTA.breakingPointDice;
+    const top = Math.min(10, humanity);
+    let levelOptions = "";
+    for (let level = top; level >= 1; level--) {
+      const n = dice[level];
+      levelOptions += `<option value="${level}">Humanity ${level} breaking point &mdash; `
+        + `${n} ${n === 1 ? "die" : "dice"}</option>`;
+    }
 
     const body = `
       <p class="vtr-rite-summary">Humanity <strong>${humanity}</strong> &middot; Touchstones: ${tsLabel}</p>
       <dl>
-        <dt>Breaking point severity:</dt>
-        <dd><select name="severity">
-          <option value="5">5 dice &mdash; Humanity 10-9 acts</option>
-          <option value="4">4 dice &mdash; Humanity 8-7 acts</option>
-          <option value="3" selected>3 dice &mdash; Humanity 6-5 acts</option>
-          <option value="2">2 dice &mdash; Humanity 4-3 acts</option>
-          <option value="1">1 die &mdash; Humanity 2 acts</option>
-          <option value="0">0 dice (chance die) &mdash; Humanity 1 acts</option>
-        </select></dd>
-        <dt>Extra modifier (Masquerade, Requiem, &hellip;):</dt>
+        <dt>Breaking point level (at or below current Humanity):</dt>
+        <dd><select name="level">${levelOptions}</select></dd>
+        <dt>Banes already taken (&minus;1 each):</dt>
+        <dd><input type="number" name="banes" value="0" min="0" max="3"></dd>
+        <dt>Other modifier:</dt>
         <dd><input type="number" name="modifier" value="0"></dd>
-      </dl>`;
+      </dl>
+      <div class="vtr-rite-checks">
+        <label><input type="checkbox" name="masquerade"> Protecting your Masquerade (&minus;1)</label>
+        <label><input type="checkbox" name="requiem"> Protecting your Requiem (+1)</label>
+      </div>`;
 
     this._renderRiteDialog({
       title: "Detachment Roll",
       variant: "detachment",
       body,
       onRoll: async (html) => {
-        const severity = Math.round(Number(html.find('[name="severity"]').val()) || 0);
-        const modifier = Math.round(Number(html.find('[name="modifier"]').val()) || 0);
-        const pool = severity + tsMod + modifier; // may be <= 0 -> chance die
+        const num = (name) => Math.round(Number(html.find(`[name="${name}"]`).val()) || 0);
+        const level = Math.clamp(num("level") || top, 1, top);
+        const baseDice = dice[level];
+        const banes = Math.max(0, num("banes"));
+        const masquerade = html.find('[name="masquerade"]').is(":checked");
+        const requiem = html.find('[name="requiem"]').is(":checked");
+        const modifier = num("modifier");
+        // May be <= 0, which rolls a chance die.
+        const pool = baseDice + tsMod - banes - (masquerade ? 1 : 0) + (requiem ? 1 : 0) + modifier;
+
+        const parts = [
+          `Humanity ${level} breaking point: ${baseDice} ${baseDice === 1 ? "die" : "dice"}`,
+          `Touchstones ${signed(tsMod)}`
+        ];
+        if (banes) parts.push(`banes -${banes}`);
+        if (masquerade) parts.push("Masquerade -1");
+        if (requiem) parts.push("Requiem +1");
+        if (modifier) parts.push(`modifier ${signed(modifier)}`);
 
         const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
           dicePool: pool,
-          flavor: `Detachment (severity ${severity}, Touchstones ${tsMod >= 0 ? "+" : ""}${tsMod}`
-            + `${modifier ? `, modifier ${modifier >= 0 ? "+" : ""}${modifier}` : ""})`,
+          flavor: `Detachment (${parts.join(", ")})`,
           title: "Detachment",
           actorOverride: this,
           hungerDice: 0,
@@ -1912,7 +2253,8 @@ export class ActorMtA extends Actor {
       cls = "messy-failure";
       title = "Detachment &mdash; Failure";
       body = "You move toward monstrosity, losing a dot of Humanity. Gain Bestial, Competitive, or Wanton. "
-        + "(Optional: take a Bane and a Beat instead of losing Humanity.)";
+        + "(Optional: also take a bane and a Beat. That breaking point can then never cost you Humanity "
+        + "again, but every bane is &minus;1 on later detachment rolls.)";
       buttons = sinButtons;
       loseHumanity = true;
     } else if (roll?.exceptionalSuccess || hits >= 5) {
@@ -1929,10 +2271,19 @@ export class ActorMtA extends Actor {
 
     let humanityNote = "";
     if (loseHumanity) {
-      const cur = Number(this.system?.integrity ?? 7);
+      // A Vampire's Humanity lives under vampire_traits; everyone else has
+      // Integrity. The stored dot is `.value` (`.final` adds item effects).
+      const isVampire = this.system?.characterVariant === "vampire";
+      const path = isVampire ? "system.vampire_traits.humanity.value" : "system.integrity";
+      const cur = Number(foundry.utils.getProperty(this, path) ?? 0) || 0;
       const next = Math.max(0, cur - 1);
-      await this.update({ "system.integrity": next });
-      humanityNote = ` <strong>Humanity ${cur} &rarr; ${next}.</strong>`;
+      const update = { [path]: next };
+      // Reaching Humanity 6 wakes the clan bane for good (p. 103).
+      const wakesBane = isVampire && next <= 6 && !this.isClanBaneAwake();
+      if (isVampire && next <= 6) update[`flags.${SYSTEM_ID}.clanBaneAwake`] = true;
+      await this.update(update);
+      humanityNote = ` <strong>Humanity ${cur} &rarr; ${next}.</strong>`
+        + (wakesBane ? " The clan bane wakes, and will not leave even if the dot is regained." : "");
     }
 
     await ChatMessage.create({

@@ -989,7 +989,8 @@
         "penetration": 0,
         "noSuccessesToDamage": false,
         "applyDefense": false,
-        "damageType": "lethal"
+        "damageType": "lethal",
+        "fullDamageToKindred": false
       },
       "basicSpell": {
         "arcanum": "death",

@@ -193,9 +193,12 @@ export class ItemMtA extends Item {
             label: "Spend",
             callback: async (html) => {
               const n = Math.max(0, Math.round(Number(html.find('[name="vitae"]').val()) || 0));
-              if (n > 0) {
-                if (n > current) ui.notifications.warn(`${actor.name}: not enough Vitae — pool emptied.`);
-                await actor.update({ "system.vitae.value": Math.max(0, current - n) });
+              if (n > current) {
+                ui.notifications.warn(`${actor.name}: not enough Vitae — pool emptied.`);
+                await actor.update({ "system.vitae.value": 0 });
+              } else if (n > 0) {
+                // Counts towards the Vitae-per-turn limit while in combat.
+                await actor.spendVitae(n, { reason: `use ${this.name}` });
               }
               resolve();
             }
@@ -387,6 +390,15 @@ export class ItemMtA extends Item {
     const ballistic = target ? target.actor?.system.derivedTraits.ballistic.final : 0;
     const armor = target ? target.actor?.system.derivedTraits.armor.final : 0;
     let applyDefense = this.type === "melee" || this.type === "explosive" || (this.type === "firearm" && target?.actor?.type === "ephemeral") || this.system.applyDefense;
+
+    // A shot that ignores Defense is still hindered by the target's Celerity
+    // dots (VtR 2E p. 130), so only that part of their Defense is applied.
+    const targetCelerity = target?.actor?.system?.physicalDisciplines?.celerity ?? 0;
+    if (damageRoll && !applyDefense && this.type === "firearm" && targetCelerity > 0) {
+      defense = targetCelerity;
+      applyDefense = true;
+      flavor += ` (Celerity ${targetCelerity})`;
+    }
 
     flavor += " " + additionalFlavor;
 
@@ -685,14 +697,14 @@ export class ItemMtA extends Item {
         ui.notifications.warn("Can currently only be executed by the GM or the actor owner!");
         return;
       }
-      console.log(actor.system, button.dataset)
-
-
-      if (damageBashing) await actor.damage(damageBashing, "bashing");
-      if (damage) actor.damage(damage, damageisaggravated ? "aggravated" : "lethal");
-
-
-      console.log("target", actor, tokenId, actorId)
+      // The card carries the damage as the weapon deals it to a mortal. The
+      // one being hit turns that into what they actually suffer: a Kindred
+      // body takes bashing from a mundane weapon, and Resilience may apply.
+      await actor.receiveAttack({
+        bashing: damageBashing,
+        lethal: damageisaggravated ? 0 : damage,
+        aggravated: damageisaggravated ? damage : 0
+      }, { fullToKindred: button.dataset.fulltokindred === "true" });
     }
     // Re-enable the button
     button.disabled = false;

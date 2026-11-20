@@ -43,14 +43,11 @@ export const registerHandlebarsHelpers = function () {
     return MTA.scelestiRanks.indexOf(value) >= MTA.scelestiRanks.indexOf(rank);
   });
   Handlebars.registerHelper('convertVampTouchstone', function (value) {
-    let newValues = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-    return newValues[value - 1];
+    return MTA.touchstoneSlotToDot(value);
   });
 
   Handlebars.registerHelper('isActiveVampTouchstone', function (value, integrity) {
-    let newValues = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-    let newValue = newValues[value - 1];
-    return newValue <= integrity;
+    return MTA.touchstoneSlotToDot(value) <= integrity;
   });
 
   Handlebars.registerHelper('isActiveTouchstoneChangeling', function (value, composure) {
@@ -205,8 +202,13 @@ export const registerHandlebarsHelpers = function () {
         <input data-dtype="Boolean" name="system.noSuccessesToDamage" type="checkbox" ${sheet.system.noSuccessesToDamage ? 'checked' : ''}>
         <span></span>
       </label>
-      <label>${game.i18n.localize("MTA.DamageType")}</label> 
+      <label>${game.i18n.localize("MTA.DamageType")}</label>
         ${selectHelper(CONFIG.MTA.damageTypes, sheet.system.damageType, "system.damageType")}
+      <label title="Kindred take only bashing damage from mundane weapons. Tick this for fangs, claws and other sources whose damage a vampire suffers in full.">Harms Kindred fully</label>
+      <label class="checkBox">
+        <input data-dtype="Boolean" name="system.fullDamageToKindred" type="checkbox" ${sheet.system.fullDamageToKindred ? 'checked' : ''}>
+        <span></span>
+      </label>
     </div>`
   });
 
@@ -361,22 +363,23 @@ export const registerHandlebarsHelpers = function () {
     // Touchstone corner icons — Vampire Humanity box only. Renders up to four
     // macro-touchstone.svg markers (one per corner) for the actor's four
     // highest-Humanity Touchstones. Purely informational; a click handler in
-    // actor-sheet.js shows each Touchstone's details.
+    // actor-sheet.js shows each Touchstone's details. A Touchstone whose dot
+    // the character has lost is drawn dimmed (no longer attached).
     let touchstoneCorners = "";
     let extraClass = "";
     if (traitName === "vampire_traits.humanity") {
       extraClass = " touchstone-host";
       const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;")
         .replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const corners = Object.entries(actor.system?.touchstones_vampire ?? {})
-        .map(([lvl, name]) => ({ humanity: Number(lvl), name: String(name ?? "").trim() }))
-        .filter(t => t.name.length > 0)
-        .sort((a, b) => b.humanity - a.humanity)
+      const humanityNow = Number(isInteger ? trait : (trait.final ?? trait.value)) || 0;
+      const corners = MTA.vampireTouchstones(actor.system?.touchstones_vampire, humanityNow)
         .slice(0, 4);
       const positions = ["tl", "tr", "bl", "br"];
       touchstoneCorners = corners.map((t, i) => {
-        const tip = esc(`Touchstone - Humanity ${t.humanity} - ${t.name}`);
-        return `<span class="touchstone-corner touchstone-${positions[i]}" title="${tip}" data-touchstone-tip="${tip}">`
+        const tip = esc(`Touchstone - Humanity ${t.dot} - ${t.name}`
+          + (t.attached ? "" : " (no longer attached)"));
+        return `<span class="touchstone-corner touchstone-${positions[i]}${t.attached ? "" : " touchstone-detached"}" `
+          + `title="${tip}" data-touchstone-tip="${tip}">`
           + `<img src="systems/vampire-the-requiem-2e/icons/gui/macro-touchstone.svg" alt="Touchstone"></span>`;
       }).join("");
     }

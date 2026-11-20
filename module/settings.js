@@ -114,7 +114,7 @@ export const registerSystemSettings = function () {
 
   game.settings.register("vampire-the-requiem-2e", "homebrewBlushOfLife", {
     name: "Homebrew rule: Blush of Life portrait swap",
-    hint: "Adds a small icon to the Vampire portrait. Left-click spends 1 Vitae and swaps the sheet portrait to a player-supplied 'alive-looking' variant (token and canonical portrait are not touched); right-click picks the alternate image. The portrait reverts when the Phase of Night changes or the character takes a daysleep. Requires the Phases of Night setting to be enabled.",
+    hint: "Blush of Life itself is always available: the icon on a Vampire's portrait spends 1 Vitae and lasts until it is clicked again, the character takes a daysleep, or the Phase of Night changes. With this setting on, an active Blush also swaps the sheet portrait to a player-supplied 'alive-looking' variant (token and canonical portrait are not touched); right-click the icon to pick that image.",
     scope: "world",
     config: true,
     default: false,

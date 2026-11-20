@@ -411,7 +411,7 @@ export const CODEX_ENTRIES = {
       <p>Danger, hunger, fury, or fear can goad the Beast into demanding an immediate, violent answer. Holding it back is a reflexive roll &mdash; it costs no action.</p>
       <p>The Storyteller assigns a modifier for the provocation: a slain friend or lover, an open flame, deep hunger, or a public humiliation can all swing the pool up or down. Enter that total in the dialog's modifier field.</p>
       <p>Willpower behaves differently here. It does <em>not</em> grant the usual three dice. Instead, each point spent buys one turn of visibly wrestling the Beast down &mdash; snarling, smashing, fleeing &mdash; and when the character finally stops, every point spent that way is added to the roll as a bonus die.</p>
-      <p>Gangrel suffer their clan curse: their resistance pool can never exceed their Humanity dots.</p>
+      <p>Gangrel suffer their clan curse: once it has taken hold, their resistance pool can never exceed their Humanity dots. Like every clan bane it lies dormant until Humanity first falls to 6, and then stays for good. The dialog ticks the cap for you when it applies.</p>
       <p><strong>Outcomes.</strong> Dramatic failure &mdash; frenzy that cannot end until a breaking point is reached. Failure &mdash; frenzy; the Beast decides what it wants. Success &mdash; the Beast is held back, but the character is left Tempted. Exceptional success &mdash; control held, and spent Willpower returns. Entering frenzy is worth a Beat.</p>
       <p class="codex-rolls"><strong>Roll:</strong> Resolve + Composure + provocation modifier + Willpower spent (reflexive).</p>`
   },
@@ -419,11 +419,54 @@ export const CODEX_ENTRIES = {
     title: "Detachment",
     body: `
       <p>When a character commits an act that strains her conscience &mdash; a breaking point &mdash; she risks detaching from her remaining Humanity. Facing a breaking point at all is worth a Beat.</p>
-      <p>The dice pool reflects how severe the act is, measured against her current Humanity: comparatively minor transgressions are rolled with more dice, genuinely monstrous ones with very few or none. Choose the severity in the dialog.</p>
-      <p>Touchstones anchor her to the living world. One attached Touchstone adds +2 dice; several attached add +3; having none imposes a &minus;2 penalty. Willpower cannot be spent to help this roll.</p>
+      <p>Every breaking point sits at a Humanity level, and only those at or below her current Humanity can trouble her &mdash; she is already numb to anything listed higher. The level sets the dice: comparatively minor transgressions are rolled with more dice, genuinely monstrous ones with very few or none. Choose the level in the dialog.</p>
+      <p>Touchstones anchor her to the living world. One attached Touchstone adds +2 dice; several attached add +3; having no Touchstones at all imposes a &minus;2 penalty. A Touchstone is attached only while she still has the Humanity dot it is written beside. Acting to protect her Masquerade costs a die, acting to protect her Requiem adds one, and each bane she carries costs a die. Willpower cannot be spent to help this roll.</p>
       <p><strong>Outcomes.</strong> Dramatic failure &mdash; lose a dot of Humanity and gain the Jaded Condition. Failure &mdash; lose a dot of Humanity and gain Bestial, Competitive, or Wanton. Success &mdash; Humanity holds, but she still withdraws into one of those same Conditions. Exceptional success &mdash; Humanity holds and she gains the Inspired Condition.</p>
-      <p>As an alternative to losing the dot, the character may instead take a Bane &mdash; a personal supernatural flaw &mdash; along with a Beat. Each Bane taken this way makes every future detachment roll a little harder.</p>
-      <p class="codex-rolls"><strong>Roll:</strong> breaking-point severity dice + Touchstone modifier (no Willpower).</p>`
+      <p>When she loses the dot, the character may also take a Bane &mdash; a personal supernatural flaw &mdash; along with a Beat. That same breaking point can then never cost her Humanity again, but each Bane taken this way makes every future detachment roll a little harder.</p>
+      <p class="codex-rolls"><strong>Roll:</strong> breaking-point level dice + Touchstone modifier &minus; Banes (no Willpower).</p>`
+  },
+  "rite.daysleep": {
+    title: "Daysleep",
+    body: `
+      <p>When the sun rises the blood drags a vampire down into sleep. While she sleeps her body closes every wound it can pay for: one Vitae mends two bashing or one lethal, and an aggravated wound takes five Vitae and the whole day.</p>
+      <p>The healing is not a choice, and it can spend her dry. To keep a wound through the day &mdash; a scar, or simply Vitae she cannot spare &mdash; she spends a point of Willpower for each wound kept.</p>
+      <p>Rising the next night costs one Vitae. A vampire with none left to rise with does not wake: she drifts into torpor.</p>
+      <p><strong>Staying awake.</strong> She can fight the sleep with Stamina + Resolve. Success keeps her alert but Lethargic; an exceptional success spares her that.</p>
+      <p><strong>Woken by danger.</strong> Fire, sunlight or a threat to her resting place calls for a Humanity roll. Success gives her as many turns awake as she has Humanity dots.</p>
+      <p>Haven dots add to both of those rolls when she sleeps in her haven.</p>
+      <p class="codex-rolls"><strong>Rolls:</strong> Stamina + Resolve + Haven to stay awake; Humanity + Haven when disturbed.</p>`
+  },
+  "rite.mending": {
+    title: "Mending",
+    body: `
+      <p>Vitae forces a dead body back to the shape it had at the Embrace. Spending it is reflexive, and limited each turn by Blood Potency.</p>
+      <p>One Vitae closes two points of bashing damage or one of lethal, at once. An aggravated wound is another matter: it takes five Vitae and a full day's sleep, so Vitae can only be set aside towards it here. The next daysleep closes one aggravated wound for every five set aside.</p>
+      <p>A vampire whose last Health box holds lethal damage falls into torpor at the end of her turn unless she mends some of it first.</p>`
+  },
+  "rite.physicalDisciplines": {
+    title: "Celerity, Resilience and Vigor",
+    body: `
+      <p>The physical Disciplines each do two things. Their dots are always at work: Celerity adds to Defense, Vigor to Strength, Resilience to Stamina, and Resilience also turns one point of aggravated damage per dot into lethal (never against sunlight). The sheet applies all of that by itself.</p>
+      <p>Each also has active effects. Every one costs a Vitae, is reflexive, lasts the turn, and can be called on once a turn; several can be bought together.</p>
+      <p><strong>Celerity:</strong> act first this turn; interrupt another's declared action, as many times a scene as she has dots; or multiply her Speed by her dots plus one.</p>
+      <p><strong>Resilience:</strong> dismiss her dots plus one from each ordinary source of damage, or her dots from fire and other banes.</p>
+      <p><strong>Vigor:</strong> add her dots as a weapon bonus to Athletics, Brawl and Weaponry attacks &mdash; that one is a toggle on the attack roll &mdash; or lift and hurl something far too big to be a weapon.</p>`
+  },
+  "rite.banes": {
+    title: "Sunlight and Fire",
+    body: `
+      <p><strong>Sunlight.</strong> Humanity decides how badly the sun burns, and Blood Potency how fast. A humane neonate smoulders slowly; a monstrous elder is ash in moments. Covering everything but the eyes slows it by one step. Resilience does nothing against the sun.</p>
+      <p><strong>Fire.</strong> Fire deals aggravated damage every turn of exposure, by the size of the blaze plus its heat. Resilience turns one point per dot into lethal each turn, and its active effect dismisses its dots outright.</p>
+      <p>Both are provocations to frenzy.</p>`
+  },
+  "rite.feeding": {
+    title: "Feeding",
+    body: `
+      <p>A living human can give as many Vitae as they have Health dots; each one taken is a point of lethal damage to them, and taking more than their Stamina leaves them Drained. Animals give a little, by Size. Kindred Vitae is taken one for one and harms no one, but it is addictive and it binds. Cold blood works, at Blood Potency times two pints for each Vitae.</p>
+      <p>As Blood Potency grows, lesser blood stops nourishing: animals from the third dot, humans from the sixth. Drinking beneath that line still works, at a point of Willpower for every Vitae.</p>
+      <p>Target a vessel's token before feeding and the sheet fills in their numbers and makes them pay the cost.</p>
+      <p><strong>Hunting</strong> is one roll for an hour's effort, with whatever Attribute and Skill fit the approach. <strong>Starting Vitae</strong> is a single die read at face value, plus Feeding Grounds. A <strong>Herd</strong> gives twice its dots in Vitae each week without a roll.</p>
+      <p class="codex-rolls"><strong>Rolls:</strong> Attribute + Skill to hunt; Wits + Composure to read a taste of blood.</p>`
   },
   "rite.lashingOut": {
     title: "Lashing Out (Predatory Aura)",
@@ -432,6 +475,8 @@ export const CODEX_ENTRIES = {
       <p>The Beast shows one of three faces. <strong>Monstrous</strong> (Strength) threatens destruction and provokes fight-or-flight. <strong>Seductive</strong> (Presence) promises abandon and provokes reckless desire. <strong>Competitive</strong> (Intelligence) demands dominance and provokes power games.</p>
       <p>The target answers with <em>fight</em> &mdash; meeting the challenge with a Power Attribute + Blood Potency of their own, which costs them a Willpower point if their Blood Potency is lower than the aggressor's &mdash; or with <em>flight</em>, a graceful but diminishing withdrawal.</p>
       <p><strong>Outcomes.</strong> Whoever scores more successes imposes the Condition tied to their aspect &mdash; Bestial (monstrous), Wanton (seductive), or Competitive &mdash; and gains +2 dice to pursue that drive for the rest of the scene. On a tie, both Conditions land and neither side takes the bonus. A mortal can resist, but can never impose a Condition back on a vampire.</p>
+      <p>Both sides add their Feeding Grounds dots on their own territory, +1 when hungry and +2 when starving. The aggressor loses a die for each time this victim has already been targeted this scene.</p>
+      <p>Target the victim's token before lashing out. The roll then posts a card addressed to that character, with <em>Fight</em> and <em>Flight</em> buttons for whoever controls them &mdash; their player, or the Storyteller for an NPC. The card that follows names the winner and offers the Conditions. Without a target the lash-out still rolls, but the card has to ask which token answers.</p>
       <p class="codex-rolls"><strong>Roll:</strong> Blood Potency + Strength / Presence / Intelligence, contested.</p>`
   }
 };
