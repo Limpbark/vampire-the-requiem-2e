@@ -716,7 +716,8 @@ export const KindredActorMixin = (Base) => class extends Base {
 
     this._renderRiteDialog({
       title: `Feed — ${this.name}`,
-      variant: "survival",
+      variant: "feeding",
+      background: "dark_mouth_wipe.png",
       width: 400,
       body,
       onRender: (el) => {

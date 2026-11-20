@@ -1639,6 +1639,8 @@ export class ActorMtA extends KindredActorMixin(Actor) {
    * @param {string}   opts.variant  Matches ui/dice_bg_<variant>.webp: "frenzy",
    *                                 "lashing_out", "detachment", or any
    *                                 Attribute or Skill texture ("stamina").
+   * @param {string}   [opts.background] A picture in ui/ to use instead of the
+   *                                 variant's texture, e.g. "dark_mouth_wipe.png".
    * @param {string}   opts.body     Inner HTML, wrapped in a kUltraBlock.
    * @param {Function} [opts.onRoll] Async callback(html) for a Roll button.
    * @param {object}   [opts.buttons] Action buttons to show instead of Roll,
@@ -1651,8 +1653,8 @@ export class ActorMtA extends KindredActorMixin(Actor) {
    *                                 once the dialog is on screen, to wire up
    *                                 anything that updates as choices change.
    */
-  _renderRiteDialog({ title, variant, body, onRoll, buttons, width = 440, stacked = false, onRender }) {
-    const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.webp`;
+  _renderRiteDialog({ title, variant, background, body, onRoll, buttons, width = 440, stacked = false, onRender }) {
+    const bgUrl = `systems/vampire-the-requiem-2e/ui/${background ?? `dice_bg_${variant}.webp`}`;
     const actions = buttons ?? { roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll } };
     const classes = ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`];
     if (stacked) classes.push("vtr-rite-stacked");
