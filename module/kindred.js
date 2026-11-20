@@ -352,3 +352,28 @@ export function sumModifiers(list, picked = {}) {
     return total + n * m.value;
   }, 0);
 }
+
+/**
+ * The Vitae pool as a row of droplets for the sheet's blood ribbon: one per
+ * point the character can hold, the first `value` of them full, standing in
+ * groups of five so the pool reads at a glance (and so a long row breaks
+ * between groups, never inside one). A pool holding more than its maximum
+ * still shows every point it holds. Bigger pools use smaller droplets: "l"
+ * up to 15, "m" up to 30, "s" beyond.
+ */
+export function vitaeDroplets(value, max) {
+  value = atLeast0(value);
+  const count = Math.max(atLeast0(max), value);
+  const groups = [];
+  for (let i = 0; i < count; i++) {
+    if (i % 5 === 0) groups.push([]);
+    groups.at(-1).push({ n: i + 1, filled: i < value });
+  }
+  return { size: count <= 15 ? "l" : count <= 30 ? "m" : "s", count, groups };
+}
+
+/** What clicking droplet `n` leaves in the pool: that many, or one fewer when it is the last full one. */
+export function dropletClick(n, value) {
+  n = atLeast0(n);
+  return n === atLeast0(value) ? Math.max(0, n - 1) : n;
+}

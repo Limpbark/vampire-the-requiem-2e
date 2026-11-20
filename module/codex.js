@@ -436,7 +436,7 @@ export const CODEX_ENTRIES = {
     title: "Mending",
     body: `
       <p>Vitae forces a dead body back to the shape it had at the Embrace. Spending it is reflexive, and limited each turn by Blood Potency.</p>
-      <p>One Vitae closes two points of bashing damage or one of lethal, at once. Click the word <em>Health</em> on a vampire's sheet and choose how much Vitae to spend; the sheet heals the most it can for that. Aggravated wounds take five Vitae and a full day's sleep, so Daysleep heals those.</p>
+      <p>One Vitae closes two points of bashing damage or one of lethal, at once. Press <em>Mend</em> on the button ribbon and choose how much Vitae to spend; the sheet heals the most it can for that. Aggravated wounds take five Vitae and a full day's sleep, so Daysleep heals those.</p>
       <p>A vampire whose last Health box holds lethal damage falls into torpor at the end of their turn unless some of it is mended first.</p>`
   },
   "rite.physicalDisciplines": {
@@ -453,7 +453,7 @@ export const CODEX_ENTRIES = {
     body: `
       <p>A living person can give as many Vitae as they have Health dots; each one taken is a point of lethal damage to them, and taking more than their Stamina leaves them Drained. Animals give a little, by Size. Another vampire's Vitae is taken one for one and harms no one, but it is addictive and it binds. Bagged or cold blood works too.</p>
       <p>As Blood Potency grows, lesser blood stops nourishing: animals from the third dot, people from the sixth. Drinking beneath that line still works, at a point of Willpower for every Vitae.</p>
-      <p>Click the word <em>Vitae</em> under the blood pool, pick what kind of blood it is and how much to take; the window says what that does before anything happens. The card states what the vessel suffers, for the Storyteller to apply.</p>
+      <p>Press <em>Feed</em> on the button ribbon, pick what kind of blood it is and how much to take; the window says what that does before anything happens. The card states what the vessel suffers, for the Storyteller to apply.</p>
       <p>No map or token is needed. If the vessel does have a token, targeting it first reads their numbers and changes their sheet as well.</p>`
   },
   "rite.lashingOut": {

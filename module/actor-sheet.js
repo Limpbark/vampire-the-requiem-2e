@@ -14,6 +14,11 @@ import "../lib/dragster/dragster.js";
 import * as customui from "./ui.js";
 import { TacticDialogue } from "./dialogue-tactic.js";
 import { CODEX_ENTRIES } from "./codex.js";
+import * as Kindred from "./kindred.js";
+
+// Height of the blood ribbon plus the gap under it: Vampire and Ghoul sheets
+// open this much taller so the rest of the sheet keeps the room it had.
+const BLOOD_RIBBON_HEIGHT = 52;
 
 const getInventory = () => ({
   firearm: {
@@ -227,6 +232,11 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
   constructor(...args) {
     super(...args);
 
+    if (this.actor?.type === "character" && this.actor.system?.characterType === "vampire") {
+      this.options.height += BLOOD_RIBBON_HEIGHT;
+      this.position.height = this.options.height;
+    }
+
     Hooks.on("closeProgressDialogue", (app, ele) => {
       if (app === this._progressDialogue) this._progressDialogue = null;
     });
@@ -323,9 +333,6 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // "homebrewBlushOfLife" setting. blushActive is a flag, not a system
     // field; cleared on daysleep and on a Phase of Night change in actor.js.
     sheetData.blushEnabled = systemData.characterVariant === "vampire";
-    // The Physical Disciplines button is greyed out for a character with no
-    // dots in Celerity, Resilience or Vigor.
-    sheetData.hasPhysicalDisciplines = Object.values(systemData.physicalDisciplines ?? {}).some(dots => dots > 0);
     sheetData.blushPortraitSwap = sheetData.blushEnabled
       && game.settings.get("vampire-the-requiem-2e", "homebrewBlushOfLife");
     sheetData.blushActive = !!actor.getFlag("vampire-the-requiem-2e", "blushActive");
@@ -334,14 +341,28 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       ? sheetData.blushOfLifeImg
       : actor.img;
 
-    // Vitae blood-splatter background bucket (Vampires only). Maps the current
-    // Vitae/max ratio to one of five splatter graphics in ui/, so the macro-row
-    // pool reflects how depleted the character is. Null when not a Vampire or
-    // when max is 0 (e.g., during sheet setup) so the splatter is hidden.
+    // Blood ribbon (Vampires and Ghouls): the Vitae pool as a row of droplets
+    // with Blood Potency and the Vitae-per-turn limit beside it. The maximum
+    // falls back to what Blood Potency (or a Ghoul's Stamina) allows while the
+    // sheet's own maximum is still unset.
+    sheetData.blood = null;
     sheetData.vitaeSplatterBucket = null;
     if (systemData.characterType === "vampire") {
-      const v = Number(systemData.vitae?.value ?? 0);
-      const m = Number(systemData.vitae?.max ?? 0);
+      const bloodPotency = Math.min(10, Math.max(0, Number(systemData.vampire_traits?.bloodPotency?.final) || 0));
+      const level = CONFIG.MTA.bloodPotency_levels[bloodPotency];
+      const v = Math.max(0, Number(systemData.vitae?.value) || 0);
+      const m = Number(systemData.vitae?.max) || level.max_vitae
+        || Number(systemData.attributes_physical?.stamina?.final) || 10;
+      sheetData.blood = {
+        ...Kindred.vitaeDroplets(v, m),
+        value: v,
+        max: m,
+        isKindred: systemData.characterVariant === "vampire",
+        bloodPotency,
+        perTurn: level.vitae_per_turn
+      };
+      // The splatter behind the word Vitae: one of five graphics in ui/, by
+      // how full the pool is, so the stain shrinks as the character runs dry.
       if (m > 0) {
         const ratio = v / m;
         sheetData.vitaeSplatterBucket =
@@ -1729,19 +1750,15 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.daysleep();
     });
 
-    // The Kindred body (see module/actor-kindred.js). Mend opens from the word
-    // "Health" and Feed from the word "Vitae" under the blood pool, so the
-    // button row keeps only the Physical Disciplines.
+    // The Kindred body (see module/actor-kindred.js): Mend and Feed are
+    // ordinary buttons at the end of the button ribbon.
     const kindredActions = {
       mendButton: ["rite.mending", () => this.actor.mendWounds()],
-      physicalButton: ["rite.physicalDisciplines", () => this.actor.usePhysicalDisciplines()],
       feedButton: ["rite.feeding", () => this.actor.openFeeding()]
     };
     for (const [cls, [codexKey, action]] of Object.entries(kindredActions)) {
       html.find(`.${cls}`).click(ev => {
         ev.preventDefault();
-        // A greyed-out button (nothing to use) does nothing.
-        if (ev.currentTarget.classList.contains("vtr-unavailable")) return;
         this._updateCodex(codexKey);
         action();
       });
@@ -1888,12 +1905,12 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       dlg.render(true);
     });
 
-    // The macro-bar Vitae pool input is intentionally not bound to the form
-    // (its name attribute is omitted to avoid colliding with the Disciplines-
-    // tab Vitae input), so update the actor directly on change.
-    html.find('.vitae-pool-value').change(ev => {
-      const raw = ev.currentTarget.value;
-      const value = Math.max(0, parseInt(raw, 10) || 0);
+    // Blood ribbon: clicking a droplet sets Vitae to that many; clicking the
+    // last full one empties it. The droplets are not form fields (the Vitae
+    // box on the Blood & Powers tab is), so write to the actor directly.
+    html.find('.vtr-droplet').click(ev => {
+      ev.preventDefault();
+      const value = Kindred.dropletClick(ev.currentTarget.dataset.vitae, this.actor.system.vitae?.value);
       this.actor.update({ "system.vitae.value": value });
     });
 

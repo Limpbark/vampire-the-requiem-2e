@@ -75,48 +75,103 @@
 
 /* The progress (book) icon was originally sized for the small Beats box; in
    the macro row it should match the other charMacroButton icons. */
-.worldbuilding .characterMacroPanel .charMacroButton.progress,
-.worldbuilding .characterMacroPanel .charMacroButton.progress > img {
+.worldbuilding .characterMacroPanel .charMacroButton.progress {
   height: 50px;
   width: 50px;
-  min-width: 50px;
 }
 
-/* Prominent Vitae blood-pool counter on the macro row (Vampires only).
-   Click the number to edit; hover reveals +/- buttons. The blood-splatter
-   background is provided by a sibling .vitae-splatter element keyed to a
-   Vitae/max bucket (see actor-sheet.js getData → vitaeSplatterBucket), so
-   the splatter shrinks as the character depletes. */
-.characterSheet .characterMacroPanel > div { position: relative; }
-.characterSheet .vitae-pool {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 72px;
-  height: 72px;
-  z-index: 2;
+/* The button ribbon is one row of buttons and nothing else: the Vitae pool
+   that used to float over its right-hand end now has a ribbon of its own
+   above (see "Blood ribbon" below). Until v1.0.85 one button too many, or a
+   wide side column, put a button underneath the pool.
+   When the sheet is narrow the empty margins at both ends give way first
+   (::before / ::after), and only then do the buttons shrink a little; they
+   never wrap onto a second line or cover one another. */
+.characterSheet .characterMacroPanel { padding: 0 6px; }
+.characterSheet .characterMacroPanel > div {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.characterSheet .characterMacroPanel > div::before,
+.characterSheet .characterMacroPanel > div::after {
+  content: "";
+  flex: 0 100 70px;
+}
+/* The right-hand margin goes first, so the buttons keep their old places. */
+.characterSheet .characterMacroPanel > div::after { flex-shrink: 100000; }
+.worldbuilding .characterSheet .characterMacroPanel > div > .charMacroButton {
+  flex: 0 1 50px;
+  width: auto;
+  height: auto;
+  min-width: 34px;
+  aspect-ratio: 1 / 1;
+}
+.worldbuilding .characterSheet .characterMacroPanel > div > .charMacroButton > img {
+  display: block;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  min-width: 0;
+}
+
+/* Blood ribbon (Vampires and Ghouls): its own row between the header and the
+   button ribbon. Left to right: the word Vitae over the blood splatter, one
+   droplet per point of Vitae the character can hold, then Blood Potency and
+   the Vitae-per-turn limit. The sheet grows by this row's height (see the
+   constructor in actor-sheet.js). */
+.characterSheet.character.vtr-has-blood {
+  grid-template-rows: auto auto 64px 64px 1fr;
+  grid-template-areas:
+      "stats conditions"
+      "blood conditions"
+      "macro conditions"
+      "tabs conditions"
+      "body conditions";
+}
+.characterSheet .vtr-blood-ribbon {
+  grid-area: blood;
+  position: relative;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 3px 18px 3px 8px;
+  border: var(--border-macroBar);
+  background: rgba(0, 0, 0, 0.28);
+  overflow: hidden;
   user-select: none;
 }
+.characterSheet .vtr-blood-label {
+  position: relative;
+  flex: 0 0 88px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.characterSheet .vtr-blood-label > span {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px #000, 0 0 6px #000;
+}
 
-/* Vitae blood-splatter: sits behind the macro-row icons and the Vitae number,
-   so the depleting splatter feels like it's bleeding across the ribbon rather
-   than being a small icon. Sized larger than .vitae-pool intentionally. */
-.characterSheet .vitae-splatter {
+/* The blood splatter behind the word Vitae. Five graphics, keyed to how full
+   the pool is (see actor-sheet.js getData → vitaeSplatterBucket), so the
+   stain shrinks as the character runs dry. */
+.characterSheet .vtr-blood-label > .vitae-splatter {
   position: absolute;
-  right: -20px;
+  left: 44%;
   top: 50%;
-  transform: translateY(-50%);
-  width: 180px;
-  height: 180px;
-  background-size: contain;
+  width: 150px;
+  height: 54px;
+  transform: translate(-50%, -50%);
+  background-size: 100% 100%;
   background-repeat: no-repeat;
-  background-position: center;
   pointer-events: none;
   z-index: 0;
 }
@@ -126,100 +181,71 @@
 .characterSheet .vitae-splatter[data-bucket="40"]  { background-image: url("../ui/vitae_40pct.webp"); }
 .characterSheet .vitae-splatter[data-bucket="20"]  { background-image: url("../ui/vitae_20pct.webp"); }
 
-/* Ensure the other macro-row icons paint above the splatter rather than
-   under it (they're statically positioned by default so they'd otherwise
-   share the same stacking level as the splatter). */
-.characterSheet .characterMacroPanel > div > .charMacroButton {
-  position: relative;
-  z-index: 1;
-}
-/* A button with nothing to offer this character: greyed out, inert. */
-.characterSheet .charMacroButton.vtr-unavailable {
-  opacity: 0.35;
-  cursor: default;
-}
-.characterSheet .charMacroButton.vtr-unavailable > img,
-.characterSheet .charMacroButton.vtr-unavailable > img:hover {
-  filter: grayscale(1);
-}
-.characterSheet .vitae-pool .niceNumber {
-  background: transparent;
-  border: none;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-.characterSheet .vitae-pool input.vitae-pool-value {
-  background: transparent;
-  border: none;
-  color: #ffd0d8;
-  font-size: 26px;
-  font-weight: bold;
-  text-align: center;
-  width: 44px;
-  padding: 0;
-  text-shadow: 0 1px 2px #000, 0 0 6px rgba(255, 208, 216, 0.5);
-  -moz-appearance: textfield;
-}
-.characterSheet .vitae-pool input.vitae-pool-value::-webkit-outer-spin-button,
-.characterSheet .vitae-pool input.vitae-pool-value::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.characterSheet .vitae-pool .numBtns {
-  position: absolute;
-  left: -14px;
-  top: 0;
-  bottom: 0;
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-}
-.characterSheet .vitae-pool:hover .numBtns,
-.characterSheet .vitae-pool:focus-within .numBtns {
+/* The droplets. Each is a small click target with the drop drawn inside it;
+   they stand in fives so the pool can be read at a glance. Bigger pools
+   (Blood Potency 6 and up) use smaller drops and may run to a second line,
+   always breaking between fives. */
+.characterSheet .vtr-droplets {
+  flex: 0 1 auto;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px 9px;
 }
-.characterSheet .vitae-pool .numBtns > div {
-  width: 16px;
-  height: 16px;
-  line-height: 14px;
-  text-align: center;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffd0d8;
-  border: 1px solid #5a0010;
-  border-radius: 50%;
+.characterSheet .vtr-blood-ribbon[data-size="s"] .vtr-droplets { column-gap: 6px; }
+.characterSheet .vtr-droplet-group { display: flex; flex: 0 0 auto; }
+.characterSheet .vtr-droplet {
+  --drop: 13px;
+  position: relative;
+  width: calc(var(--drop) + 7px);
+  height: calc(var(--drop) + 11px);
   cursor: pointer;
-  font-size: 13px;
 }
-.characterSheet .vitae-pool .numBtns > div:hover { background: #5a0010; }
-.characterSheet .vitae-pool-label {
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+.characterSheet .vtr-blood-ribbon[data-size="m"] .vtr-droplet { --drop: 10px; }
+.characterSheet .vtr-blood-ribbon[data-size="s"] .vtr-droplet { --drop: 7px; }
+.characterSheet .vtr-droplet::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: var(--drop);
+  height: var(--drop);
+  margin: calc(var(--drop) / -2) 0 0 calc(var(--drop) / -2);
+  border-radius: 0 55% 55% 55%;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+  border: 1px solid #8f2c39;
+  background: rgba(30, 0, 4, 0.7);
+  transition: background 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+.characterSheet .vtr-droplet.filled::before {
+  border-color: #ff9aa6;
+  background: radial-gradient(circle at 62% 62%, #ff6b7d 0, #d3142e 38%, #7c0015 100%);
+  box-shadow: 0 0 5px rgba(224, 32, 58, 0.75);
+}
+/* Hovering shows what a click would leave: every drop up to the pointer
+   lights its rim, and the full ones past it fade. */
+.characterSheet .vtr-droplet:hover::before,
+.characterSheet .vtr-droplet:has(~ .vtr-droplet:hover)::before,
+.characterSheet .vtr-droplet-group:has(~ .vtr-droplet-group .vtr-droplet:hover) .vtr-droplet::before {
+  border-color: #ffe3e7;
+}
+.characterSheet .vtr-droplet:hover ~ .vtr-droplet.filled::before,
+.characterSheet .vtr-droplet-group:has(.vtr-droplet:hover) ~ .vtr-droplet-group .vtr-droplet.filled::before {
+  opacity: 0.45;
+}
+.characterSheet .vtr-blood-facts {
+  flex: 1 0 auto;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+  color: #e8dcc8;
+  font-size: 14px;
+  letter-spacing: 0.3px;
   text-shadow: 0 1px 2px #000;
-  margin-top: -4px;
-  pointer-events: none;
 }
-/* Words on a Vampire's sheet that open an action: "Health" opens Mend and
-   "Vitae" under the blood pool opens Feed. They read as labels and glow red
-   on hover. */
-.characterSheet .vtr-sheet-link,
-.characterSheet .vitae-pool-label.vtr-sheet-link {
-  cursor: pointer;
-  pointer-events: auto;
-  transition: color 0.15s, text-shadow 0.15s;
-}
-.characterSheet .vitae-pool-label.vtr-sheet-link {
-  padding: 1px 6px;
-}
-.characterSheet .vtr-sheet-link:hover {
-  color: #ff8a9a;
-  text-shadow: 0 0 6px rgba(224, 32, 58, 0.9), 0 1px 2px #000;
-}
+.characterSheet .vtr-blood-facts strong { color: #fff; font-size: 16px; }
+.characterSheet .vtr-blood-turn { color: #c9b8a0; }
 
 /* Codex panel: reference text for the currently-selected trait. Sits in the
    right column above Merits. Empty when nothing is selected; scrolls when the

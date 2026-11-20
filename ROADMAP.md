@@ -92,6 +92,14 @@ Rules arithmetic is in `module/kindred.js` (plain functions, no Foundry globals)
 dialogs and updates are in `module/actor-kindred.js`, a mixin on the actor class.
 Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
 
+**The sheet since v1.0.85.** The Vitae pool left the button ribbon for a blood ribbon of its
+own above it: the word Vitae over the splatter, one droplet per point the character can hold
+(click a droplet to set the pool, click the last full one to spend a point), then Blood
+Potency and Vitae per turn, always in view. The button ribbon holds the seven buttons the
+sheet always had, in their old places, then Mend and Feed. Vampire and Ghoul sheets open
+52px taller to make the room. Nothing on either ribbon is positioned over anything else,
+so a wide side column or a narrow window can no longer put a button under the pool.
+
 - [x] **2.1 Physical Disciplines feed derived traits** (pp.130-142).
   Add a vampire branch to `prepareData()`, for vampires and ghouls:
   Celerity adds to Defense; Vigor adds to Strength; Resilience adds to Stamina and so to Health.
@@ -110,6 +118,10 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   dialog. Resilience is asked for when damage is applied, or bought ahead in that dialog
   while in combat. "Once per turn" is only enforced in combat, where a turn has edges.
   Not automated: the Initiative jump and the Speed change are announced on a card only.
+  v1.0.85: the Physical Disciplines button is off the sheet. Its pop-up told players only
+  that they could spend Vitae, and listed Resilience only while Foundry's combat tracker was
+  running. Spending the Vitae is now one click on the last full droplet. The dialog code
+  (`usePhysicalDisciplines`) is kept but nothing opens it.
 - [x] **2.3 Kindred damage intake** (p.90, p.181).
   Mundane weapons deal bashing to Kindred. Weapon rolls currently apply the item's damage
   type unchanged. Add a weapon flag for "lethal to Kindred" (fangs, Horrid Talons, Carving).
@@ -129,8 +141,10 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   A Mend control: 1 Vitae heals 2 bashing or 1 lethal. One aggravated costs 5 Vitae plus a
   full day's sleep, so track Vitae banked toward it. Respect Vitae per turn.
   Shipped: the dialog pre-fills the cheapest wounds within what can be spent this turn.
-  Slimmed after v1.0.83: opened by clicking "Health"; asks only the Vitae to spend and shows
-  what it heals. Banking Vitae towards aggravated wounds is gone; Daysleep heals those.
+  Slimmed after v1.0.83: asks only the Vitae to spend and shows what it heals. Banking Vitae
+  towards aggravated wounds is gone; Daysleep heals those.
+  v1.0.85: an ordinary Mend button at the end of the button ribbon. (v1.0.84 opened it from
+  the word "Health", which nobody could be expected to find.)
 - [x] **2.6 A real Daysleep** (p.91, p.98).
   Order: heal wounds with Vitae (offer 1 Willpower per wound to preserve it), then spend the
   waking Vitae, and fall into torpor if none is left. Add the stay-awake roll
@@ -164,8 +178,9 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   Shipped: target a vessel's token first and its numbers are filled in and it pays the cost.
   Not done: the violent bite and the Feed move in a grapple, the Swooning and Scarred
   Conditions, and counting the Herd's week.
-  Slimmed after v1.0.83: Feed opens from the word "Vitae" under the blood pool and asks only
-  what kind of blood and how much, with a preview. Hunting, starting Vitae and the Herd were
+  Slimmed after v1.0.83: Feed asks only what kind of blood and how much, with a preview.
+  v1.0.85: an ordinary Feed button at the end of the button ribbon. (v1.0.84 opened it from
+  the word "Vitae", which nobody could be expected to find.) Hunting, starting Vitae and the Herd were
   removed from the sheet; the rules stay in `module/kindred.js` and `MTA.huntingModifiers`.
 - [x] **2.11 Kindred senses and A Taste of Blood** (p.91). Low priority helper rolls.
   Shipped: the Taste of Blood roll, and a line of sense ranges on the Feeding menu.

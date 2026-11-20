@@ -1,6 +1,6 @@
 <form class="{{cssClass}}" autocomplete="off">
 
-  <div class="characterSheet character">
+  <div class="characterSheet character{{#if blood}} vtr-has-blood{{/if}}">
 
     {{!-- Sheet Header --}}
     <!-- Column #1 -->
@@ -36,11 +36,7 @@
                 <span class="tooltip-text">{{ localize "MTA.TooltipCalcMaxHealth" }}</span>
                 <img src="systems/vampire-the-requiem-2e/icons/gui/calculate.svg" alt="Calculate max. health.">
               </div>
-              {{#if (eq system.characterVariant "vampire")}}
-              <span class="vtr-sheet-link mendButton" title="Mend wounds with Vitae">{{ localize "MTA.Health" }}</span>
-              {{else}}
               {{ localize "MTA.Health" }}
-              {{/if}}
             </h4>
             <div class="gold-border"> </div>
             <div class="kMageTracker" data-type="health" data-name="system.health" data-states="max/value/lethal/aggravated" data-marked="{{system.health.marked}}" data-max="{{system.health.max}}" data-aggravated="{{system.health.aggravated}}" data-lethal="{{system.health.lethal}}" data-value="{{system.health.value}}"></div>
@@ -529,6 +525,31 @@
       </details>
     </div>
 
+    {{!-- Blood ribbon (Vampires and Ghouls): the Vitae pool as a row of
+          droplets, one per point the character can hold, with Blood Potency
+          and the Vitae-per-turn limit beside it so both are always in view.
+          Clicking a droplet sets Vitae to that many; clicking the last full
+          one empties it. The droplets carry no form names: a handler in
+          actor-sheet.js writes the value, so they cannot clash with the
+          Vitae box on the Blood & Powers tab. --}}
+    {{#if blood}}
+    <div class="vtr-blood-ribbon" data-size="{{blood.size}}">
+      <div class="vtr-blood-label">
+        {{#if vitaeSplatterBucket}}
+        <div class="vitae-splatter" data-bucket="{{vitaeSplatterBucket}}"></div>
+        {{/if}}
+        <span>{{ localize "MTA.Vitae" }}</span>
+      </div>
+      <div class="vtr-droplets" title="Vitae {{blood.value}} of {{blood.max}}. Click a droplet to set the pool to it; click the last full droplet to spend one.">
+        {{#each blood.groups}}<span class="vtr-droplet-group">{{#each this}}<span class="vtr-droplet{{#if filled}} filled{{/if}}" data-vitae="{{n}}"></span>{{/each}}</span>{{/each}}
+      </div>
+      <div class="vtr-blood-facts">
+        {{#if blood.isKindred}}{{ localize "MTA.BloodPotency" }} <strong>{{blood.bloodPotency}}</strong>
+        <span class="vtr-blood-turn">({{blood.perTurn}} Vitae/turn)</span>{{else}}<span class="vtr-blood-turn">{{blood.perTurn}} Vitae/turn</span>{{/if}}
+      </div>
+    </div>
+    {{/if}}
+
     <div class="characterMacroPanel">
       <div>
         <div class="button charMacroButton rollButton tooltip">
@@ -580,10 +601,6 @@
           <span class="tooltip-text">Daysleep: heal, then rise for 1 Vitae{{#if homebrewWillpower}} and recover 1 Willpower{{/if}}</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-daysleep.svg" alt="Daysleep.">
         </div>
-        <div class="button charMacroButton physicalButton tooltip{{#unless hasPhysicalDisciplines}} vtr-unavailable{{/unless}}">
-          <span class="tooltip-text">{{#if hasPhysicalDisciplines}}Celerity, Resilience and Vigor: active effects (1 Vitae each){{else}}No Celerity, Resilience or Vigor{{/if}}</span>
-          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-physical.svg" alt="Physical Disciplines.">
-        </div>
         <div class="button charMacroButton frenzyButton tooltip">
           <span class="tooltip-text">Resist Frenzy (Resolve + Composure)</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-breaking-point.svg" alt="Resist frenzy.">
@@ -595,6 +612,16 @@
         <div class="button charMacroButton detachmentButton tooltip">
           <span class="tooltip-text">Detachment roll (breaking point)</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-detachment.svg" alt="Detachment.">
+        </div>
+        {{!-- Newer buttons go after the ones the sheet has always had, so
+              those stay exactly where players expect them. --}}
+        <div class="button charMacroButton mendButton tooltip">
+          <span class="tooltip-text">Mend: spend Vitae to heal wounds</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-mend.svg" alt="Mend.">
+        </div>
+        <div class="button charMacroButton feedButton tooltip">
+          <span class="tooltip-text">Feed: drink and gain Vitae</span>
+          <img src="systems/vampire-the-requiem-2e/icons/gui/macro-feed.svg" alt="Feed.">
         </div>
         {{else}}
         <div class="button charMacroButton dreamingButton tooltip {{#if system.isDreaming}}dreaming{{/if}}">
@@ -614,33 +641,6 @@
         <div class="button charMacroButton falteringButton tooltip">
           <span class="tooltip-text">{{ localize "MTA.TooltipFalteringRoll" }}</span>
           <img src="systems/vampire-the-requiem-2e/icons/gui/macro-faltering.svg" alt="{{ localize "MTA.TooltipFalteringRoll" }}">
-        </div>
-        {{/if}}
-
-        {{!-- Prominent Vitae blood pool counter (Vampires + Ghouls).
-              The input intentionally has no `name` attribute so it does not
-              clash with the canonical system.vitae.value input on the
-              Disciplines tab (duplicate names confuse Foundry's form
-              submission). A dedicated change handler in actor-sheet.js
-              writes the value back via actor.update(). --}}
-        {{#if (eq system.characterType "vampire")}}
-        {{#if vitaeSplatterBucket}}
-        <div class="vitae-splatter" data-bucket="{{vitaeSplatterBucket}}"></div>
-        {{/if}}
-        <div class="vitae-pool tooltip" title="Vitae">
-          <span class="tooltip-text">{{#if (eq system.characterVariant "vampire")}}Vitae (click the word to feed){{else}}{{ localize "MTA.Vitae" }}{{/if}}</span>
-          <div class="niceNumber">
-            <input class="vitae-pool-value" type="number" value="{{system.vitae.value}}" data-dtype="Number" min="0">
-            <div class="numBtns">
-              <div class="plusBtn">+</div>
-              <div class="minusBtn">−</div>
-            </div>
-          </div>
-          {{#if (eq system.characterVariant "vampire")}}
-          <div class="vitae-pool-label vtr-sheet-link feedButton">{{ localize "MTA.Vitae" }}</div>
-          {{else}}
-          <div class="vitae-pool-label">{{ localize "MTA.Vitae" }}</div>
-          {{/if}}
         </div>
         {{/if}}
       </div>
