@@ -1,6 +1,6 @@
 
 
-export class TokenHotBar extends Application {
+export class TokenHotBar extends foundry.appv1.api.Application {
   constructor(options) {
     super(options);
   }

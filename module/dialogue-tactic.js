@@ -1,4 +1,4 @@
-export class TacticDialogue extends Application {
+export class TacticDialogue extends foundry.appv1.api.Application {
   constructor(actor, item, ...args) {
     super(...args);
     this.actor = actor;
@@ -45,7 +45,7 @@ export class TacticDialogue extends Application {
     }
     else {
       return ChatMessage.create({
-        user: game.user.id,
+        author: game.user.id,
         content: "",
         speaker: ChatMessage.getSpeaker({ actor: this.actor, token: this.actor.token }),
         flavor: dicePool.description

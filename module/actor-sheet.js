@@ -922,7 +922,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       }
 
       // Confirmation dialogue
-      let d = new Dialog({
+      let d = new foundry.appv1.api.Dialog({
         title: "Confirm delete",
         content: "<p>Are you sure you want to permanently delete this item?</p><p>(Holding shift skips this dialogue)</p>",
         buttons: {
@@ -1006,7 +1006,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       }
 
       // Confirmation dialogue
-      let d = new Dialog({
+      let d = new foundry.appv1.api.Dialog({
         title: "Confirm delete",
         content: "<p>Are you sure you want to permanently delete this dicepool?</p><p>(Holding shift skips this dialogue)</p>",
         buttons: {
@@ -2055,7 +2055,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     const sortBefore = source.sort > target?.sort;
 
     // Perform the sort
-    const sortUpdates = SortingHelpers.performIntegerSort(source, { target: target, siblings: siblings, sortBefore: sortBefore });
+    const sortUpdates = foundry.utils.performIntegerSort(source, { target: target, siblings: siblings, sortBefore: sortBefore });
     const updateData = sortUpdates.map(u => {
       const update = u.update;
       update._id = u.target._id;
@@ -2119,7 +2119,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     if (this.actor.type === "simple_antagonist" &&
       !(itemData.type === "general_dice_pool" || itemData.type === "combat_dice_pool"
         || itemData.type === "merit" || itemData.type === "condition" || itemData.type === "tilt")) {
-      const response = await Dialog.wait({
+      const response = await foundry.appv1.api.Dialog.wait({
         title: "Incompatible item type.",
         content: "Which type should the item convert to? (Description and name are kept)",
         buttons: {
@@ -2302,7 +2302,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     const keys = this.actor.items.filter(item => item.type === "key");
     // TODO: Synergy checkbox
     // TODO: Willpower checkbox
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: "Unlock Key",
       content: `
       <style>
@@ -2378,7 +2378,7 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   _onUnlockSineaterKey(event, item) {
     item.showChatCard();
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: "Unlock Key",
       buttons: {
         one: {

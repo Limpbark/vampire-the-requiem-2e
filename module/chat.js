@@ -1,3 +1,22 @@
+/**
+ * Apply message visibility to pending ChatMessage data.
+ * v14 replaced "roll modes" with message visibility modes: ChatMessage.applyMode
+ * with no mode argument applies the user's currently selected mode. A blind GM
+ * roll sets the schema fields directly, so it does not depend on mode names.
+ * @param {object} chatData           Pending ChatMessage creation data.
+ * @param {object} [options]
+ * @param {boolean} [options.blind]   Force a blind roll whispered to the GMs.
+ * @returns {object}                  The same chatData, with visibility applied.
+ */
+export const applyMessageVisibility = function (chatData, { blind = false } = {}) {
+  if (blind) {
+    chatData.blind = true;
+    chatData.whisper = ChatMessage.getWhisperRecipients("GM").map(u => u.id ?? u);
+    return chatData;
+  }
+  return ChatMessage.applyMode(chatData);
+}
+
 export const createShortActionMessage = async function (flavor = "", actor) {
 
 
@@ -12,18 +31,13 @@ export const createShortActionMessage = async function (flavor = "", actor) {
 
   // Basic chat message data
   let chatData = {
-    user: game.user.id,
+    author: game.user.id,
     content: html,
     speaker: actor ? ChatMessage.getSpeaker({ actor: actor, token: actor.token }) : ChatMessage.getSpeaker(),
     flavor: flavor
   };
 
-  // Toggle default roll mode
-  let rollMode = game.settings.get("core", "rollMode");
-  /* if ( ["gmroll", "blindroll"].includes(rollMode) ) chatData["whisper"] = ChatMessage.getWhisperIDs("GM");
-  if ( rollMode === "blindroll" ) chatData["blind"] = true; */
-  chatData = ChatMessage.applyRollMode(chatData, rollMode);
+  chatData = applyMessageVisibility(chatData);
   // Create the chat message
   return ChatMessage.create(chatData);
 }
-

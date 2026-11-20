@@ -1,6 +1,6 @@
 import { createShortActionMessage } from "./chat.js";
 
-export class ReloadDialogue extends Application {
+export class ReloadDialogue extends foundry.appv1.api.Application {
   constructor(item, button, container, ...args) {
     super(...args);
     this._item = item;

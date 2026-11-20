@@ -232,11 +232,15 @@ Hooks.once("ready", function () {
   foundry.utils.debounce(createTokenBar, 200);
 
   // NEW STATUS EFFECTS & VISION MODES
-  CONFIG.statusEffects.push({
+  // v14 keys CONFIG.statusEffects by id (earlier versions used an array), and
+  // the v12-era `label`/`icon` fields were retired in favour of `name`/`img`.
+  const twillightStatus = {
     id: "twillight",
-    label: "MTA.Effect.Twillight",
-    icon: "systems/vampire-the-requiem-2e/icons/statusEffects/twillight.svg"
-  });
+    name: "MTA.Effect.Twillight",
+    img: "systems/vampire-the-requiem-2e/icons/statusEffects/twillight.svg"
+  };
+  if (Array.isArray(CONFIG.statusEffects)) CONFIG.statusEffects.push(twillightStatus);
+  else CONFIG.statusEffects.twillight = twillightStatus;
   CONFIG.specialStatusEffects.TWILLIGHT = "twillight";
 
   CONFIG.Canvas.detectionModes.seeTwillight = new DetectionModeTwillight({
@@ -337,53 +341,32 @@ Hooks.once("ready", function () {
 
 });
 
-Hooks.on("renderChatMessageHTML", (message, html, data) => {
+Hooks.on("renderChatMessageHTML", (message, html) => {
   // Optionally collapse the description
   if (game.settings.get("vampire-the-requiem-2e", "autoCollapseItemDescription")) {
     const desc = html.querySelector(".card-description");
     if (desc) desc.style.display = "none";
   }
 
-
-  if (data.message.blind && !game.user.isGM) {
-    html.querySelector(".dice-formula").html(`???`);
-    html.querySelector(".dice-tooltip").html(``);
-    let total = html.querySelector(".dice-total");
-    total.html(`?`);
-    total.removeClass('exceptionalSuccess dramaticFailure');
-
-    html.addClass('hidden-message');
+  // Blind rolls: our cards carry the pre-rendered roll in their content, so
+  // core's private-roll masking does not apply and non-GMs are masked here.
+  if (message.blind && !game.user.isGM) {
+    html.querySelectorAll(".dice-formula").forEach(el => el.textContent = "???");
+    html.querySelectorAll(".dice-tooltip").forEach(el => el.replaceChildren());
+    html.querySelectorAll(".dice-total").forEach(el => {
+      el.textContent = "?";
+      el.classList.remove("exceptionalSuccess", "dramaticFailure");
+    });
+    html.querySelectorAll(".hunger-messy").forEach(el => el.remove());
+    html.classList.add("hidden-message");
   }
 
-  const actor = game.actors.get(data.message.speaker.actor);
-  const senderName = html.querySelector(".message-sender");
+  // The GM, the message author and owners of the speaking actor keep the
+  // card's action buttons; everyone else has them hidden.
+  const actor = game.actors.get(message.speaker?.actor);
+  if (actor?.isOwner || game.user.isGM || message.isAuthor) return;
 
-  // Hide actor name if player does not have at least limited permission
-  /*   if(actor && actor.getUserLevel(game.user) !== CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
-  
-      // Show token name instead if that is visible (TODO: currently only works for prototype settings...)
-      if(actor.prototypeToken.displayName === CONST.TOKEN_DISPLAY_MODES.ALWAYS || actor.prototypeToken.displayName === CONST.TOKEN_DISPLAY_MODES.HOVER) {
-        senderName.text(actor.prototypeToken.name);
-      }
-      else senderName.text('???');
-    } */
-
-  // If the user is the message author or the actor owner, proceed
-
-  if (actor && actor.isOwner) return;
-  else if (game.user.isGM || (data.author.id === game.user.id)) return;
-
-  // Chat card changes
-  const chatCard = html.querySelector(".chat-card");
-  if (chatCard.length === 0) {
-    return;
-  }
-
-  // Otherwise hide action buttons
-  const buttons = chatCard.querySelector("button[data-action]");
-  buttons.each((i, btn) => {
-    btn.style.display = "none"
-  });
+  html.querySelectorAll(".chat-card button[data-action]").forEach(btn => btn.style.display = "none");
 });
 
 Hooks.on("renderChatMessageHTML", (app, html, data) => ItemMtA.chatListeners(html));
@@ -506,18 +489,25 @@ Hooks.on("renderChatMessageHTML", (app, html, data) => {
 
 /** Add the dice roller button **/
 Hooks.on("renderChatInput", (chatApp, elements) => {
-  console.log("#roll-privacy", elements, elements['#roll-privacy'])
-  const root = elements['#roll-privacy'];
+  // The button sits beside the message-visibility buttons. v13 exposed that
+  // bar as "#roll-privacy"; v14 renamed roll modes to message modes, so fall
+  // back to locating the bar by its buttons rather than by a fixed id.
+  const modeButton = '[data-action="messageMode"], [data-action="rollMode"]';
+  let root = elements["#roll-privacy"];
+  if (!root) {
+    for (const el of Object.values(elements)) {
+      const found = el?.matches?.(modeButton) ? el : el?.querySelector?.(modeButton);
+      if (found) { root = found.parentElement; break; }
+    }
+  }
   if (!root) return;
 
-  console.log("#roll-privacy2", root, root.querySelector(".cofd-d10-roller"))
   if (root.querySelector(".cofd-d10-roller")) return;
 
   const btn = document.createElement("button");
   btn.classList.add("ui-control", "icon", "cofd-d10-roller");
   btn.setAttribute("data-tooltip", "Dice Roller");
   btn.setAttribute("data-tooltip-direction", "DOWN");
-  console.log("#roll-privacy3", btn)
 
   btn.addEventListener("click", (event) => {
     event.preventDefault();
@@ -641,7 +631,7 @@ Hooks.on("renderCombatTracker", (app, html) => {
     const c = combat.combatants.get(id);
 
     const a = c?.actor;
-    if (a.system?.typeConf.sheet.cipherName) {
+    if (a?.system?.typeConf?.sheet?.cipherName) {
       li.classList.add("cipherText");
     } else {
       li.classList.remove("cipherText");
@@ -815,4 +805,26 @@ Hooks.once("ready", () => {
 
 // Register a crimson "Hunger" colourset so Hunger dice (homebrew) are visually
 // distinct in the Dice So Nice 3D animation, matching the chat card. The roll
-// builder tags the Hunger term with `options.appe
+// builder tags the Hunger term with `options.appearance = { colorset: "vtr-hunger" }`.
+Hooks.once("diceSoNiceReady", (dice3d) => {
+  dice3d.addColorset({
+    name: "vtr-hunger",
+    description: "Hunger (Vampire the Requiem 2E)",
+    category: "Vampire the Requiem 2E",
+    foreground: "#ffffff",
+    background: "#c8102e",
+    edge: "#7a0a18",
+    outline: "#3a0008",
+    texture: "none",
+    material: "plastic",
+    font: "auto",
+    fontScale: {},
+    visibility: "visible"
+  }, "default");
+});
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 import { createShortActionMessage } from "./chat.js";
 
-export class FullProgressDialogue extends Application {
+export class FullProgressDialogue extends foundry.appv1.api.Application {
   constructor(actor, progressDialogue, ...args) {
     super(...args);
     this._actor = actor;

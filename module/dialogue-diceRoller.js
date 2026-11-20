@@ -1,4 +1,6 @@
-export class DiceRollerDialogue extends Application {
+import { applyMessageVisibility } from "./chat.js";
+
+export class DiceRollerDialogue extends foundry.appv1.api.Application {
   constructor({ dicePool = 0,
     targetNumber = 8,
     extended = false,
@@ -611,8 +613,6 @@ export class DiceRollerDialogue extends Application {
 
     let roll = await DiceRollerDialogue._roll({ dicePool: dicePool, targetNumber: targetNumber, tenAgain: tenAgain, nineAgain: nineAgain, eightAgain: eightAgain, roteAction: roteAction, chanceDie: chanceDie, exceptionalTarget: exceptionalTarget, advancedAction, hungerDice: hungerDice });
     if (rollReturn) rollReturn.roll = roll;
-    //Create Roll Message
-    let speaker = ChatMessage.getSpeaker();
 
     if (chanceDie) flavor += " [Chance die]";
     if (roteAction) flavor += " [Rote quality]";
@@ -621,19 +621,13 @@ export class DiceRollerDialogue extends Application {
     else if (tenAgain) flavor += " [10-again]";
     if (!showFlavor) flavor = undefined;
 
-    let chatData = {
-      user: game.user.id,
-      speaker: speaker,
-      flavor: flavor
-    };
-    let rollMode = blindGMRoll ? "blindroll" : game.settings.get("core", "rollMode");
-    chatData = ChatMessage.applyRollMode(chatData, rollMode);
+    const renderOptions = { flavor };
 
     extended_accumulatedSuccesses += Math.max(0, roll.total);
     extended_rolls++;
 
 
-    let html = await roll.render(chatData);
+    let html = await roll.render(renderOptions);
 
     // Build a full-sentence result from the success count.
     const hits = Math.max(0, roll.total);
@@ -689,7 +683,7 @@ export class DiceRollerDialogue extends Application {
     }
 
     if (roll.advancedRoll) {
-      let advHtml = await roll.advancedRoll.render(chatData);
+      let advHtml = await roll.advancedRoll.render(renderOptions);
       advHtml = advHtml.replace('class="dice-roll"', 'class="dice-roll vtr-roll advancedRoll"');
       html += advHtml;
     }
@@ -758,7 +752,6 @@ export class DiceRollerDialogue extends Application {
     };
 
     //Create Roll Message
-    let rollMode = blindGMRoll ? "blindroll" : game.settings.get("core", "rollMode");
     let speaker = actorOverride ? ChatMessage.getSpeaker({ actor: actorOverride }) : ChatMessage.getSpeaker();
 
     // Render the chat card template
@@ -774,22 +767,16 @@ export class DiceRollerDialogue extends Application {
 
     // Basic chat message data
     let chatData = {
-      user: game.user.id,
-      //type: CONST.CHAT_MESSAGE_STYLES.ROLL,
+      author: game.user.id,
       content: html,
       speaker: speaker,
       flavor: flavor,
       sound: CONFIG.sounds.dice,
-      roll: rollReturn.roll,
       rolls: [rollReturn.roll],
-      rollMode: rollMode,
       flags: { "vampire-the-requiem-2e": { diceBgUrl: cardBgUrl } },
     };
 
-    // Toggle default roll mode
-    /* if ( ["gmroll", "blindroll"].includes(rollMode) ) chatData["whisper"] = ChatMessage.getWhisperRecipients("GM");*/
-    //if ( rollMode === "blindroll" ) chatData["blind"] = true;
-    chatData = ChatMessage.applyRollMode(chatData, rollMode);
+    chatData = applyMessageVisibility(chatData, { blind: blindGMRoll });
 
     const msg = await ChatMessage.create(chatData);
     if (actor) await actor.setFlag('vampire-the-requiem-2e', 'rollReturn', rollReturn.roll);
@@ -986,7 +973,6 @@ export class DiceRollerDialogue extends Application {
     }
 
     //Create Roll Message
-    let rollMode = blindGMRoll ? "blindroll" : game.settings.get("core", "rollMode");
     let speaker = actorOverride ? ChatMessage.getSpeaker({ actor: actorOverride }) : ChatMessage.getSpeaker();
 
     // Render the chat card template
@@ -998,24 +984,16 @@ export class DiceRollerDialogue extends Application {
 
     // Basic chat message data
     let chatData = {
-      user: game.user.id,
-      //type: CONST.CHAT_MESSAGE_STYLES.ROLL,
+      author: game.user.id,
       content: html,
       speaker: speaker,
       flavor: flavor,
       sound: CONFIG.sounds.dice,
-      roll: rollReturn.roll,
       rolls: [rollReturn.roll],
-      rollMode: rollMode,
       flags: { "vampire-the-requiem-2e": { diceBgUrl: cardBgUrl } },
-      /*       system: {
-              targetId: templateData.data.damageTokenId,
-              isAttack: true,
-              actor: actor?.id
-            } */
     };
 
-    chatData = ChatMessage.applyRollMode(chatData, rollMode);
+    chatData = applyMessageVisibility(chatData, { blind: blindGMRoll });
     const msg = await ChatMessage.create(chatData);
 
     if (actor) await actor.setFlag('vampire-the-requiem-2e', 'rollReturn', rollReturn.roll);

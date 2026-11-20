@@ -139,12 +139,12 @@ export class MtAItemSheet extends foundry.appv1.sheets.ItemSheet {
           sheetData.mummyKeywords['t' + i] = {epic: false, curse: false, potency: false, subtle: false};
         }
       }
-      sheetData.tier1_desc_enriched = await TextEditor.enrichHTML(this.item.system.tier1_desc, { secrets: this.item.isOwner, entities: true });
-      sheetData.tier2_desc_enriched = await TextEditor.enrichHTML(this.item.system.tier2_desc, { secrets: this.item.isOwner, entities: true });
-      sheetData.tier3_desc_enriched = await TextEditor.enrichHTML(this.item.system.tier3_desc, { secrets: this.item.isOwner, entities: true });
-      sheetData.tier1_pillar_effect_enriched = await TextEditor.enrichHTML(this.item.system.tier1_pillar_effect, { secrets: this.item.isOwner, entities: true });
-      sheetData.tier2_pillar_effect_enriched = await TextEditor.enrichHTML(this.item.system.tier2_pillar_effect, { secrets: this.item.isOwner, entities: true });
-      sheetData.tier3_pillar_effect_enriched = await TextEditor.enrichHTML(this.item.system.tier3_pillar_effect, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier1_desc_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier1_desc, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier2_desc_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier2_desc, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier3_desc_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier3_desc, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier1_pillar_effect_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier1_pillar_effect, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier2_pillar_effect_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier2_pillar_effect, { secrets: this.item.isOwner, entities: true });
+      sheetData.tier3_pillar_effect_enriched = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.item.system.tier3_pillar_effect, { secrets: this.item.isOwner, entities: true });
     }
     
     if (this.item.type === "distillation" && item.isOwned && item.actor) {

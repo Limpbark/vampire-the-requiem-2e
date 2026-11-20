@@ -4,6 +4,7 @@ import {
 import {
   ActorMtA
 } from "./actor.js";
+import { applyMessageVisibility } from "./chat.js";
 /**
  * Override and extend the basic :class:`Item` implementation
  */
@@ -224,17 +225,13 @@ export class ItemMtA extends Item {
     // Basic chat message data — type defaults to "base" in v14; the old
     // CONST.CHAT_MESSAGE_STYLES.OTHER (numeric 0) is no longer valid.
     const chatData = {
-      user: game.user.id,
+      author: game.user.id,
       content: html,
       speaker: ChatMessage.getSpeaker({ actor: this.actor, token: this.actor.token }),
       flavor: ""
     };
 
-    // Toggle default roll mode
-    let rollMode = game.settings.get("core", "rollMode");
-    if (["gmroll", "blindroll"].includes(rollMode)) chatData["whisper"] = ChatMessage.getWhisperRecipients("GM");
-    if (rollMode === "blindroll") chatData["blind"] = true;
-    ChatMessage.create(chatData);
+    ChatMessage.create(applyMessageVisibility(chatData));
   }
 
   /**
@@ -334,7 +331,7 @@ export class ItemMtA extends Item {
       const pos = target ? { x: target.center.x, y: target.center.y } : canvas.scene._viewPosition; // Default is middle of the screen
 
       const getSurroundingTokens = (origin, distance = 1) => {
-        return canvas.scene.tokens.filter(t => canvas.grid.measureDistance(origin, t, { gridSpaces: true }) <= distance);
+        return canvas.scene.tokens.filter(t => canvas.grid.measurePath([origin, { x: t.x, y: t.y }]).distance <= distance);
       }
 
       // Note: blast-radius MeasuredTemplate visuals were removed for Foundry v14

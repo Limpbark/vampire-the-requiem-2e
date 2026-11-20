@@ -337,27 +337,35 @@ a.header-button.actor-link-toggle i.fa-link {
 
 /* Chat Controls */
 
-#roll-privacy .cofd-d10-roller {
+/* The dice roller button is appended to the message-visibility button bar
+   (see the renderChatInput hook in module/mta.js). The bar was "#roll-privacy"
+   in v13; the class-only selectors keep the button styled if v14 names it
+   differently. */
+#roll-privacy .cofd-d10-roller,
+button.ui-control.cofd-d10-roller {
   position: relative;
   background: var(--background-input-active);
   border: var(--border-button-macro);
   margin-left: 5px;
 }
 
-#roll-privacy.vertical .cofd-d10-roller{
+#roll-privacy.vertical .cofd-d10-roller,
+.vertical > button.ui-control.cofd-d10-roller {
   margin-top: 5px;
   margin-left: 0px;
 }
 
 
-#roll-privacy .cofd-d10-roller:before {
+#roll-privacy .cofd-d10-roller:before,
+button.ui-control.cofd-d10-roller:before {
   content: url(../icons/gui/d10.svg) !important;
   height: 25px;
   width: 25px;
   position: absolute;
 }
 
-#roll-privacy .cofd-d10-roller:hover:before {
+#roll-privacy .cofd-d10-roller:hover:before,
+button.ui-control.cofd-d10-roller:hover:before {
   /* color: var(--color-accent-neu-glow);
   filter: invert(65%) sepia(50%) saturate(683%) hue-rotate(146deg) brightness(196%) contrast(95%); */
   cursor: pointer;
@@ -365,7 +373,10 @@ a.header-button.actor-link-toggle i.fa-link {
   filter: var(--filter-button-macro-hover);
 }
 
-button.ui-control.icon[data-action="rollMode"][data-roll-mode="selfroll"] {
+/* The visibility button that now precedes ours is no longer last in its bar,
+   so restore its trailing border (v13 "rollMode" / v14 "messageMode"). */
+button.ui-control.icon[data-action="rollMode"][data-roll-mode="selfroll"],
+button.ui-control.icon[data-action="messageMode"]:has(+ .cofd-d10-roller) {
   border-inline-end-width: 1px;
 }
 

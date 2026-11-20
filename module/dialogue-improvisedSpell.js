@@ -2,8 +2,9 @@ import {
   DiceRollerDialogue
 } from "./dialogue-diceRoller.js";
 import { MTA } from "./config.js";
+import { applyMessageVisibility } from "./chat.js";
 
-export class ImprovisedSpellDialogue extends FormApplication {
+export class ImprovisedSpellDialogue extends foundry.appv1.api.FormApplication {
   constructor(spell, actor) {
     super(spell, { submitOnChange: true, closeOnSubmit: false });
     console.log("OBJECT", this.object)
@@ -723,24 +724,20 @@ export class ImprovisedSpellDialogue extends FormApplication {
     const template = `systems/vampire-the-requiem-2e/templates/chat/item-card.html`;
     const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
     let rolls = templateData.data.rolls.map(a => a.rollReturn.roll);
-    const pool = PoolTerm.fromRolls(rolls);
+    const pool = foundry.dice.terms.PoolTerm.fromRolls(rolls);
     let roll = Roll.fromTerms([pool]);
 
     // Basic chat message data
     let chatData = {
-      user: game.user.id,
-      //type: CONST.CHAT_MESSAGE_STYLES.ROLL,
+      author: game.user.id,
       content: html,
       speaker: ChatMessage.getSpeaker({ actor: this.actor, token: this.actor.token }),
       flavor: game.i18n.localize('MTA.SpellcastingLevel') + " " + spellData.level + " " + spellData.arcanum + " (" + spellData.practice + ")",
       sound: CONFIG.sounds.dice,
-      roll: roll,
       rolls: [roll]
     };
 
-    // Toggle default roll mode
-    let rollMode = game.settings.get("core", "rollMode");
-    chatData = ChatMessage.applyRollMode(chatData, rollMode);
+    chatData = applyMessageVisibility(chatData);
 
     // Create the chat message
     return ChatMessage.create(chatData);

@@ -1,4 +1,4 @@
-export class UtteranceDialogue extends FormApplication {
+export class UtteranceDialogue extends foundry.appv1.api.FormApplication {
   constructor(actor, item,...args) {
     super(...args);
     this.actor = actor;
@@ -86,13 +86,13 @@ export class UtteranceDialogue extends FormApplication {
       const roll = this.actor.roll({traits: dicePool.attributes, diceBonus: dicePool.value});
     }
 
-    const chatContent = await renderTemplate(
+    const chatContent = await foundry.applications.handlebars.renderTemplate(
       "systems/vampire-the-requiem-2e/templates/chat/use-utterance.hbs",
       data
     );
 
     return ChatMessage.create({
-      user: game.user.id,
+      author: game.user.id,
       content: chatContent,
       flavor: game.i18n.localize('MTA.Mummy.Utterance.chat.flavor') + " " + game.i18n.localize('MTA.Mummy.Utterance.tabTier' + chosenTier),
       speaker: ChatMessage.getSpeaker({actor: this.actor, token: this.actor.token}),

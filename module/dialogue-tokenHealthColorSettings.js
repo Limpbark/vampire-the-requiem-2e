@@ -1,4 +1,4 @@
-export class TokenHealthColorSettingsDialogue extends FormApplication {
+export class TokenHealthColorSettingsDialogue extends foundry.appv1.api.FormApplication {
   constructor() {
     const color_healthy = game.settings.get("vampire-the-requiem-2e", "tokenHealthColorHealthy");
     const color_bashing = game.settings.get("vampire-the-requiem-2e", "tokenHealthColorBashing");

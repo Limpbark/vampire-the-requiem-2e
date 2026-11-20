@@ -3,7 +3,7 @@ import {
   FullProgressDialogue
 } from "./dialogue-progressFull.js";
 
-export class ProgressDialogue extends Application {
+export class ProgressDialogue extends foundry.appv1.api.Application {
   constructor(actor, ...args) {
     super(...args);
     this._actor = actor;

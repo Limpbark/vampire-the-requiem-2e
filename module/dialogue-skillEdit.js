@@ -1,4 +1,4 @@
-export class SkillEditDialogue extends Application {
+export class SkillEditDialogue extends foundry.appv1.api.Application {
   constructor(actor, trait, ...args) {
     super(...args);
     this.actor = actor;

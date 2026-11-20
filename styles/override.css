@@ -1005,4 +1005,33 @@ game-pause .vtr-pause-icon img {
    Foundry's default `.message-sender` and `.flavor-text` rules carry the
    global UI font and inherited bold/italic — strip those and apply the
    system's flair fonts directly. */
-.chat-log .mess
+.chat-log .message .message-sender,
+#chat-log .message .message-sender,
+#chat .message .message-sender {
+  font-family: "Trajan VTR", "Trajan Pro", "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  line-height: 1.15;
+  text-shadow: none;
+}
+.chat-log .message .flavor-text,
+#chat-log .message .flavor-text,
+#chat .message .flavor-text {
+  font-family: "Cezanne VTR", cursive;
+  font-size: 18px;
+  font-weight: normal;
+  font-style: normal;
+  color: #c87848;
+  line-height: 1.15;
+  text-shadow: none;
+  background: transparent;
+  border: none;
+  padding: 2px 6px 6px;
+  margin: 0;
+}
+.chat-log .message .flavor-text * {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: normal;
+}

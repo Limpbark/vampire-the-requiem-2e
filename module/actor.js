@@ -963,7 +963,7 @@ export class ActorMtA extends Actor {
       return manaCost;
     }
 
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: "Mage Sight",
       content: `<ul>
         ${listItems}
@@ -1965,7 +1965,7 @@ export class ActorMtA extends Actor {
     const gnosis = Math.clamp(this.system.mage_traits.gnosis.final - 1, 0, 9);
     const scouringFrequency = CONFIG.MTA.gnosis_levels[gnosis].scouringFrequency;
 
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: game.i18n.localize("MTA.DialoguePatternScouring.Title"),
       content: `<p>${game.i18n.format("MTA.DialoguePatternScouring.ScouringFrequency", { var: scouringFrequency })}</p>`,
       buttons: {
@@ -2043,7 +2043,7 @@ export class ActorMtA extends Actor {
       }
     }
 
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: game.i18n.localize("MTA.DialogueFaltering.Title"),
       buttons: options,
     });
@@ -2083,7 +2083,7 @@ export class ActorMtA extends Actor {
    * a progress entry to the actor.
    */
   addProgressDialogue() {
-    let d = new Dialog({
+    let d = new foundry.appv1.api.Dialog({
       title: "Add Progress",
       content: "<div> <span> Name </span> <input class='attribute-value' type='text' name='input.name' placeholder='No Reason'/></div> <div> <span> Beats </span> <input class='attribute-value' type='number' name='input.beats' data-dtype='Number' min='0' placeholder='0'/></div> <div> <span> Arc. Beats </span> <input class='attribute-value' type='number' name='input.arcaneBeats' data-dtype='Number' min='0' placeholder='0'/></div>",
       buttons: {
