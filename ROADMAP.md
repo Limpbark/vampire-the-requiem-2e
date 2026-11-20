@@ -188,6 +188,9 @@ so a wide side column or a narrow window can no longer put a button under the po
 
 ## Phase 3: The Beast and the Blood
 
+Declined 2026-11-20, after v1.0.86: the owner judged none of this phase worth adding to the
+sheet. Kept here as a record only; do not build it unless asked.
+
 - [ ] **3.1 Frenzy as a state** (pp.103-105).
   Prefill modifiers: hungry at 4 Vitae or less (-2), starving at 2 or less (-4), wounded (-1),
   wounded in the last three boxes (-3), plus a provocation pick-list.

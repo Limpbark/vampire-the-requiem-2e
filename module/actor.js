@@ -9,7 +9,8 @@ import {
 } from "./dialogue-utterance.js";
 import {
   KindredActorMixin,
-  targetIsKindred
+  targetIsKindred,
+  pillGroup
 } from "./actor-kindred.js";
 
 /**
@@ -1960,6 +1961,8 @@ export class ActorMtA extends KindredActorMixin(Actor) {
     const defenderUuid = victim ? (victimToken.document?.uuid ?? victim.uuid) : null;
     const defenderName = victim?.name ?? null;
     const bp = this.getBloodPotency();
+    // With nothing targeted the window asks whether the victim is a vampire.
+    const victimPills = pillGroup("victimKind");
 
     this._renderAuraDialog({
       title: `Lash Out — ${this.name}`,
@@ -1967,15 +1970,12 @@ export class ActorMtA extends KindredActorMixin(Actor) {
         ? `Lashing out at <strong>${defenderName}</strong><br>`
           + (targetIsKindred(victim) ? "A vampire: costs 1 Willpower" : "A mortal: free")
         : "Who are you lashing out at?",
-      extra: victim ? "" : `<div class="vtr-pills">
-          <label><input type="radio" name="victimKind" value="kindred" checked><span>Vampire (1 Willpower)</span></label>
-          <label><input type="radio" name="victimKind" value="mortal"><span>Mortal (free)</span></label>
-        </div>`,
+      extra: victim ? "" : victimPills.html({ kindred: "Vampire (1 Willpower)", mortal: "Mortal (free)" }, "kindred"),
       tip: (aspect) => `If ${defenderName ?? "they"} give${victim ? "s" : ""} way, they gain the ${aspect.condition} Condition.`,
       onChoose: async (aspectKey, aspect, onGrounds, html) => {
         const againstKindred = victim
           ? targetIsKindred(victim)
-          : html.find('[name="victimKind"]:checked').val() !== "mortal";
+          : html.find(`[name="${victimPills.name}"]:checked`).val() !== "mortal";
         if (againstKindred && !(await this._spendWillpowerPoint("lash out at another vampire"))) return;
 
         const rollReturn = {};

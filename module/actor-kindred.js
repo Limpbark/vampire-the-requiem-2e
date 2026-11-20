@@ -6,6 +6,26 @@ const int = (v) => Math.round(Number(v) || 0);
 const atLeast0 = (v) => Math.max(0, int(v));
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
+/**
+ * A row of radio "pills" for one window. Radio buttons that share a name
+ * share a single choice across the whole page, not just their own window, so
+ * every window gets a group name of its own: otherwise two Feed windows open
+ * together would untick each other's choice.
+ * @param {string} label  What the choice is, e.g. "kind".
+ * @returns {{name: string, html: (options: object, checked: string) => string}}
+ *   `name` is the group's name to read the choice back with; `html` builds
+ *   the pills from { value: text } with one of them ticked.
+ */
+export const pillGroup = (label) => {
+  const name = `${label}-${Math.random().toString(36).slice(2, 10).padEnd(8, "0")}`;
+  return {
+    name,
+    html: (options, checked) => `<div class="vtr-pills">${Object.entries(options).map(([value, text]) => `
+        <label><input type="radio" name="${name}" value="${value}"${value === checked ? " checked" : ""}><span>${text}</span></label>`).join("")}
+      </div>`
+  };
+};
+
 /** Read named inputs back out of an appv1 Dialog's jQuery html. */
 const reader = (html) => ({
   num: (name) => int(html.find(`[name="${name}"]`).val()),
@@ -706,11 +726,10 @@ export const KindredActorMixin = (Base) => class extends Base {
       ].filter(Boolean).join("<br>");
     };
 
+    const kindPills = pillGroup("kind");
     const body = `
       <p class="vtr-rite-summary">Drink from${vessel ? ` <strong>${vessel.name}</strong>` : ""}</p>
-      <div class="vtr-pills">${Object.entries(kinds).map(([key, label]) => `
-        <label><input type="radio" name="kind" value="${key}"${key === guess ? " checked" : ""}><span>${label}</span></label>`).join("")}
-      </div>
+      ${kindPills.html(kinds, guess)}
       <div class="vtr-amount"><span>Vitae to take</span>${stepper("amount", 1, 1, Math.max(1, most(guess)))}</div>
       <p class="vtr-rite-preview">${preview(guess, 1)}</p>`;
 
@@ -723,10 +742,10 @@ export const KindredActorMixin = (Base) => class extends Base {
       onRender: (el) => {
         const amount = el.querySelector('[name="amount"]');
         const out = el.querySelector(".vtr-rite-preview");
-        const kind = () => el.querySelector('[name="kind"]:checked')?.value ?? guess;
+        const kind = () => el.querySelector(`[name="${kindPills.name}"]:checked`)?.value ?? guess;
         const refresh = () => { out.innerHTML = preview(kind(), amount.value); };
         wireSteppers(el, refresh);
-        for (const radio of el.querySelectorAll('[name="kind"]')) {
+        for (const radio of el.querySelectorAll(`[name="${kindPills.name}"]`)) {
           radio.addEventListener("change", () => {
             amount.max = Math.max(1, most(kind()));
             amount.value = Math.clamp(int(amount.value), 1, int(amount.max));
@@ -740,7 +759,8 @@ export const KindredActorMixin = (Base) => class extends Base {
           label: "Drink",
           callback: async (html) => {
             const r = reader(html);
-            const kind = kinds[r.picked("kind")] ? r.picked("kind") : guess;
+            const picked = r.picked(kindPills.name);
+            const kind = kinds[picked] ? picked : guess;
             const top = most(kind);
             if (top < 1) {
               ui.notifications.warn(whyNothing(kind));
