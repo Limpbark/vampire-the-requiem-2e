@@ -428,20 +428,16 @@ export const CODEX_ENTRIES = {
   "rite.daysleep": {
     title: "Daysleep",
     body: `
-      <p>When the sun rises the blood drags a vampire down into sleep. While she sleeps her body closes every wound it can pay for: one Vitae mends two bashing or one lethal, and an aggravated wound takes five Vitae and the whole day.</p>
-      <p>The healing is not a choice, and it can spend her dry. To keep a wound through the day &mdash; a scar, or simply Vitae she cannot spare &mdash; she spends a point of Willpower for each wound kept.</p>
-      <p>Rising the next night costs one Vitae. A vampire with none left to rise with does not wake: she drifts into torpor.</p>
-      <p><strong>Staying awake.</strong> She can fight the sleep with Stamina + Resolve. Success keeps her alert but Lethargic; an exceptional success spares her that.</p>
-      <p><strong>Woken by danger.</strong> Fire, sunlight or a threat to her resting place calls for a Humanity roll. Success gives her as many turns awake as she has Humanity dots.</p>
-      <p>Haven dots add to both of those rolls when she sleeps in her haven.</p>
-      <p class="codex-rolls"><strong>Rolls:</strong> Stamina + Resolve + Haven to stay awake; Humanity + Haven when disturbed.</p>`
+      <p>When the sun rises the blood drags a vampire down into sleep. While they sleep their body closes every wound it can pay for: one Vitae mends two bashing or one lethal, and an aggravated wound takes five Vitae and the whole day.</p>
+      <p>The healing is not a choice, and it can spend them dry. Rising the next night costs one Vitae; a vampire with none left to rise with does not wake, but drifts into torpor.</p>
+      <p>The Daysleep button shows what the sleep will heal and what is left before anything happens.</p>`
   },
   "rite.mending": {
     title: "Mending",
     body: `
       <p>Vitae forces a dead body back to the shape it had at the Embrace. Spending it is reflexive, and limited each turn by Blood Potency.</p>
-      <p>One Vitae closes two points of bashing damage or one of lethal, at once. An aggravated wound is another matter: it takes five Vitae and a full day's sleep, so Vitae can only be set aside towards it here. The next daysleep closes one aggravated wound for every five set aside.</p>
-      <p>A vampire whose last Health box holds lethal damage falls into torpor at the end of her turn unless she mends some of it first.</p>`
+      <p>One Vitae closes two points of bashing damage or one of lethal, at once. Click the word <em>Health</em> on a vampire's sheet and choose how much Vitae to spend; the sheet heals the most it can for that. Aggravated wounds take five Vitae and a full day's sleep, so Daysleep heals those.</p>
+      <p>A vampire whose last Health box holds lethal damage falls into torpor at the end of their turn unless some of it is mended first.</p>`
   },
   "rite.physicalDisciplines": {
     title: "Celerity, Resilience and Vigor",
@@ -452,21 +448,13 @@ export const CODEX_ENTRIES = {
       <p><strong>Resilience:</strong> dismiss her dots plus one from each ordinary source of damage, or her dots from fire and other banes.</p>
       <p><strong>Vigor:</strong> add her dots as a weapon bonus to Athletics, Brawl and Weaponry attacks &mdash; that one is a toggle on the attack roll &mdash; or lift and hurl something far too big to be a weapon.</p>`
   },
-  "rite.banes": {
-    title: "Sunlight and Fire",
-    body: `
-      <p><strong>Sunlight.</strong> Humanity decides how badly the sun burns, and Blood Potency how fast. A humane neonate smoulders slowly; a monstrous elder is ash in moments. Covering everything but the eyes slows it by one step. Resilience does nothing against the sun.</p>
-      <p><strong>Fire.</strong> Fire deals aggravated damage every turn of exposure, by the size of the blaze plus its heat. Resilience turns one point per dot into lethal each turn, and its active effect dismisses its dots outright.</p>
-      <p>Both are provocations to frenzy.</p>`
-  },
   "rite.feeding": {
     title: "Feeding",
     body: `
-      <p>A living human can give as many Vitae as they have Health dots; each one taken is a point of lethal damage to them, and taking more than their Stamina leaves them Drained. Animals give a little, by Size. Kindred Vitae is taken one for one and harms no one, but it is addictive and it binds. Cold blood works, at Blood Potency times two pints for each Vitae.</p>
-      <p>As Blood Potency grows, lesser blood stops nourishing: animals from the third dot, humans from the sixth. Drinking beneath that line still works, at a point of Willpower for every Vitae.</p>
-      <p>Target a vessel's token before feeding and the sheet fills in their numbers and makes them pay the cost.</p>
-      <p><strong>Hunting</strong> is one roll for an hour's effort, with whatever Attribute and Skill fit the approach. <strong>Starting Vitae</strong> is a single die read at face value, plus Feeding Grounds. A <strong>Herd</strong> gives twice its dots in Vitae each week without a roll.</p>
-      <p class="codex-rolls"><strong>Rolls:</strong> Attribute + Skill to hunt; Wits + Composure to read a taste of blood.</p>`
+      <p>A living person can give as many Vitae as they have Health dots; each one taken is a point of lethal damage to them, and taking more than their Stamina leaves them Drained. Animals give a little, by Size. Another vampire's Vitae is taken one for one and harms no one, but it is addictive and it binds. Bagged or cold blood works too.</p>
+      <p>As Blood Potency grows, lesser blood stops nourishing: animals from the third dot, people from the sixth. Drinking beneath that line still works, at a point of Willpower for every Vitae.</p>
+      <p>Click the word <em>Vitae</em> under the blood pool, pick what kind of blood it is and how much to take; the window says what that does before anything happens. The card states what the vessel suffers, for the Storyteller to apply.</p>
+      <p>No map or token is needed. If the vessel does have a token, targeting it first reads their numbers and changes their sheet as well.</p>`
   },
   "rite.lashingOut": {
     title: "Lashing Out (Predatory Aura)",
@@ -475,8 +463,9 @@ export const CODEX_ENTRIES = {
       <p>The Beast shows one of three faces. <strong>Monstrous</strong> (Strength) threatens destruction and provokes fight-or-flight. <strong>Seductive</strong> (Presence) promises abandon and provokes reckless desire. <strong>Competitive</strong> (Intelligence) demands dominance and provokes power games.</p>
       <p>The target answers with <em>fight</em> &mdash; meeting the challenge with a Power Attribute + Blood Potency of their own, which costs them a Willpower point if their Blood Potency is lower than the aggressor's &mdash; or with <em>flight</em>, a graceful but diminishing withdrawal.</p>
       <p><strong>Outcomes.</strong> Whoever scores more successes imposes the Condition tied to their aspect &mdash; Bestial (monstrous), Wanton (seductive), or Competitive &mdash; and gains +2 dice to pursue that drive for the rest of the scene. On a tie, both Conditions land and neither side takes the bonus. A mortal can resist, but can never impose a Condition back on a vampire.</p>
-      <p>Both sides add their Feeding Grounds dots on their own territory, +1 when hungry and +2 when starving. The aggressor loses a die for each time this victim has already been targeted this scene.</p>
-      <p>Target the victim's token before lashing out. The roll then posts a card addressed to that character, with <em>Fight</em> and <em>Flight</em> buttons for whoever controls them &mdash; their player, or the Storyteller for an NPC. The card that follows names the winner and offers the Conditions. Without a target the lash-out still rolls, but the card has to ask which token answers.</p>
+      <p>Both sides add their Feeding Grounds dots on their own territory, +1 when hungry (4 Vitae or fewer) and +2 when starving (2 or fewer). The sheet works out hunger from Vitae by itself.</p>
+      <p>Press Lash Out, say whether the victim is a vampire or a mortal, and click the face of the Beast to show; it rolls at once. The card that follows has <em>Fight</em> and <em>Flight</em> buttons. Whoever answers &mdash; the victim's player, or the Storyteller for an NPC &mdash; has that character's sheet open in front, then clicks. The card after that names the winner and offers the Conditions.</p>
+      <p>No map or token is needed. If the victim does have a token, targeting it first saves the vampire-or-mortal question and addresses the card to them.</p>
       <p class="codex-rolls"><strong>Roll:</strong> Blood Potency + Strength / Presence / Intelligence, contested.</p>`
   }
 };

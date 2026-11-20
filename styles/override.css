@@ -133,6 +133,15 @@
   position: relative;
   z-index: 1;
 }
+/* A button with nothing to offer this character: greyed out, inert. */
+.characterSheet .charMacroButton.vtr-unavailable {
+  opacity: 0.35;
+  cursor: default;
+}
+.characterSheet .charMacroButton.vtr-unavailable > img,
+.characterSheet .charMacroButton.vtr-unavailable > img:hover {
+  filter: grayscale(1);
+}
 .characterSheet .vitae-pool .niceNumber {
   background: transparent;
   border: none;
@@ -194,6 +203,22 @@
   text-shadow: 0 1px 2px #000;
   margin-top: -4px;
   pointer-events: none;
+}
+/* Words on a Vampire's sheet that open an action: "Health" opens Mend and
+   "Vitae" under the blood pool opens Feed. They read as labels and glow red
+   on hover. */
+.characterSheet .vtr-sheet-link,
+.characterSheet .vitae-pool-label.vtr-sheet-link {
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.15s, text-shadow 0.15s;
+}
+.characterSheet .vitae-pool-label.vtr-sheet-link {
+  padding: 1px 6px;
+}
+.characterSheet .vtr-sheet-link:hover {
+  color: #ff8a9a;
+  text-shadow: 0 0 6px rgba(224, 32, 58, 0.9), 0 1px 2px #000;
 }
 
 /* Codex panel: reference text for the currently-selected trait. Sits in the
@@ -567,6 +592,12 @@ game-pause .vtr-pause-icon img {
   color: #f4ead8;
   text-shadow: 0 1px 3px #000, 0 0 4px #000;
 }
+/* Labels on the left, a fixed-width field column on the right. The shared
+   two-column layout sizes the label column to its longest label, which
+   squeezed dropdowns down to their first letter. */
+.vtr-rite-dialog .vtr-rite-block dl {
+  grid-template-columns: minmax(0, 1fr) 10rem;
+}
 .vtr-rite-dialog .vtr-rite-block dl dd input,
 .vtr-rite-dialog .vtr-rite-block dl dd select {
   width: 100%;
@@ -602,9 +633,94 @@ game-pause .vtr-pause-icon img {
   color: #e6dcc8;
   text-shadow: 0 1px 3px #000, 0 0 4px #000;
 }
-/* Two short number fields side by side (Health dots / Stamina). */
-.vtr-rite-dialog .vtr-rite-block dl dd input + input {
-  margin-top: 4px;
+.vtr-rite-dialog .vtr-center {
+  text-align: center;
+}
+.vtr-rite-dialog .vtr-rite-checks.vtr-center label {
+  justify-content: center;
+}
+/* "Vitae to spend: − n +" (Mend, Feed). */
+.vtr-rite-dialog .vtr-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  color: #f4ead8;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+.vtr-rite-dialog .vtr-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.vtr-rite-dialog .vtr-stepper input {
+  width: 3.2rem;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+.vtr-rite-dialog .vtr-stepper .vtr-step {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 24px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  background: var(--background-button);
+  border: var(--border-button);
+  color: #fff;
+}
+.vtr-rite-dialog .vtr-stepper .vtr-step:hover {
+  box-shadow: var(--box-shadow-button-hover);
+}
+/* One choice out of a few, as a row of pills (Feed: what kind of blood). */
+.vtr-rite-dialog .vtr-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+.vtr-rite-dialog .vtr-pills label {
+  cursor: pointer;
+}
+.vtr-rite-dialog .vtr-pills input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.vtr-rite-dialog .vtr-pills span {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 234, 216, 0.5);
+  background: rgba(0, 0, 0, 0.45);
+  color: #f4ead8;
+  text-shadow: 0 1px 2px #000;
+}
+.vtr-rite-dialog .vtr-pills input:checked + span {
+  background: #5a0010;
+  border-color: #ff8a9a;
+  color: #fff;
+}
+.vtr-rite-dialog .vtr-pills input:focus-visible + span {
+  outline: 1px solid #ff8a9a;
+}
+/* What the chosen amount will do; updates as it changes. */
+.vtr-rite-dialog .vtr-rite-preview {
+  text-align: center;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #f4ead8;
+  text-shadow: 0 1px 3px #000, 0 0 4px #000;
+}
+.vtr-rite-dialog .vtr-warn {
+  color: #ff9aa8;
 }
 /* A dialog that is a menu of actions: one full-width button per row. */
 .vtr-rite-dialog.vtr-rite-stacked .dialog-buttons {

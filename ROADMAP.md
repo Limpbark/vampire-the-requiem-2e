@@ -62,8 +62,15 @@ Implemented 2026-11-20, after v1.0.82. Not yet play-tested in Foundry.
   hungry +1, starving +2, -1 for each earlier aura used on the same victim this scene.
   Shipped target-first, like weapon rolls: the aggressor targets the victim's token, and the
   card is addressed to that character with Fight and Flight buttons for whoever controls
-  them. An untargeted lash-out still rolls and asks which token answers. The +2 for the scene is stated on the card, not applied to rolls
-  (that needs the pool-only modifier of 5.5).
+  them. The +2 for the scene is stated on the card, not applied to rolls (that needs the
+  pool-only modifier of 5.5).
+  Slimmed after v1.0.83: Kindred or mortal comes from the target's sheet, hunger and Blood
+  Potency from the aggressor's; a Feeding Grounds tick box shows only for a character with the
+  Merit; one button per aspect shows its dice and rolls at once. Fight Back works the same way.
+  Nothing targeted is the normal case (theatre of the mind): the dialog asks vampire or
+  mortal, and the card is answered by the selected token, else the character whose sheet the
+  user has in front, else the user's own character. Targeting is an optional shortcut.
+  Dropped: the -1 per earlier use on the same victim, and the free modifier field.
 - [x] **1.4 Condition buttons ignore the shipped compendium.**
   `applyConditionByName` (`module/actor.js` line 1599) searches world items only. Fall back to
   the `conditions` pack, as the Inspired button in `module/mta.js` already does.
@@ -122,6 +129,8 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   A Mend control: 1 Vitae heals 2 bashing or 1 lethal. One aggravated costs 5 Vitae plus a
   full day's sleep, so track Vitae banked toward it. Respect Vitae per turn.
   Shipped: the dialog pre-fills the cheapest wounds within what can be spent this turn.
+  Slimmed after v1.0.83: opened by clicking "Health"; asks only the Vitae to spend and shows
+  what it heals. Banking Vitae towards aggravated wounds is gone; Daysleep heals those.
 - [x] **2.6 A real Daysleep** (p.91, p.98).
   Order: heal wounds with Vitae (offer 1 Willpower per wound to preserve it), then spend the
   waking Vitae, and fall into torpor if none is left. Add the stay-awake roll
@@ -130,6 +139,8 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   Shipped: the Daysleep button now opens a dialog instead of acting at once. When Vitae is
   short the sleep heals bashing first, then lethal, then aggravated (the book gives no
   order). Not done: counting successes towards staying awake for good.
+  Slimmed after v1.0.83: a pop-up of what the sleep will do and one Sleep button. Keeping
+  wounds for Willpower, staying awake and being woken by danger were removed from the sheet.
 - [x] **2.7 Vitae per turn.** Track spends per combat round and warn past the Blood Potency limit.
   Shipped as `actor.spendVitae()`, used by every Vitae spend in the system. It warns and
   does not refuse. Nothing is tracked outside combat.
@@ -142,6 +153,8 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
 - [x] **2.9 Sunlight and fire calculators** (pp.102-103). Chat card with an apply-damage button.
   Shipped as dialogs on the burning character's own sheet that apply the damage directly,
   rather than a card with a second button. A woken Mekhet bane lowers Humanity by one here.
+  Removed from the sheet after v1.0.83 (too rare for a button). The rules stay in
+  `module/kindred.js` (`sunlightExposure`, `fireDamage`) for a future Storyteller tool.
 - [x] **2.10 Feeding** (p.89, pp.95-96).
   Feed dialog by source: living human (up to their Health dots, 1 lethal per Vitae, Drained
   past Stamina), animal by Size, Kindred Vitae (1 for 1, triggers addiction and the bond),
@@ -151,8 +164,12 @@ Four new macro buttons for Vampires: Mend, Feeding, Physical Disciplines, Banes.
   Shipped: target a vessel's token first and its numbers are filled in and it pays the cost.
   Not done: the violent bite and the Feed move in a grapple, the Swooning and Scarred
   Conditions, and counting the Herd's week.
+  Slimmed after v1.0.83: Feed opens from the word "Vitae" under the blood pool and asks only
+  what kind of blood and how much, with a preview. Hunting, starting Vitae and the Herd were
+  removed from the sheet; the rules stay in `module/kindred.js` and `MTA.huntingModifiers`.
 - [x] **2.11 Kindred senses and A Taste of Blood** (p.91). Low priority helper rolls.
   Shipped: the Taste of Blood roll, and a line of sense ranges on the Feeding menu.
+  Removed from the sheet after v1.0.83 along with the Feeding menu.
 
 ## Phase 3: The Beast and the Blood
 

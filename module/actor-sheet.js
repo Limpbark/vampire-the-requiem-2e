@@ -323,6 +323,9 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
     // "homebrewBlushOfLife" setting. blushActive is a flag, not a system
     // field; cleared on daysleep and on a Phase of Night change in actor.js.
     sheetData.blushEnabled = systemData.characterVariant === "vampire";
+    // The Physical Disciplines button is greyed out for a character with no
+    // dots in Celerity, Resilience or Vigor.
+    sheetData.hasPhysicalDisciplines = Object.values(systemData.physicalDisciplines ?? {}).some(dots => dots > 0);
     sheetData.blushPortraitSwap = sheetData.blushEnabled
       && game.settings.get("vampire-the-requiem-2e", "homebrewBlushOfLife");
     sheetData.blushActive = !!actor.getFlag("vampire-the-requiem-2e", "blushActive");
@@ -1726,17 +1729,19 @@ export class MtAActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.daysleep();
     });
 
-    // The Kindred body: each button opens a dialog that gathers every choice
-    // before anything is spent or rolled (see module/actor-kindred.js).
+    // The Kindred body (see module/actor-kindred.js). Mend opens from the word
+    // "Health" and Feed from the word "Vitae" under the blood pool, so the
+    // button row keeps only the Physical Disciplines.
     const kindredActions = {
       mendButton: ["rite.mending", () => this.actor.mendWounds()],
       physicalButton: ["rite.physicalDisciplines", () => this.actor.usePhysicalDisciplines()],
-      banesButton: ["rite.banes", () => this.actor.exposeToBane()],
       feedButton: ["rite.feeding", () => this.actor.openFeeding()]
     };
     for (const [cls, [codexKey, action]] of Object.entries(kindredActions)) {
       html.find(`.${cls}`).click(ev => {
         ev.preventDefault();
+        // A greyed-out button (nothing to use) does nothing.
+        if (ev.currentTarget.classList.contains("vtr-unavailable")) return;
         this._updateCodex(codexKey);
         action();
       });

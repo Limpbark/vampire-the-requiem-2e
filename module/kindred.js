@@ -180,6 +180,28 @@ export function mendCost({ bashing = 0, lethal = 0 } = {}) {
   return Math.ceil(atLeast0(bashing) / 2) + atLeast0(lethal);
 }
 
+/**
+ * What spending some Vitae on mending closes (p. 91). Bashing goes first in
+ * pairs, since one Vitae closes two of those; then lethal; then a last odd
+ * bashing. That clears the most boxes for the Vitae, and when a Vitae would
+ * close one box either way it closes the lethal one.
+ * @param {{bashing?:number, lethal?:number}} wounds
+ * @param {number} vitae  Vitae to spend; any beyond what the wounds need is kept.
+ * @returns {{bashing:number, lethal:number, cost:number}}
+ */
+export function mendPlan({ bashing = 0, lethal = 0 } = {}, vitae = 0) {
+  bashing = atLeast0(bashing);
+  lethal = atLeast0(lethal);
+  let left = atLeast0(vitae);
+  const pairs = Math.min(Math.floor(bashing / 2), left);
+  left -= pairs;
+  const mendLethal = Math.min(lethal, left);
+  left -= mendLethal;
+  const odd = bashing % 2 === 1 && left > 0 ? 1 : 0;
+  left -= odd;
+  return { bashing: pairs * 2 + odd, lethal: mendLethal, cost: atLeast0(vitae) - left };
+}
+
 /** An aggravated wound takes this much Vitae and a full day's sleep (p. 91). */
 export const AGGRAVATED_MEND_COST = 5;
 
@@ -269,7 +291,7 @@ export const VESSELS = {
  *                                 beneath her Blood Potency. Unlimited if omitted.
  * @param {number} [o.health]      Human vessel: unmodified Health dots.
  * @param {number} [o.stamina]     Human vessel: Stamina dots.
- * @param {number} [o.size]        Animal vessel: Size.
+ * @param {number} [o.size]        Animal vessel: Size. Unlimited if omitted.
  * @param {number} [o.vesselVitae] Kindred vessel: Vitae they hold.
  */
 export function feedingPlan({ vessel, requested, bloodPotency, vitae, maxVitae, willpower, health, stamina, size, vesselVitae }) {
@@ -280,7 +302,7 @@ export function feedingPlan({ vessel, requested, bloodPotency, vitae, maxVitae, 
 
   let capacity = Infinity;
   if (vessel === "human" && health != null) capacity = atLeast0(health);
-  if (vessel === "animal") capacity = animalVitae(size);
+  if (vessel === "animal" && size != null) capacity = animalVitae(size);
   if (vessel === "kindred" && vesselVitae != null) capacity = atLeast0(vesselVitae);
 
   const room = Math.max(0, atLeast0(maxVitae) - atLeast0(vitae));

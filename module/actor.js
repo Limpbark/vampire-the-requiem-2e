@@ -8,7 +8,8 @@ import {
   UtteranceDialogue
 } from "./dialogue-utterance.js";
 import {
-  KindredActorMixin
+  KindredActorMixin,
+  targetIsKindred
 } from "./actor-kindred.js";
 
 /**
@@ -1646,8 +1647,11 @@ export class ActorMtA extends KindredActorMixin(Actor) {
    * @param {number}   [opts.width=440]
    * @param {boolean}  [opts.stacked=false]  Lay the buttons out one per row,
    *                                 for a dialog that is a menu of actions.
+   * @param {Function} [opts.onRender] Called with (contentElement, windowElement)
+   *                                 once the dialog is on screen, to wire up
+   *                                 anything that updates as choices change.
    */
-  _renderRiteDialog({ title, variant, body, onRoll, buttons, width = 440, stacked = false }) {
+  _renderRiteDialog({ title, variant, body, onRoll, buttons, width = 440, stacked = false, onRender }) {
     const bgUrl = `systems/vampire-the-requiem-2e/ui/dice_bg_${variant}.webp`;
     const actions = buttons ?? { roll: { icon: '<i class="fas fa-dice-d10"></i>', label: "Roll", callback: onRoll } };
     const classes = ["mta-sheet", "vtr-rite-dialog", `vtr-rite-${variant}`];
@@ -1663,18 +1667,20 @@ export class ActorMtA extends KindredActorMixin(Actor) {
       render: (html) => {
         const el = html instanceof HTMLElement ? html : html?.[0];
         const root = el?.closest(".window-app, .application, .app");
-        if (!root) return;
-        root.classList.add("theme-dark", ...classes);
-        const wc = root.querySelector(".window-content");
-        if (wc) {
-          // Set every background longhand inline so the whole texture fills
-          // the window regardless of CSS load order or specificity.
-          wc.style.backgroundColor = "#050505";
-          wc.style.backgroundImage = `url("${bgUrl}")`;
-          wc.style.backgroundSize = "100% 100%";
-          wc.style.backgroundRepeat = "no-repeat";
-          wc.style.backgroundPosition = "center";
+        if (root) {
+          root.classList.add("theme-dark", ...classes);
+          const wc = root.querySelector(".window-content");
+          if (wc) {
+            // Set every background longhand inline so the whole texture fills
+            // the window regardless of CSS load order or specificity.
+            wc.style.backgroundColor = "#050505";
+            wc.style.backgroundImage = `url("${bgUrl}")`;
+            wc.style.backgroundSize = "100% 100%";
+            wc.style.backgroundRepeat = "no-repeat";
+            wc.style.backgroundPosition = "center";
+          }
         }
+        if (el && onRender) onRender(el, root);
       }
     }, {
       classes,
@@ -1833,119 +1839,146 @@ export class ActorMtA extends KindredActorMixin(Actor) {
   }
 
   /**
-   * Dialog rows for the Predatory Aura choices that either side of a clash may
-   * claim (VtR 2E p. 92): the aspect of the Beast and, for Kindred, Feeding
-   * Grounds dots on home territory and hunger. Hunger is preselected from
-   * current Vitae using the frenzy table's thresholds (p. 104).
-   * @returns {string} HTML <dt>/<dd> pairs.
+   * What the Predatory Aura adds for this character (VtR 2E p. 92), read from
+   * the sheet: Blood Potency, hunger from current Vitae (the frenzy table's
+   * thresholds, p. 104), and the Feeding Grounds dots that count on home
+   * territory. A mortal has none of these.
+   * @returns {{bloodPotency:number, hunger:number, grounds:number}}
    */
-  _auraDialogRows() {
-    const isKindred = this.system?.characterVariant === "vampire";
-    const aspectRow = `
-        <dt>Aspect of the Beast:</dt>
-        <dd><select name="aspect">${Object.entries(BEAST_ASPECTS).map(([key, a]) =>
-          `<option value="${key}">${a.label} &mdash; ${a.attr}${isKindred ? ` (inflicts ${a.condition})` : ""}</option>`
-        ).join("")}</select></dd>`;
-    if (!isKindred) return aspectRow;
-
+  _auraModifiers() {
+    if (this.system?.characterVariant !== "vampire") return { bloodPotency: 0, hunger: 0, grounds: 0 };
     const vitae = Number(this.system?.vitae?.value ?? 0);
-    const hunger = vitae <= 2 ? 2 : vitae <= 4 ? 1 : 0;
-    const grounds = Number(this.items.find(i => i.type === "merit"
-      && /feeding grounds?/i.test(i.name ?? ""))?.system?.rating ?? 0) || 0;
-    const picked = (n) => (hunger === n ? " selected" : "");
-    return `${aspectRow}
-        <dt>On your own territory &mdash; Feeding Grounds dots${grounds ? ` (you have ${grounds})` : ""}:</dt>
-        <dd><input type="number" name="territory" value="0" min="0" max="5"></dd>
-        <dt>Hunger:</dt>
-        <dd><select name="hunger">
-          <option value="0"${picked(0)}>Fed</option>
-          <option value="1"${picked(1)}>Hungry &mdash; 4 or fewer Vitae (+1)</option>
-          <option value="2"${picked(2)}>Starving &mdash; 2 or fewer Vitae (+2)</option>
-        </select></dd>`;
-  }
-
-  /**
-   * Read the fields rendered by _auraDialogRows(), plus the optional "earlier"
-   * and "modifier" inputs, back out of a Predatory Aura dialog.
-   * @returns {{aspectKey:string, aspect:object, bonus:number}} `bonus` is the
-   *   net dice modifier from territory, hunger, earlier uses and the free field.
-   */
-  _readAuraDialog(html) {
-    const num = (name) => Math.round(Number(html.find(`[name="${name}"]`).val()) || 0);
-    const chosen = html.find('[name="aspect"]').val();
-    const aspectKey = BEAST_ASPECTS[chosen] ? chosen : "monstrous";
     return {
-      aspectKey,
-      aspect: BEAST_ASPECTS[aspectKey],
-      bonus: Math.max(0, num("territory")) + Math.clamp(num("hunger"), 0, 2)
-        - Math.max(0, num("earlier")) + num("modifier")
+      bloodPotency: this.getBloodPotency(),
+      hunger: vitae <= 2 ? 2 : vitae <= 4 ? 1 : 0,
+      grounds: this.meritDots(/feeding grounds?/i)
     };
   }
 
+  /** Dice for one aspect of the Beast: Blood Potency + its Power Attribute + hunger (+ Feeding Grounds). */
+  _auraDicePool(aspect, onGrounds = false) {
+    const m = this._auraModifiers();
+    const attr = Number(this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0) || 0;
+    return Math.max(0, m.bloodPotency + attr + m.hunger + (onGrounds ? m.grounds : 0));
+  }
+
   /**
-   * Lashing Out with the Predatory Aura (VtR 2E p. 91-92). Opens a dialog for
-   * the aspect of the Beast and the aura modifiers, spends the Willpower point
-   * it costs against Kindred, rolls Blood Potency + the matching Power
-   * Attribute, and posts a card with Fight and Flight buttons.
+   * The Predatory Aura dialog both sides of a clash use: a line of context,
+   * the sheet's own modifiers, a Feeding Grounds tick box for a character who
+   * has that Merit, and one button per aspect of the Beast showing its dice.
+   * Clicking an aspect rolls it at once.
+   * @param {object}   o
+   * @param {string}   o.title
+   * @param {string}   o.summary   HTML for the top line.
+   * @param {string}   [o.extra]   HTML for any further choice, under the summary.
+   * @param {Function} o.tip       aspect => tooltip saying what winning with it does.
+   * @param {Function} o.onChoose  async (aspectKey, aspect, onGrounds, html) => void
+   */
+  _renderAuraDialog({ title, summary, extra = "", tip, onChoose }) {
+    const m = this._auraModifiers();
+    const facts = this.system?.characterVariant === "vampire" ? [`Blood Potency ${m.bloodPotency}`] : [];
+    if (m.hunger) facts.push(`${m.hunger === 2 ? "Starving" : "Hungry"} +${m.hunger}`);
+    const label = (aspect, onGrounds) => {
+      const dice = this._auraDicePool(aspect, onGrounds);
+      return `${aspect.label} (${aspect.attr}): ${dice} ${dice === 1 ? "die" : "dice"}`;
+    };
+    const icon = '<i class="fas fa-dice-d10"></i>';
+
+    const buttons = {};
+    for (const [key, aspect] of Object.entries(BEAST_ASPECTS)) {
+      buttons[key] = {
+        icon,
+        label: label(aspect, false),
+        callback: (html) => onChoose(key, aspect, html.find('[name="grounds"]').is(":checked"), html)
+      };
+    }
+
+    this._renderRiteDialog({
+      title,
+      variant: "lashing_out",
+      width: 380,
+      stacked: true,
+      body: `
+        <p class="vtr-rite-summary">${summary}</p>
+        ${extra}
+        ${facts.length ? `<p class="vtr-rite-note vtr-center">${facts.join(" &middot; ")}</p>` : ""}
+        ${m.grounds ? `<div class="vtr-rite-checks vtr-center">
+          <label><input type="checkbox" name="grounds"> On my Feeding Grounds (+${m.grounds})</label>
+        </div>` : ""}`,
+      buttons,
+      onRender: (el, root) => {
+        if (!root) return;
+        const buttonFor = (key) => root.querySelector(`.dialog-button[data-button="${key}"]`);
+        for (const [key, aspect] of Object.entries(BEAST_ASPECTS)) {
+          const button = buttonFor(key);
+          if (button) button.title = tip(aspect);
+        }
+        const box = el.querySelector('[name="grounds"]');
+        box?.addEventListener("change", () => {
+          for (const [key, aspect] of Object.entries(BEAST_ASPECTS)) {
+            const button = buttonFor(key);
+            if (button) button.innerHTML = `${icon} ${label(aspect, box.checked)}`;
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Lashing Out with the Predatory Aura (VtR 2E p. 91-92). The game is mostly
+   * played without a map, so the normal case has nothing targeted: the dialog
+   * asks whether the victim is a vampire (1 Willpower) or a mortal (free), and
+   * whoever answers the card does so with the character whose sheet they have
+   * in front (see resolveAuraDefender). When the victim does have a token,
+   * targeting it first answers that question from their sheet and addresses
+   * the card to them.
    *
-   * The victim is the token the user has targeted when the ability is used,
-   * the same convention weapon rolls follow (see ItemMtA#roll). The card is
-   * addressed to that character, so whoever controls them only has to click
-   * Fight or Flight; that side is respondToLashingOut(). With nothing
-   * targeted the lash-out still works, for play without tokens, but the card
-   * then has to ask which token answers.
+   * Hunger, Blood Potency and Feeding Grounds come from the sheet. Clicking an
+   * aspect of the Beast rolls Blood Potency + its Power Attribute and posts a
+   * card with Fight and Flight buttons; that side is respondToLashingOut().
    */
   async rollLashingOut() {
-    const bp = Number(this.system?.vampire_traits?.bloodPotency?.final ?? 0);
-
     const targeted = [...(game.user?.targets ?? [])];
     if (targeted.length > 1) {
-      ui.notifications.warn("A predatory aura is aimed at one victim. Target a single token first.");
+      ui.notifications.warn("A predatory aura is aimed at one character. Target one token, or none.");
       return;
     }
     const victimToken = targeted[0] ?? null;
     const victim = victimToken?.actor ?? null;
+    if (victimToken && !victim) {
+      ui.notifications.warn("That token has no character to lash out at.");
+      return;
+    }
     if (victim && victim.uuid === this.uuid) {
-      ui.notifications.warn(`${this.name} cannot lash out at themself. Target the victim's token first.`);
+      ui.notifications.warn(`${this.name} cannot lash out at themself. Target the victim's token, or none.`);
       return;
     }
     // A token's own UUID resolves to the right actor for linked and unlinked
     // tokens alike, so prefer it over the actor's.
     const defenderUuid = victim ? (victimToken.document?.uuid ?? victim.uuid) : null;
     const defenderName = victim?.name ?? null;
-    const victimIsMortal = !!victim && victim.system?.characterVariant !== "vampire";
+    const bp = this.getBloodPotency();
 
-    const body = `
-      <p class="vtr-rite-summary">Blood Potency = <strong>${bp}</strong><br>
-        ${victim ? `Target: <strong>${defenderName}</strong>`
-          : "<em>No token targeted &mdash; the card will ask which token answers</em>"}</p>
-      <dl>
-        <dt>Target is:</dt>
-        <dd><select name="targetKind">
-          <option value="kindred">Kindred &mdash; costs 1 Willpower</option>
-          <option value="mortal"${victimIsMortal ? " selected" : ""}>Mortal &mdash; free</option>
-        </select></dd>${this._auraDialogRows()}
-        <dt>Earlier aura uses on this victim this scene (&minus;1 each):</dt>
-        <dd><input type="number" name="earlier" value="0" min="0"></dd>
-        <dt>Other modifier:</dt>
-        <dd><input type="number" name="modifier" value="0"></dd>
-      </dl>`;
-
-    this._renderRiteDialog({
-      title: "Lash Out with the Predatory Aura",
-      variant: "lashing_out",
-      body,
-      onRoll: async (html) => {
-        const { aspectKey, aspect, bonus } = this._readAuraDialog(html);
-        const againstKindred = html.find('[name="targetKind"]').val() !== "mortal";
+    this._renderAuraDialog({
+      title: `Lash Out — ${this.name}`,
+      summary: victim
+        ? `Lashing out at <strong>${defenderName}</strong><br>`
+          + (targetIsKindred(victim) ? "A vampire: costs 1 Willpower" : "A mortal: free")
+        : "Who are you lashing out at?",
+      extra: victim ? "" : `<div class="vtr-pills">
+          <label><input type="radio" name="victimKind" value="kindred" checked><span>Vampire (1 Willpower)</span></label>
+          <label><input type="radio" name="victimKind" value="mortal"><span>Mortal (free)</span></label>
+        </div>`,
+      tip: (aspect) => `If ${defenderName ?? "they"} give${victim ? "s" : ""} way, they gain the ${aspect.condition} Condition.`,
+      onChoose: async (aspectKey, aspect, onGrounds, html) => {
+        const againstKindred = victim
+          ? targetIsKindred(victim)
+          : html.find('[name="victimKind"]:checked').val() !== "mortal";
         if (againstKindred && !(await this._spendWillpowerPoint("lash out at another vampire"))) return;
-
-        const attrVal = this.system?.[aspect.path[0]]?.[aspect.path[1]]?.final ?? 0;
-        const pool = Math.max(0, bp + attrVal + bonus);
 
         const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
-          dicePool: pool,
+          dicePool: this._auraDicePool(aspect, onGrounds),
           flavor: `Predatory Aura &mdash; ${aspect.label} (Blood Potency + ${aspect.attr})`
             + (againstKindred ? ", 1 Willpower spent" : ""),
           title: "Lashing Out",
@@ -1960,6 +1993,7 @@ export class ActorMtA extends KindredActorMixin(Actor) {
         // the answering side needs, including who that is, travel in the
         // message flags.
         const successes = Math.max(0, rollReturn.roll?.total ?? 0);
+        const who = defenderName ?? "The victim";
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor: this }),
           flags: {
@@ -1978,13 +2012,13 @@ export class ActorMtA extends KindredActorMixin(Actor) {
           content: `<div class="vtr-roll"><div class="hunger-messy messy-success">`
             + `<span class="hunger-messy-title">Predatory Aura &mdash; ${aspect.label} Beast</span>`
             + `<span class="hunger-messy-text"><strong>${this.name}</strong> lashes out`
-            + `${victim ? ` at <strong>${defenderName}</strong>` : ""}: `
-            + `<strong>${successes}</strong> success${successes === 1 ? "" : "es"} to beat. `
-            + `${victim ? defenderName : "The target"} answers with <em>fight</em> (a Power Attribute + `
-            + `Blood Potency; 1 Willpower if their Blood Potency is the lower) or <em>flight</em> `
-            + `(free, but they take the <strong>${aspect.condition}</strong> Condition).</span>`
-            + (victim ? "" : `<span class="hunger-messy-text"><em>No token was targeted. `
-              + `Select the answering token, then choose.</em></span>`)
+            + `${victim ? ` at <strong>${defenderName}</strong>` : ""}: <strong>${successes}</strong> `
+            + `success${successes === 1 ? "" : "es"} to beat.</span>`
+            + `<span class="hunger-messy-text">${who} can <em>fight</em> back (a roll; costs 1 Willpower `
+            + `if their Blood Potency is lower) or take <em>flight</em> (free, but they gain the `
+            + `<strong>${aspect.condition}</strong> Condition).</span>`
+            + (victim ? "" : `<span class="hunger-messy-text"><em>To answer, have the answering character's `
+              + `sheet open in front, then choose.</em></span>`)
             + `<button type="button" class="vtr-frenzy-button" data-vtr-aura-response="fight">Fight</button>`
             + `<button type="button" class="vtr-frenzy-button" data-vtr-aura-response="flight">Flight</button>`
             + `</div></div>`
@@ -1994,10 +2028,38 @@ export class ActorMtA extends KindredActorMixin(Actor) {
   }
 
   /**
+   * The character whose sheet this user has in front, among the character
+   * sheets they have open and may act for. Most play is theatre of the mind
+   * and most characters have no token, so an open sheet is how a user says
+   * "this one". Null when no such sheet is open, or when several are and
+   * none is clearly in front.
+   * @param {string} [exclude]  UUID of a character never to pick.
+   * @returns {ActorMtA|null}
+   */
+  static frontCharacterSheet(exclude) {
+    const depth = (app) => {
+      const el = app.element?.[0] ?? app.element;
+      return (el && Number(el.style?.zIndex || globalThis.getComputedStyle?.(el)?.zIndex)) || 0;
+    };
+    const open = new Map();   // character -> how far forward its sheet is
+    const apps = [...Object.values(ui.windows ?? {}), ...(foundry.applications?.instances?.values?.() ?? [])];
+    for (const app of apps) {
+      if (!app || app.rendered === false) continue;
+      const doc = app.document ?? app.actor ?? app.object;
+      if (doc?.documentName !== "Actor" || !doc.isOwner || doc.uuid === exclude) continue;
+      open.set(doc, Math.max(open.get(doc) ?? 0, depth(app)));
+    }
+    const ranked = [...open.entries()].sort((a, b) => b[1] - a[1]);
+    if (ranked.length === 1 || (ranked.length > 1 && ranked[0][1] > ranked[1][1])) return ranked[0][0];
+    return null;
+  }
+
+  /**
    * Work out who answers a Lashing Out card. A card addressed to a target
-   * (the aggressor had a token targeted) resolves that character, whatever
-   * the clicking user has selected. An unaddressed card falls back to the
-   * user's single controlled token, or failing that their assigned character.
+   * resolves that character, whatever the clicking user has selected. An
+   * unaddressed card (nothing was targeted: the usual case without a map) is
+   * answered by, in order: the user's single selected token; the character
+   * whose sheet they have in front; their assigned character.
    * Only someone who owns the answering character may answer for them: their
    * player, or the Storyteller for an NPC.
    * @param {object} clash  The `lashOut` flag stored on the aggressor's card.
@@ -2012,10 +2074,14 @@ export class ActorMtA extends KindredActorMixin(Actor) {
     } else {
       const tokens = canvas.tokens?.controlled ?? [];
       defender = tokens.length === 1 ? tokens[0].actor
-        : tokens.length === 0 ? game.user?.character : null;
-      if (!defender) return { problem: "This card names no target. Select the one token that answers the predatory aura." };
+        : tokens.length > 1 ? null
+        : (ActorMtA.frontCharacterSheet(clash?.aggressorUuid) ?? game.user?.character);
+      if (!defender) {
+        return { problem: "Open the answering character's sheet (or select their token), "
+          + "then choose Fight or Flight." };
+      }
       if (defender.uuid === clash?.aggressorUuid) {
-        return { problem: `${defender.name} lashed out. Select the token that answers instead.` };
+        return { problem: `${defender.name} lashed out. Open the sheet of the character who answers instead.` };
       }
     }
     if (!defender.isOwner) {
@@ -2069,33 +2135,23 @@ export class ActorMtA extends KindredActorMixin(Actor) {
       return;
     }
 
-    const bp = isKindred ? Number(this.system?.vampire_traits?.bloodPotency?.final ?? 0) : 0;
+    const bp = this._auraModifiers().bloodPotency;
     const costsWillpower = bp < (Number(clash?.bloodPotency ?? 0) || 0);
 
-    const body = `
-      <p class="vtr-rite-summary">Answering ${aggressorName}'s ${theirs.label} Beast
-        (${theirHits} success${theirHits === 1 ? "" : "es"})<br>
-        Blood Potency = <strong>${bp}</strong>${costsWillpower
-          ? " &middot; <em>costs 1 Willpower (lower Blood Potency)</em>" : ""}</p>
-      <dl>${this._auraDialogRows()}
-        <dt>Other modifier:</dt>
-        <dd><input type="number" name="modifier" value="0"></dd>
-      </dl>`;
-
-    this._renderRiteDialog({
-      title: "Fight the Predatory Aura",
-      variant: "lashing_out",
-      body,
-      onRoll: async (html) => {
-        const { aspect: mine, bonus } = this._readAuraDialog(html);
+    this._renderAuraDialog({
+      title: `Fight Back — ${this.name}`,
+      summary: `${aggressorName}'s ${theirs.label} Beast: <strong>${theirHits}</strong> `
+        + `success${theirHits === 1 ? "" : "es"} to beat`
+        + (costsWillpower ? "<br>Fighting back costs 1 Willpower (lower Blood Potency)" : ""),
+      tip: (aspect) => isKindred
+        ? `Win, and ${aggressorName} gains the ${aspect.condition} Condition.`
+        : "Win, and you take +2 dice to deal with the threat for the scene.",
+      onChoose: async (mineKey, mine, onGrounds) => {
         if (costsWillpower && !(await this._spendWillpowerPoint("fight the predatory aura"))) return;
-
-        const attrVal = this.system?.[mine.path[0]]?.[mine.path[1]]?.final ?? 0;
-        const pool = Math.max(0, bp + attrVal + bonus);
 
         const rollReturn = {};
         await DiceRollerDialogue.rollToChat({
-          dicePool: pool,
+          dicePool: this._auraDicePool(mine, onGrounds),
           flavor: `Predatory Aura &mdash; Fight: ${mine.label} (${isKindred ? "Blood Potency + " : ""}${mine.attr})`
             + (costsWillpower ? ", 1 Willpower spent" : ""),
           title: "Fighting the Predatory Aura",
